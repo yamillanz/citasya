@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "skills": {
+    "brainstorming": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "computedHash": "8e99026256fdd857520640b72e0181221ae02bcba16bdb9d644191c1b1b3b9e4"
+    },
+    "openspec-apply": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "7cf5ea16d5f47de2fe80a6aaeead8ebf56a2316df7fc089b026d9da0fe36a9d6"
+    },
+    "openspec-archive": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "ceb38b8eb49918f3466f6e2cc168bb9f57cd56908bc057d3cf9d316a1c0a879e"
+    },
+    "openspec-continue": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "9169a5fed9ba3402408a0fe456ad16e802156dac749dc7db25909ba0966392a0"
+    },
+    "openspec-explore": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "001e5e9cd7a2b9fd06a6d25b4a8b3d3eaa830e25ddfdd70da18fed0f3a9a7477"
+    },
+    "openspec-ff": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "0dc9de5b8ad0cdaebbace0a372cfe1c1a3759a08d9fdaf326ec8d86393432c39"
+    },
+    "openspec-initial": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "aa0d00458e4cc805ff685fbe2453003fc8b80cea445e8aca7bd41f10bb5335f6"
+    },
+    "openspec-install": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "2248b383c0b98b23a947ed3bfc7a31291f75a94371c331dfe3c20848e2b4d7a7"
+    },
+    "openspec-new": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "28a5bdc81d0d8fa3280a6785689126ce43da528900996e49fb128053cf31f992"
+    },
+    "openspec-onboard": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "fde5de1166fcf842624654be4e5af485a1d3e04ea8b1eaabf634cf46200c43c8"
+    },
+    "openspec-sync": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "91057634ba761d2fa1bf6495bf6c79de17f44a96e4dd3e47f7b44b343ed0e744"
+    },
+    "openspec-update": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "992b3186f1fc9f3c65b23f3a83002a51be24516f86601e85de7efa966f8effaa"
+    },
+    "openspec-verify": {
+      "source": "partme-ai/openspec-skills",
+      "sourceType": "github",
+      "computedHash": "f399cc2b67d0583110b785e37e31b5bef0ecf3d8cecb3d19cb2a11353209ea66"
+    },
+    "writing-plans": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "computedHash": "0a4f401596106cfa62c8fd821326c23ef6969a99792dc64691163ec2737f3ec7"
+    }
+  }
+}
