@@ -72,7 +72,7 @@ Expected: UUID installed
 Run: `npm install -D tailwindcss postcss autoprefixer && npx tailwindcss init`
 Expected: TailwindCSS installed
 
-- [ ] **Step 6: Configure TailwindCSS**
+- [ ] **Step 6: Configure TailwindCSS v3**
 
 Update `tailwind.config.js`:
 ```javascript
@@ -81,6 +81,7 @@ module.exports = {
   content: [
     "./src/**/*.{html,ts}",
   ],
+  darkMode: ['selector', '[class~="my-app-dark"]'],
   theme: {
     extend: {
       colors: {
@@ -92,6 +93,125 @@ module.exports = {
         'text-muted': '#95A5A6',
         'surface': '#F8F9FA',
         'border': '#E5E8EB',
+      }
+    },
+  },
+  plugins: [],
+}
+```
+
+Add to `src/styles.scss`:
+```scss
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #9DC183;
+  --color-primary-dark: #7BA366;
+  --color-primary-light: #B8D4A3;
+  --color-text-primary: #2C3E50;
+  --color-text-secondary: #5D6D7E;
+  --color-text-muted: #95A5A6;
+  --color-background: #FFFFFF;
+  --color-surface: #F8F9FA;
+  --color-border: #E5E8EB;
+  --color-success: #9DC183;
+  --color-warning: #F4D03F;
+  --color-error: #E74C3C;
+  --color-info: #3498DB;
+}
+
+body {
+  @apply bg-white text-text-primary;
+}
+```
+
+- [ ] **Step 7: Install PrimeNG**
+
+Run: `npm install primeng @primeng/themes`
+Expected: PrimeNG installed
+
+- [ ] **Step 8: Install TailwindCSS PrimeUI Plugin**
+
+Run: `npm install tailwindcss-primeui`
+Expected: Plugin installed
+
+- [ ] **Step 9: Update TailwindCSS config for PrimeUI**
+
+Update `tailwind.config.js`:
+```javascript
+import PrimeUI from 'tailwindcss-primeui';
+
+export default {
+  // ... existing config
+  plugins: [PrimeUI],
+  darkMode: ['selector', '[class~="my-app-dark"]'],
+}
+```
+
+- [ ] **Step 10: Configure PrimeNG in app.config.ts**
+
+```typescript
+// src/app/app.config.ts
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeng/themes/aura';
+
+export const appConfig: ApplicationConfig = {
+    providers: [
+        provideZoneChangeDetection({ eventCoalescing: true }),
+        provideAnimationsAsync(),
+        providePrimeNG({
+            theme: {
+                preset: Aura,
+                options: {
+                    darkModeSelector: '.my-app-dark',
+                    cssLayer: {
+                        name: 'primeng',
+                        order: 'theme, base, primeng'
+                    }
+                }
+            },
+            palette: {
+                primary: {
+                    50: '#F0F7EB',
+                    100: '#D9EACD',
+                    200: '#B8D4A3',
+                    300: '#97BE79',
+                    400: '#7BA366',
+                    500: '#9DC183',  // Verde Salvia
+                    600: '#5D8A4E',
+                    700: '#4A6F3C',
+                    800: '#39542B',
+                    900: '#28391A',
+                    950: '#141F0D'
+                }
+            }
+        })
+    ]
+};
+```
+
+- [ ] **Step 11: Add PrimeNG styles to styles.scss**
+
+```scss
+// src/styles.scss
+@import "primeng/resources/themes/aura/theme.css";
+@import "primeng/resources/primeng.min.css";
+@import "primeicons/primeicons.css";
+
+// TailwindCSS
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+- [ ] **Step 12: Verify PrimeNG components work**
+
+Run: `ng build`
+Expected: Build succeeds with PrimeNG
       }
     },
   },
@@ -1799,7 +1919,7 @@ Expected: Login form displayed
 | Task | Description | Status |
 |------|-------------|--------|
 | 1.1 | Initialize Angular 20+ project | ✅ |
-| 1.2 | Install dependencies (Supabase, FullCalendar, jsPDF, TailwindCSS) | ✅ |
+| 1.2 | Install dependencies (Supabase, FullCalendar, jsPDF, TailwindCSS, PrimeNG) | ✅ |
 | 1.2b | Configure PWA (manifest, icons, service worker) | ✅ |
 | 1.3 | Configure Supabase client | ✅ |
 | 1.4 | Create database tables | ✅ |
@@ -1807,10 +1927,10 @@ Expected: Login form displayed
 | 1.6 | Create core models | ✅ |
 | 1.7 | Implement AuthService | ✅ |
 | 1.8 | Create auth guards | ✅ |
-| 1.9 | Set up global styles (TailwindCSS + colors) | ✅ |
+| 1.9 | Set up global styles (TailwindCSS + PrimeNG + colors) | ✅ |
 | 1.10 | Create login component | ✅ |
 | 1.11 | Configure routing | ✅ |
 | 1.12 | Test authentication flow | ✅ |
 | 1.4 | Create Landing Page (Hero, Pricing, Contact, About) | ✅ |
 
-**Total: ~4 hours** (incluye PWA y Landing Page)
+**Total: ~5 hours** (incluye PWA, PrimeNG y Landing Page)

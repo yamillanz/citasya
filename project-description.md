@@ -36,18 +36,76 @@ CitasYa es una plataforma que permite a pequeños negocios de servicios personal
 | Backend | Supabase (Auth, Database, Storage) |
 | PDF | jsPDF |
 | Calendario | FullCalendar |
-| UI Framework | TailwindCSS (mobile-friendly) |
+| UI Framework | PrimeNG + TailwindCSS |
 | PWA | Angular PWA (@angular/pwa) |
 
 ---
 
-## 3.1 Esquema de Colores
+## 3.1 Esquema de Colores (Aplicado a PrimeNG)
 
 | Color | Código Hex | Uso Principal | Significado Psicológico |
 | :--- | :--- | :--- | :--- |
 | **Blanco Puro** | `#FFFFFF` | Fondos, espacios de contenido principal | Limpieza, pureza, máxima legibilidad |
-| **Verde Salvia** | `#9DC183` | Acentos, indicadores de estado ("Disponible"), iconos de éxito | Salud, crecimiento, calma natural, confianza |
+| **Verde Salvia** | `#9DC183` | Primary de PrimeNG, acentos, botones principales | Salud, crecimiento, calma natural, confianza |
 | **Gris Cálido** | `#5D6D7E` | Texto secundario, bordes, elementos de estructura | Estabilidad, equilibrio, sofisticación cálida |
+
+### Configuración de Tema PrimeNG con Colores Personalizados
+
+```typescript
+// app.config.ts
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeng/themes/aura';
+
+export const appConfig: ApplicationConfig = {
+    providers: [
+        provideZoneChangeDetection({ eventCoalescing: true }),
+        provideAnimationsAsync(),
+        providePrimeNG({
+            theme: {
+                preset: Aura,
+                options: {
+                    darkModeSelector: '.my-app-dark',
+                    cssLayer: {
+                        name: 'primeng',
+                        order: 'theme, base, primeng'
+                    }
+                }
+            },
+            palette: {
+                primary: {
+                    50: '#F0F7EB',
+                    100: '#D9EACD',
+                    200: '#B8D4A3',
+                    300: '#97BE79',
+                    400: '#7BA366',
+                    500: '#9DC183',  // Verde Salvia - Color principal
+                    600: '#5D8A4E',
+                    700: '#4A6F3C',
+                    800: '#39542B',
+                    900: '#28391A',
+                    950: '#141F0D'
+                },
+                surface: {
+                    0: '#FFFFFF',
+                    50: '#F8F9FA',
+                    100: '#F1F3F5',
+                    200: '#E9ECEF',
+                    300: '#DEE2E6',
+                    400: '#CED4DA',
+                    500: '#ADB5BD',
+                    600: '#6C757D',
+                    700: '#5D6D7E',  // Gris Cálido
+                    800: '#495057',
+                    900: '#343A40',
+                    950: '#212529'
+                }
+            }
+        })
+    ]
+};
+```
 
 ### Variables CSS
 
@@ -595,7 +653,6 @@ Las siguientes funcionalidades no son requeridas para el MVP pero pueden agregar
 ---
 
 *Documento generado para revisión*
-*Versión: 1.2*
+*Versión: 1.3*
 *Fecha: 2026-03-11*
-*Actualizado: PWA, Esquema de colores, Landing Page*
-*Actualizado con respuestas a preguntas abiertas*
+*Actualizado: PWA, Esquema de colores, Landing Page, PrimeNG + TailwindCSS*
