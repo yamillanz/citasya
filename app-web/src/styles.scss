@@ -1,7 +1,10 @@
+/* TailwindCSS v3 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* PrimeNG - Styles handled by providePrimeNG in app.config.ts */
 @import "primeicons/primeicons.css";
-
-/* Base CSS */
 
 :root {
   --color-primary: #9DC183;
