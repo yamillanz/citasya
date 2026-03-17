@@ -54,8 +54,9 @@
 
 ## Estado de OpenSpec
 
-**Change activo:** `phase-2-public-booking`
-**Artefactos creados:** proposal.md, design.md, tasks.md, specs/
+**Change activo:** Ninguno (Phase 2 archivada)
+**Change archivado:** `2026-03-17-phase-2-public-booking`
+**Specs actualizadas:** appointment-booking, company-directory, employee-calendar, slot-availability
 
 ---
 
@@ -73,6 +74,24 @@
 - ✅ Company List (`/c/:slug`)
 - ✅ Employee Calendar (`/c/:slug/e/:id`)
 - ✅ Booking Form (`/c/:slug/e/:id/book`)
+
+---
+
+## Estado de Testing
+
+| Componente | Tests | Estado |
+|------------|-------|--------|
+| booking-form.component.spec.ts | 5 | ✅ |
+| company-list.component.spec.ts | 9 | ✅ |
+| appointment.service.spec.ts | 7 | ✅ |
+| **Total** | **21** | ✅ |
+
+### Ejecución de Tests
+```bash
+npm test              # Ejecutar tests
+npm run test:watch    # Modo watch
+npm run test:coverage # Con coverage
+```
 
 ---
 
