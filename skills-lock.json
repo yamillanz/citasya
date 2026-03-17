@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "angular-best-practices": {
+      "source": "boise-state-development/agentcore-public-stack",
+      "sourceType": "github",
+      "computedHash": "b46417ce22d25f6359c7b2356d88e033caa7b5c5c57255a1786b26f0d584abcf"
+    },
     "angular-component": {
       "source": "analogjs/angular-skills",
       "sourceType": "github",
