@@ -3,62 +3,82 @@
     <a [routerLink]="['/c', company?.slug]">← Volver</a>
   </div>
 
-  <div class="employee-header" *ngIf="employee">
-    <div class="photo">
-      <img [src]="employee.photo_url || '/assets/images/default-avatar.png'" [alt]="employee.full_name">
+  @if (employee) {
+    <div class="employee-header">
+      <div class="photo">
+        <img [src]="employee.photo_url || '/assets/images/default-avatar.png'" [alt]="employee.full_name">
+      </div>
+      <h1>{{ employee.full_name }}</h1>
     </div>
-    <h1>{{ employee.full_name }}</h1>
-  </div>
+  }
 
-  <div class="loading" *ngIf="loading">Cargando...</div>
-  <div class="error" *ngIf="error">{{ error }}</div>
+  @if (loading) {
+    <div class="loading">Cargando...</div>
+  }
+  @if (error) {
+    <div class="error">{{ error }}</div>
+  }
 
-  <div class="booking-section" *ngIf="!loading && !error">
-    <div class="services-select">
-      <h2>Selecciona un servicio</h2>
-      <div class="service-list">
-        <div 
-          class="service-item" 
-          *ngFor="let service of services"
-          [class.selected]="selectedService?.id === service.id"
-          (click)="onServiceChange(service)"
-        >
-          <span class="service-name">{{ service.name }}</span>
-          <span class="service-duration">{{ service.duration_minutes }} min</span>
-          <span class="service-price" *ngIf="service.price">${{ service.price }}</span>
+  @if (!loading && !error) {
+    <div class="booking-section">
+      <div class="services-select">
+        <h2>Selecciona un servicio</h2>
+        <div class="service-list">
+          @for (service of services; track service.id) {
+            <div 
+              class="service-item" 
+              [class.selected]="selectedService?.id === service.id"
+              (click)="onServiceChange(service)"
+            >
+              <span class="service-name">{{ service.name }}</span>
+              <span class="service-duration">{{ service.duration_minutes }} min</span>
+              @if (service.price) {
+                <span class="service-price">${{ service.price }}</span>
+              }
+            </div>
+          }
         </div>
       </div>
-    </div>
 
-    <div class="date-select" *ngIf="selectedService">
-      <h2>Selecciona fecha</h2>
-      <full-calendar [options]="calendarOptions"></full-calendar>
-    </div>
+      @if (selectedService) {
+        <div class="date-select">
+          <h2>Selecciona fecha</h2>
+          <full-calendar [options]="calendarOptions"></full-calendar>
+        </div>
+      }
 
-    <div class="slots-select" *ngIf="selectedDate && selectedService">
-      <h2>Horarios disponibles</h2>
-      <p class="selected-date">{{ selectedDate | date:'fullDate' }}</p>
-      
-      <div class="slots-grid">
-        <button 
-          *ngFor="let slot of availableSlots"
-          class="slot-btn"
-          [class.selected]="selectedTime === slot"
-          (click)="selectTime(slot)"
-        >
-          {{ slot }}
-        </button>
-      </div>
+      @if (selectedDate && selectedService) {
+        <div class="slots-select">
+          <h2>Horarios disponibles</h2>
+          <p class="selected-date">{{ selectedDate | date:'fullDate' }}</p>
+          
+          <div class="slots-grid">
+            @for (slot of availableSlots; track slot) {
+              <button 
+                class="slot-btn"
+                [class.selected]="selectedTime === slot"
+                (click)="selectTime(slot)"
+              >
+                {{ slot }}
+              </button>
+            }
+          </div>
 
-      <div class="no-slots" *ngIf="availableSlots.length === 0">
-        <p>No hay horarios disponibles para esta fecha</p>
-      </div>
-    </div>
+          @if (availableSlots.length === 0) {
+            <div class="no-slots">
+              <p>No hay horarios disponibles para esta fecha</p>
+            </div>
+          }
+        </div>
+      }
 
-    <div class="booking-action" *ngIf="selectedDate && selectedTime && selectedService">
-      <button class="btn btn-primary btn-large" (click)="proceedToBooking()">
-        Continuar con la reserva
-      </button>
+      @if (selectedDate && selectedTime && selectedService) {
+        <div class="booking-action">
+          <button class="btn btn-primary btn-large" (click)="proceedToBooking()">
+            Continuar con la reserva
+          </button>
+        </div>
+      }
     </div>
-  </div>
+  }
 </div>
