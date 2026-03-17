@@ -1,5 +1,7 @@
 # CitasYa - Estado del Proyecto
 
+> **Flujo de Trabajo:** Este proyecto usa **OpenSpec** para desarrollo por fases. Ver comandos en `app-web/README.md` o usar `/opsx:` en el chat.
+
 ## Progreso General
 
 | Fase | Estado | Descripción |
@@ -47,8 +49,8 @@
 | 2.7 | Implement available slot calculation | ✅ Completado |
 | 2.8 | Create appointment via public API | ✅ Completado |
 | 2.9 | Implement booking confirmation | ✅ Completado |
-| 2.10 | Create cancel/reschedule token | ⏳ Pendiente |
-| 2.11 | Test public booking flow | ⏳ Pendiente |
+| 2.10 | Create cancel/reschedule token | ✅ Completado |
+| 2.11 | Test public booking flow | ✅ Completado |
 
 ---
 

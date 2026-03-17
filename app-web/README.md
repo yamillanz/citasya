@@ -2,6 +2,31 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.4.
 
+## Flujo de Trabajo - OpenSpec
+
+Este proyecto usa **OpenSpec** para gestionar el desarrollo por fases.
+
+### Comandos OpenSpec
+
+| Comando | Descripción |
+|---------|-------------|
+| `/opsx:propose <nombre-fase>` | Crear nueva propuesta y artefactos |
+| `/opsx:apply` | Implementar tareas del change activo |
+| `/opsx:verify` | Verificar implementación contra specs |
+| `/opsx:archive` | Archivar change completado |
+
+### Progreso del Proyecto
+
+| Fase | Estado |
+|------|--------|
+| Phase 1: Foundation | ✅ Completada |
+| Phase 2: Public Booking | ✅ Completada |
+| Phase 3: Back Office Manager | ⏳ Pendiente |
+
+Ver `PROGRESS.md` para detalles completos.
+
+---
+
 ## Development server
 
 To start a local development server, run:
@@ -38,21 +63,17 @@ This will compile your project and store the build artifacts in the `dist/` dire
 
 ## Running unit tests
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Este proyecto usa **Jest** + **Testing Library** para testing.
 
 ```bash
-ng test
+npm test              # Ejecutar tests
+npm run test:watch   # Modo watch
+npm run test:coverage # Con coverage
 ```
 
-## Running end-to-end tests
+Ver `docs/TESTING.md` para estrategia de testing.
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
 ## Additional Resources
 

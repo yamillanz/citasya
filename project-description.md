@@ -594,16 +594,16 @@ Las siguientes funcionalidades no son requeridas para el MVP pero pueden agregar
 ## 12. Milestones Sugeridos
 
 ### Milestone 1: Fundamentos
-- [ ] Setup proyecto Angular (en `app-web/`)
-- [ ] Configurar Supabase (Auth, DB, Storage)
-- [ ] Modelos de datos y RLS
-- [ ] Login/Logout
+- [x] Setup proyecto Angular (en `app-web/`)
+- [x] Configurar Supabase (Auth, DB, Storage)
+- [x] Modelos de datos y RLS
+- [x] Login/Logout
 
 ### Milestone 2: Portal Público
-- [ ] Ruta pública de empresa
-- [ ] Ruta pública de empleado
-- [ ] Formulario de booking
-- [ ] Creación de citas
+- [x] Ruta pública de empresa
+- [x] Ruta pública de empleado
+- [x] Formulario de booking
+- [x] Creación de citas
 
 ### Milestone 3: Back Office Manager
 - [ ] Dashboard
@@ -624,7 +624,7 @@ Las siguientes funcionalidades no son requeridas para el MVP pero pueden agregar
 
 ### Milestone 6: Polish
 - [ ] UI/UX improvements
-- [ ] Testing
+- [x] Testing (Jest + Testing Library configurado)
 - [ ] Deploy
 
 ---
