@@ -12,6 +12,18 @@ Set up project infrastructure, database, and authentication
 
 ---
 
+## Project Location
+
+**Important:** The Angular project code is located in the `app-web/` folder.
+
+All file paths in this document are relative to: `app-web/`
+
+For example:
+- `src/app/...` means `app-web/src/app/...`
+- `angular.json` means `app-web/angular.json`
+
+---
+
 ## Task 1.1: Initialize Angular 20+ Project
 
 **Files:**
@@ -33,12 +45,12 @@ Expected: Angular CLI installed
 
 - [ ] **Step 2: Create new Angular project**
 
-Run: `ng new citasya-app --standalone --routing --style=scss --skip-tests --skip-git`
-Expected: Project scaffold created
+Run (from project root): `ng new citasya-app --standalone --routing --style=scss --skip-tests --skip-git`
+Expected: Project scaffold created in `app-web/` folder
 
 - [ ] **Step 3: Navigate to project**
 
-Run: `cd citasya-app`
+Run (from project root): `cd app-web`
 Expected: In project directory
 
 ---

@@ -44,6 +44,21 @@ export const routes: Routes = [
       .then(m => m.UnauthorizedComponent)
   },
   {
+    path: 'c/:companySlug',
+    loadComponent: () => import('./features/public/company-list/company-list.component')
+      .then(m => m.CompanyListComponent)
+  },
+  {
+    path: 'c/:companySlug/e/:employeeId',
+    loadComponent: () => import('./features/public/employee-calendar/employee-calendar.component')
+      .then(m => m.EmployeeCalendarComponent)
+  },
+  {
+    path: 'c/:companySlug/e/:employeeId/book',
+    loadComponent: () => import('./features/public/booking-form/booking-form.component')
+      .then(m => m.BookingFormComponent)
+  },
+  {
     path: '**',
     redirectTo: 'dashboard'
   }

@@ -27,4 +27,5 @@ export interface CreateAppointmentDto {
   client_email?: string;
   appointment_date: string;
   appointment_time: string;
+  notes?: string;
 }

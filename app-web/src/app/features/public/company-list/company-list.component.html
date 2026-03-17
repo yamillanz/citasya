@@ -1,0 +1,33 @@
+<div class="company-container">
+  <div class="company-header" *ngIf="company">
+    <div class="logo" *ngIf="company.logo_url">
+      <img [src]="company.logo_url" [alt]="company.name">
+    </div>
+    <h1>{{ company.name }}</h1>
+    <p *ngIf="company.address">{{ company.address }}</p>
+    <p *ngIf="company.phone">{{ company.phone }}</p>
+  </div>
+
+  <div class="loading" *ngIf="loading">Cargando...</div>
+  <div class="error" *ngIf="error">{{ error }}</div>
+
+  <div class="employees-list" *ngIf="!loading && !error">
+    <h2>Selecciona un profesional</h2>
+    
+    <div class="employee-card" *ngFor="let employee of employees">
+      <div class="employee-photo">
+        <img [src]="employee.photo_url || '/assets/images/default-avatar.png'" [alt]="employee.full_name">
+      </div>
+      <div class="employee-info">
+        <h3>{{ employee.full_name }}</h3>
+        <a [routerLink]="['/c', company?.slug, 'e', employee.id]" class="btn btn-primary">
+          Ver disponibilidad
+        </a>
+      </div>
+    </div>
+
+    <div class="no-employees" *ngIf="employees.length === 0">
+      <p>No hay profesionales disponibles</p>
+    </div>
+  </div>
+</div>

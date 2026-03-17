@@ -1,0 +1,70 @@
+<div class="booking-container">
+  <div class="back-link">
+    <a [routerLink]="['/c', company?.slug, 'e', employee?.id]" [queryParams]="{date: selectedDate, time: selectedTime, serviceId: service?.id}">← Volver</a>
+  </div>
+
+  <div class="booking-summary" *ngIf="company && employee && service">
+    <h1>Confirmar Reserva</h1>
+    
+    <div class="summary-card">
+      <div class="summary-item">
+        <span class="label">Profesional:</span>
+        <span class="value">{{ employee.full_name }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Servicio:</span>
+        <span class="value">{{ service.name }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Fecha:</span>
+        <span class="value">{{ selectedDate | date:'fullDate' }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Hora:</span>
+        <span class="value">{{ selectedTime }}</span>
+      </div>
+      <div class="summary-item" *ngIf="service.price">
+        <span class="label">Precio:</span>
+        <span class="value">${{ service.price }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-message" *ngIf="success">
+    <div class="success-icon">✓</div>
+    <h2>¡Reserva Confirmada!</h2>
+    <p>Te hemos enviado un mensaje de confirmación.</p>
+    <p>Recuerda llegar 5 minutos antes.</p>
+    <a [routerLink]="['/c', company?.slug]" class="btn btn-primary">
+      Volver al inicio
+    </a>
+  </div>
+
+  <form *ngIf="!success" [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="client_name">Nombre completo *</label>
+      <input id="client_name" type="text" formControlName="client_name" placeholder="Juan Pérez">
+    </div>
+
+    <div class="form-group">
+      <label for="client_phone">Teléfono *</label>
+      <input id="client_phone" type="tel" formControlName="client_phone" placeholder="12345678">
+    </div>
+
+    <div class="form-group">
+      <label for="client_email">Email (opcional)</label>
+      <input id="client_email" type="email" formControlName="client_email" placeholder="tu@email.com">
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Notas (opcional)</label>
+      <textarea id="notes" formControlName="notes" rows="3" placeholder="Alguna información adicional"></textarea>
+    </div>
+
+    <div class="error" *ngIf="error">{{ error }}</div>
+
+    <button type="submit" class="btn btn-primary btn-large" [disabled]="loading || bookingForm.invalid">
+      {{ loading ? 'Confirmando...' : 'Confirmar Reserva' }}
+    </button>
+  </form>
+</div>
