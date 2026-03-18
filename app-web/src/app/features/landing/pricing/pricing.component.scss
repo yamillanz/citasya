@@ -1,0 +1,20 @@
+:host ::ng-deep .pricing-card .p-card-content {
+  padding: 1.5rem;
+}
+
+:host ::ng-deep .featured {
+  transform: scale(1.05);
+}
+
+:host ::ng-deep .pricing-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+:host ::ng-deep .pricing-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+:host ::ng-deep .featured:hover {
+  transform: translateY(-8px) scale(1.05);
+}

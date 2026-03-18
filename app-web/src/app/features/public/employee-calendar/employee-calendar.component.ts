@@ -6,6 +6,11 @@ import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { Button } from 'primeng/button';
+import { Card } from 'primeng/card';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { Message } from 'primeng/message';
+import { Avatar } from 'primeng/avatar';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
@@ -17,7 +22,16 @@ import { Service } from '../../../core/models/service.model';
 @Component({
   selector: 'app-employee-calendar',
   standalone: true,
-  imports: [CommonModule, FullCalendarModule, RouterLink],
+  imports: [
+    CommonModule,
+    FullCalendarModule,
+    RouterLink,
+    Button,
+    Card,
+    ProgressSpinner,
+    Message,
+    Avatar
+  ],
   templateUrl: './employee-calendar.component.html',
   styleUrls: ['./employee-calendar.component.scss']
 })

@@ -1,51 +1,81 @@
 <div class="company-container">
   @if (company) {
-    <div class="company-header">
-      @if (company.logo_url) {
-        <div class="logo">
-          <img [src]="company.logo_url" [alt]="company.name">
-        </div>
-      }
-      <h1>{{ company.name }}</h1>
-      @if (company.address) {
-        <p>{{ company.address }}</p>
-      }
-      @if (company.phone) {
-        <p>{{ company.phone }}</p>
-      }
+    <div class="company-header mb-6">
+      <p-card styleClass="text-center">
+        <ng-template pTemplate="content">
+          @if (company.logo_url) {
+          <p-avatar
+            [image]="company.logo_url"
+            styleClass="mb-4"
+            size="xlarge"
+            shape="circle"
+          ></p-avatar>
+          }
+          <h1 class="text-3xl font-bold text-primary m-0 mb-2">{{ company.name }}</h1>
+          @if (company.address) {
+            <p class="text-surface-600 mb-1">
+              <i class="pi pi-map-marker mr-2"></i>{{ company.address }}
+            </p>
+          }
+          @if (company.phone) {
+            <p class="text-surface-600 m-0">
+              <i class="pi pi-phone mr-2"></i>{{ company.phone }}
+            </p>
+          }
+        </ng-template>
+      </p-card>
     </div>
   }
 
   @if (loading) {
-    <div class="loading">Cargando...</div>
+    <div class="flex flex-col items-center justify-center py-12">
+      <p-progressSpinner></p-progressSpinner>
+      <p class="text-surface-500 mt-4">Cargando...</p>
+    </div>
   }
+
   @if (error) {
-    <div class="error">{{ error }}</div>
+    <p-message severity="error" [text]="error"></p-message>
   }
 
   @if (!loading && !error) {
-    <div class="employees-list">
-      <h2>Selecciona un profesional</h2>
+    <p-card>
+      <ng-template pTemplate="title">
+        <h2 class="text-xl font-bold m-0">Selecciona un profesional</h2>
+      </ng-template>
       
-      @for (employee of employees; track employee.id) {
-        <div class="employee-card">
-          <div class="employee-photo">
-            <img [src]="employee.photo_url || '/assets/images/default-avatar.png'" [alt]="employee.full_name">
-          </div>
-          <div class="employee-info">
-            <h3>{{ employee.full_name }}</h3>
-            <a [routerLink]="['/c', company?.slug, 'e', employee.id]" class="btn btn-primary">
-              Ver disponibilidad
-            </a>
-          </div>
-        </div>
-      }
+      <ng-template pTemplate="content">
+        <div class="employees-list space-y-4">
+          @for (employee of employees; track employee.id) {
+            <div class="employee-card flex items-center gap-4 p-4 border border-surface-200 rounded-lg hover:shadow-md transition-shadow">
+              <p-avatar
+                [image]="employee.photo_url || '/assets/images/default-avatar.png'"
+                styleClass="border-2 border-surface-200"
+                size="large"
+                shape="circle"
+              ></p-avatar>
+              
+              <div class="flex-1">
+                <h3 class="font-semibold text-surface-800 m-0">{{ employee.full_name }}</h3>
+              </div>
+              
+              <p-button 
+                label="Ver disponibilidad"
+                icon="pi pi-calendar"
+                styleClass="p-button-primary"
+                [routerLink]="['/c', company?.slug, 'e', employee.id]"
+              />
+            </div>
+          }
 
-      @if (employees.length === 0) {
-        <div class="no-employees">
-          <p>No hay profesionales disponibles</p>
+          @if (employees.length === 0) {
+            <div class="text-center py-8">
+              <i class="pi pi-users text-4xl text-surface-400 mb-4"></i>
+              <p class="text-surface-600">No hay profesionales disponibles</p>
+            </div>
+          }
         </div>
-      }
-    </div>
+      </ng-template>
+    </p-card>
   }
 </div>

@@ -1,80 +1,152 @@
 <div class="booking-container">
-  <div class="back-link">
-    <a [routerLink]="['/c', company?.slug, 'e', employee?.id]" [queryParams]="{date: selectedDate, time: selectedTime, serviceId: service?.id}">← Volver</a>
+  <div class="back-link mb-4">
+    <p-button 
+      label="Volver" 
+      icon="pi pi-arrow-left"
+      styleClass="p-button-text p-button-sm"
+      [routerLink]="['/c', company?.slug, 'e', employee?.id]"
+      [queryParams]="{date: selectedDate, time: selectedTime, serviceId: service?.id}"
+    />
   </div>
 
   @if (company && employee && service) {
-    <div class="booking-summary">
-      <h1>Confirmar Reserva</h1>
+    <p-card styleClass="mb-6">
+      <ng-template pTemplate="title">
+        <h1 class="text-2xl font-bold m-0">Confirmar Reserva</h1>
+      </ng-template>
       
-      <div class="summary-card">
-        <div class="summary-item">
-          <span class="label">Profesional:</span>
-          <span class="value">{{ employee.full_name }}</span>
-        </div>
-        <div class="summary-item">
-          <span class="label">Servicio:</span>
-          <span class="value">{{ service.name }}</span>
-        </div>
-        <div class="summary-item">
-          <span class="label">Fecha:</span>
-          <span class="value">{{ selectedDate | date:'fullDate' }}</span>
-        </div>
-        <div class="summary-item">
-          <span class="label">Hora:</span>
-          <span class="value">{{ selectedTime }}</span>
-        </div>
-        @if (service.price) {
+      <ng-template pTemplate="content">
+        <div class="summary-grid">
           <div class="summary-item">
-            <span class="label">Precio:</span>
-            <span class="value">${{ service.price }}</span>
+            <span class="label text-surface-500">Profesional:</span>
+            <span class="value font-semibold">{{ employee.full_name }}</span>
           </div>
-        }
-      </div>
-    </div>
+          <div class="summary-item">
+            <span class="label text-surface-500">Servicio:</span>
+            <span class="value font-semibold">{{ service.name }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label text-surface-500">Fecha:</span>
+            <span class="value font-semibold">{{ selectedDate | date:'fullDate' }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label text-surface-500">Hora:</span>
+            <span class="value font-semibold">{{ selectedTime }}</span>
+          </div>
+          @if (service.price) {
+            <div class="summary-item">
+              <span class="label text-surface-500">Precio:</span>
+              <span class="value font-semibold text-primary">${{ service.price }}</span>
+            </div>
+          }
+        </div>
+      </ng-template>
+    </p-card>
   }
 
   @if (success) {
-    <div class="success-message">
-      <div class="success-icon">✓</div>
-      <h2>¡Reserva Confirmada!</h2>
-      <p>Te hemos enviado un mensaje de confirmación.</p>
-      <p>Recuerda llegar 5 minutos antes.</p>
-      <a [routerLink]="['/c', company?.slug]" class="btn btn-primary">
-        Volver al inicio
-      </a>
-    </div>
+    <p-card styleClass="text-center">
+      <ng-template pTemplate="content">
+        <div class="py-8">
+          <i class="pi pi-check-circle text-6xl text-green-500 mb-4"></i>
+          <h2 class="text-2xl font-bold text-primary mb-4">¡Reserva Confirmada!</h2>
+          <p class="text-surface-600 mb-2">Te hemos enviado un mensaje de confirmación.</p>
+          <p class="text-surface-600 mb-6">Recuerda llegar 5 minutos antes.</p>
+          <p-button 
+            label="Volver al inicio"
+            icon="pi pi-home"
+            styleClass="p-button-primary"
+            [routerLink]="['/c', company?.slug]"
+          />
+        </div>
+      </ng-template>
+    </p-card>
   }
 
   @if (!success) {
-    <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="client_name">Nombre completo *</label>
-        <input id="client_name" type="text" formControlName="client_name" placeholder="Juan Pérez">
-      </div>
+    <p-card>
+      <ng-template pTemplate="title">
+        <h2 class="text-xl font-bold m-0">Datos de contacto</h2>
+      </ng-template>
+      
+      <ng-template pTemplate="content">
+        <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="space-y-4">
+          <div class="field">
+            <label for="client_name" class="block text-sm font-medium text-surface-700 mb-2">
+              Nombre completo <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="client_name" 
+              type="text" 
+              pInputText 
+              formControlName="client_name"
+              placeholder="Juan Pérez"
+              class="w-full"
+            />
+            @if (bookingForm.get('client_name')?.invalid && bookingForm.get('client_name')?.touched) {
+              <small class="p-error block mt-1">El nombre es requerido (mínimo 2 caracteres)</small>
+            }
+          </div>
 
-      <div class="form-group">
-        <label for="client_phone">Teléfono *</label>
-        <input id="client_phone" type="tel" formControlName="client_phone" placeholder="12345678">
-      </div>
+          <div class="field">
+            <label for="client_phone" class="block text-sm font-medium text-surface-700 mb-2">
+              Teléfono <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="client_phone" 
+              type="tel" 
+              pInputText 
+              formControlName="client_phone"
+              placeholder="12345678"
+              class="w-full"
+            />
+            @if (bookingForm.get('client_phone')?.invalid && bookingForm.get('client_phone')?.touched) {
+              <small class="p-error block mt-1">El teléfono es requerido (mínimo 8 caracteres)</small>
+            }
+          </div>
 
-      <div class="form-group">
-        <label for="client_email">Email (opcional)</label>
-        <input id="client_email" type="email" formControlName="client_email" placeholder="tu@email.com">
-      </div>
+          <div class="field">
+            <label for="client_email" class="block text-sm font-medium text-surface-700 mb-2">
+              Email (opcional)
+            </label>
+            <input 
+              id="client_email" 
+              type="email" 
+              pInputText 
+              formControlName="client_email"
+              placeholder="tu@email.com"
+              class="w-full"
+            />
+          </div>
 
-      <div class="form-group">
-        <label for="notes">Notas (opcional)</label>
-        <textarea id="notes" formControlName="notes" rows="3" placeholder="Alguna información adicional"></textarea>
-      </div>
+          <div class="field">
+            <label for="notes" class="block text-sm font-medium text-surface-700 mb-2">
+              Notas (opcional)
+            </label>
+            <textarea 
+              id="notes" 
+              formControlName="notes"
+              rows="3"
+              placeholder="Alguna información adicional"
+              class="w-full p-2 border border-surface-300 rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+            ></textarea>
+          </div>
 
-      @if (error) {
-        <div class="error">{{ error }}</div>
-      }
+          @if (error) {
+            <p-message severity="error" [text]="error"></p-message>
+          }
 
-      <button type="submit" class="btn btn-primary btn-large" [disabled]="loading || bookingForm.invalid">
-        {{ loading ? 'Confirmando...' : 'Confirmar Reserva' }}
-      </button>
-    </form>
+          <p-button 
+            type="submit"
+            label="Confirmar Reserva" 
+            icon="pi pi-check"
+            iconPos="right"
+            styleClass="w-full p-button-lg p-button-primary"
+            [loading]="loading"
+            [disabled]="bookingForm.invalid || loading"
+          />
+        </form>
+      </ng-template>
+    </p-card>
   }
 </div>

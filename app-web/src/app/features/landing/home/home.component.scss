@@ -1,0 +1,14 @@
+.hero-section {
+  min-height: calc(100vh - 64px);
+}
+
+:host ::ng-deep .p-button-white {
+  background: transparent !important;
+  border: 2px solid white !important;
+  color: white !important;
+}
+
+:host ::ng-deep .p-button-white:hover {
+  background: white !important;
+  color: var(--primary-color) !important;
+}
