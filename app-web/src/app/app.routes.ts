@@ -4,9 +4,16 @@ import { managerGuard } from './core/guards/role.guard';
 import { superadminGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
+  // Landing pages (public)
   {
     path: '',
-    redirectTo: 'dashboard',
+    loadChildren: () => import('./features/landing/landing.routes')
+      .then(m => m.LANDING_ROUTES)
+  },
+  // Legacy routes for landing (for SEO/backward compatibility)
+  {
+    path: 'home',
+    redirectTo: '',
     pathMatch: 'full'
   },
   {

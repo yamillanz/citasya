@@ -6,7 +6,7 @@
 
 | Fase | Estado | Descripción |
 |------|--------|-------------|
-| Phase 1: Foundation | ✅ Completada | Setup, Auth, Database, Landing Page |
+| Phase 1: Foundation | ✅ Completada | Setup, Auth, Database, **Landing Page** ✅ |
 | Phase 2: Public Booking | ✅ Completada | Portal público de reservas |
 | Phase 3: Back Office Manager | ⏳ Pendiente | Dashboard, CRUD empleados, servicios, citas |
 | Phase 4: Back Office Employee | ⏳ Pendiente | Mi calendario, historial |
@@ -33,6 +33,23 @@
 | 1.11 | Configure routing | ✅ |
 | 1.12 | Test authentication flow | ✅ |
 | 1.4 | Create Landing Page | ✅ |
+| 1.4a | Home/Hero Component with PrimeNG | ✅ |
+| 1.4b | Pricing Component with PrimeNG | ✅ |
+| 1.4c | Contact Component with PrimeNG | ✅ |
+| 1.4d | About Component with PrimeNG | ✅ |
+| 1.4e | FAQ Component with PrimeNG | ✅ |
+
+---
+
+## Landing Page Components - Detalle
+
+| Componente | Ubicación | Estado | Componentes PrimeNG Usados |
+|------------|-----------|--------|---------------------------|
+| Home/Hero | `features/landing/home/` | ✅ | p-card, p-button, p-divider, p-avatar |
+| Pricing | `features/landing/pricing/` | ✅ | p-card, p-badge, p-button, p-panel, p-avatar |
+| Contact | `features/landing/contact/` | ✅ | p-card, p-button, p-inputText, p-inputTextarea, p-toast, p-avatar, p-panel |
+| About | `features/landing/about/` | ✅ | p-card, p-panel, p-avatar, p-tag, p-divider |
+| FAQ | `features/landing/faq/` | ✅ | p-accordion, p-card, p-panel, p-avatar, p-button |
 
 ---
 
