@@ -81,8 +81,8 @@
           <tr>
             <td>{{ apt.appointment_time }}</td>
             <td>{{ apt.client_name }}</td>
-            <td>{{ (apt as any).service?.name || 'N/A' }}</td>
-            <td>{{ (apt as any).employee?.full_name || 'N/A' }}</td>
+            <td>{{ $any(apt).service?.name || 'N/A' }}</td>
+            <td>{{ $any(apt).employee?.full_name || 'N/A' }}</td>
             <td>
               <span 
                 class="status-badge"
@@ -107,7 +107,7 @@
           @for (empId of objectKeys(appointmentsByEmployee()); track empId) {
             <div class="breakdown-item">
               <span class="employee-name">
-                {{ (appointmentsByEmployee()[empId][0] as any).employee?.full_name }}
+                {{ $any(appointmentsByEmployee()[empId][0]).employee?.full_name }}
               </span>
               <div class="breakdown-stats">
                 <span class="stat">

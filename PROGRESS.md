@@ -149,12 +149,38 @@
 
 ## Estado de Testing
 
+### Tests Públicos
 | Componente | Tests | Estado |
 |------------|-------|--------|
 | booking-form.component.spec.ts | 5 | ✅ |
 | company-list.component.spec.ts | 9 | ✅ |
 | appointment.service.spec.ts | 7 | ✅ |
-| **Total** | **21** | ✅ |
+
+### Tests Backoffice (Phase 3) - Behavior Driven
+| Componente | Tests | Tipo | Estado |
+|------------|-------|------|--------|
+| dashboard.component.spec.ts | 12 | Behavior Driven | ✅ **PASANDO** |
+| services.component.spec.ts | 18+ | Behavior Driven | 🚧 Corregir async/await |
+| service-form.component.spec.ts | 20+ | Behavior Driven | 🚧 Corregir async/await |
+| employees.component.spec.ts | 16+ | Behavior Driven | 🚧 Corregir async/await |
+| employee-form.component.spec.ts | 18+ | Behavior Driven | 🚧 Corregir async/await |
+| appointments.component.spec.ts | 22+ | Behavior Driven | 🚧 Corregir async/await |
+| daily-close.component.spec.ts | 21+ | Behavior Driven | 🚧 Corregir async/await |
+| backoffice.component.spec.ts | 19+ | Behavior Driven | 🚧 Corregir async/await |
+| **Total Tests Backoffice** | **150+** | | 🚧 **38 pasando, 36 fallando** |
+
+### Estado de Tests
+- **✅ Dashboard**: 12/12 tests pasando - Ejemplo completado
+- **🚧 Otros componentes**: Tests creados con enfoque BDD pero necesitan:
+  - Reemplazar `fakeAsync/tick` por `async/await`
+  - Agregar `RouterTestingModule` y `NO_ERRORS_SCHEMA`
+  - Corregir mocks de servicios
+
+### Resumen Testing Phase 3
+- **8 archivos** de tests creados con **150+ casos** de prueba
+- Enfoque **behavior-driven**: Tests validan comportamientos del usuario
+- Tests de integración con servicios mockados
+- Estructura lista, necesita ajustes de implementación
 
 ### Ejecución de Tests
 ```bash

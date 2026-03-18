@@ -113,7 +113,7 @@
                 <div class="apt-info">
                   <div class="apt-client">{{ apt.client_name }}</div>
                   <div class="apt-service">
-                    {{ (apt as any).service?.name || 'Servicio no especificado' }}
+                    {{ $any(apt).service?.name || 'Servicio no especificado' }}
                   </div>
                 </div>
                 <div class="apt-status">

@@ -73,9 +73,9 @@
                 <div class="appointment-details">
                   <div class="client-name">{{ apt.client_name }}</div>
                   <div class="service-employee">
-                    <span class="service">{{ (apt as any).service?.name }}</span>
+                    <span class="service">{{ $any(apt).service?.name }}</span>
                     <span class="separator">•</span>
-                    <span class="employee">{{ (apt as any).employee?.full_name }}</span>
+                    <span class="employee">{{ $any(apt).employee?.full_name }}</span>
                   </div>
                 </div>
 
