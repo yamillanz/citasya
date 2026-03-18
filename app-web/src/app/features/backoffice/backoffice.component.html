@@ -1,0 +1,78 @@
+<div class="backoffice-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>CitasYa</h2>
+      <span class="tag">Manager</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.routerLink) {
+        <a 
+          [routerLink]="item.routerLink" 
+          routerLinkActive="active"
+          class="nav-item">
+          <i [class]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      @if (user()) {
+        <div class="user-info">
+          <p-avatar 
+            [label]="user()?.full_name?.charAt(0) || 'U'"
+            size="normal"
+            [style]="{ 'background-color': '#9DC183', color: '#ffffff' }">
+          </p-avatar>
+          <div class="user-details">
+            <span class="user-name">{{ user()?.full_name }}</span>
+            <span class="user-email">{{ user()?.email }}</span>
+          </div>
+        </div>
+      }
+      <p-button 
+        label="Cerrar Sesión"
+        icon="pi pi-sign-out"
+        severity="secondary"
+        [text]="true"
+        size="small"
+        (onClick)="logout()">
+      </p-button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<!-- Mobile Sidebar -->
+<p-sidebar 
+  [(visible)]="sidebarVisible" 
+  [baseZIndex]="10000"
+  [style]="{ width: '280px' }">
+  <div class="mobile-sidebar">
+    <div class="sidebar-header">
+      <h2>CitasYa</h2>
+      <span class="tag">Manager</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.routerLink) {
+        <a 
+          [routerLink]="item.routerLink" 
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="sidebarVisible.set(false)">
+          <i [class]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+  </div>
+</p-sidebar>
+
+<p-toast></p-toast>

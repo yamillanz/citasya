@@ -1,0 +1,73 @@
+<div class="services-container">
+  <header class="page-header">
+    <h1>Gestión de Servicios</h1>
+    <p-button 
+      label="Nuevo Servicio" 
+      icon="pi pi-plus"
+      routerLink="/bo/services/new">
+    </p-button>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <p>Cargando servicios...</p>
+    </div>
+  } @else if (services().length === 0) {
+    <p-card styleClass="empty-state">
+      <div class="empty-content">
+        <i class="pi pi-briefcase empty-icon"></i>
+        <h3>No hay servicios configurados</h3>
+        <p>Comienza creando tu primer servicio</p>
+        <p-button 
+          label="Crear Servicio" 
+          icon="pi pi-plus"
+          routerLink="/bo/services/new"
+          styleClass="mt-3">
+        </p-button>
+      </div>
+    </p-card>
+  } @else {
+    <div class="services-grid">
+      @for (service of services(); track service.id) {
+        <p-card styleClass="service-card">
+          <div class="service-content">
+            <div class="service-header">
+              <h3 class="service-name">{{ service.name }}</h3>
+              <span class="service-duration">
+                <i class="pi pi-clock"></i>
+                {{ service.duration_minutes }} min
+              </span>
+            </div>
+            
+            @if (service.price) {
+              <div class="service-price">
+                <span class="price-label">Precio:</span>
+                <span class="price-value">${{ service.price | number:'1.2-2' }}</span>
+              </div>
+            }
+
+            <div class="service-actions">
+              <p-button 
+                icon="pi pi-pencil"
+                severity="secondary"
+                [text]="true"
+                [routerLink]="['/bo/services', service.id]"
+                pTooltip="Editar">
+              </p-button>
+              <p-button 
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true"
+                (onClick)="confirmDelete(service)"
+                pTooltip="Eliminar">
+              </p-button>
+            </div>
+          </div>
+        </p-card>
+      }
+    </div>
+  }
+</div>
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>

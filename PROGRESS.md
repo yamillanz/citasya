@@ -8,7 +8,7 @@
 |------|--------|-------------|
 | Phase 1: Foundation | ✅ Completada | Setup, Auth, Database, **Landing Page** ✅ |
 | Phase 2: Public Booking | ✅ Completada | Portal público de reservas |
-| Phase 3: Back Office Manager | ⏳ Pendiente | Dashboard, CRUD empleados, servicios, citas |
+| Phase 3: Back Office Manager | ✅ Completada | Dashboard, CRUD empleados, servicios, citas |
 | Phase 4: Back Office Employee | ⏳ Pendiente | Mi calendario, historial |
 | Phase 5: Superadmin | ⏳ Pendiente | Gestión de empresas, usuarios, planes |
 | Phase 6: Polish | ⏳ Pendiente | UI/UX, testing, deploy |
@@ -71,11 +71,61 @@
 
 ---
 
+## Phase 3: Back Office Manager - Completada ✅
+
+### Componentes Implementados
+
+| Componente | Ubicación | Descripción |
+|------------|-----------|-------------|
+| Dashboard | `backoffice/manager/dashboard/` | Panel principal con estadísticas y citas del día |
+| Services | `backoffice/manager/services/` | Lista de servicios con CRUD |
+| Service Form | `backoffice/manager/services/service-form/` | Formulario crear/editar servicios |
+| Employees | `backoffice/manager/employees/` | Lista de empleados con CRUD |
+| Employee Form | `backoffice/manager/employees/employee-form/` | Formulario crear/editar empleados |
+| Appointments | `backoffice/manager/appointments/` | Lista de citas con filtros y estados |
+| Daily Close | `backoffice/manager/daily-close/` | Cierre diario con generación de PDF |
+| Backoffice Layout | `backoffice/` | Layout con sidebar de navegación |
+
+### Servicios Actualizados
+
+- ✅ `appointment.service.ts` - Agregados métodos: `getByCompany()`, `getByDate()`, `updateStatus()`
+- ✅ `daily-close.service.ts` - Nuevo servicio para generación de PDF con jsPDF
+
+### Rutas Configuradas
+
+- `/bo/dashboard` - Panel principal
+- `/bo/services` - Gestión de servicios
+- `/bo/services/:id` - Formulario de servicio
+- `/bo/employees` - Gestión de empleados
+- `/bo/employees/:id` - Formulario de empleado
+- `/bo/appointments` - Gestión de citas
+- `/bo/close` - Cierre diario
+
+---
+
 ## Estado de OpenSpec
 
-**Change activo:** Ninguno (Phase 2 archivada)
-**Change archivado:** `2026-03-17-phase-2-public-booking`
-**Specs actualizadas:** appointment-booking, company-directory, employee-calendar, slot-availability
+**Change activo:** Ninguno (Phase 3 completada - listo para archivar)
+**Change archivado:** 
+- `2026-03-17-phase-2-public-booking`
+- `2026-03-18-phase-3-back-office-manager` (listo)
+**Specs actualizadas:** appointment-booking, company-directory, employee-calendar, slot-availability, manager-dashboard, services-crud, employees-crud, appointments-management, daily-close
+
+### Artefactos Creados para Phase 3
+
+| Artefacto | Estado | Archivo |
+|-----------|--------|---------|
+| Proposal | ✅ | `openspec/changes/phase-3-back-office-manager/proposal.md` |
+| Specs | ✅ | `openspec/changes/phase-3-back-office-manager/specs/*.md` |
+| Design | ✅ | `openspec/changes/phase-3-back-office-manager/design.md` |
+| Tasks | ✅ | `openspec/changes/phase-3-back-office-manager/tasks.md` |
+
+**Specs creadas:**
+- `manager-dashboard.md` - Dashboard con estadísticas
+- `services-crud.md` - CRUD de servicios
+- `employees-crud.md` - Gestión de empleados
+- `appointments-management.md` - Lista y filtros de citas
+- `daily-close.md` - Cierre diario con PDF
 
 ---
 
@@ -88,6 +138,7 @@
 - ✅ `service.service.ts`
 - ✅ `schedule.service.ts`
 - ✅ `appointment.service.ts`
+- ✅ `daily-close.service.ts`
 
 ### Features Públicas Implementadas
 - ✅ Company List (`/c/:slug`)
@@ -115,5 +166,5 @@ npm run test:coverage # Con coverage
 ---
 
 ## Última Actualización
-- Fecha: 2026-03-17
-- Fase activa: Phase 2 completada
+- Fecha: 2026-03-18
+- Fase activa: Phase 3 completada

@@ -1,0 +1,85 @@
+<div class="service-form-container">
+  <header class="page-header">
+    <h1>{{ isEdit() ? 'Editar' : 'Nuevo' }} Servicio</h1>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <p>Cargando servicio...</p>
+    </div>
+  } @else {
+    <p-card styleClass="form-card">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Name -->
+          <div class="form-field">
+            <label for="name">Nombre del Servicio *</label>
+            <input 
+              id="name"
+              type="text"
+              pInputText
+              formControlName="name"
+              placeholder="Ej: Corte de cabello"
+              [ngClass]="{ 'ng-invalid ng-dirty': nameError }">
+            @if (nameError) {
+              <small class="p-error">{{ nameError }}</small>
+            }
+          </div>
+
+          <!-- Duration -->
+          <div class="form-field">
+            <label for="duration">Duración (minutos) *</label>
+            <p-inputNumber 
+              id="duration"
+              formControlName="duration_minutes"
+              [min]="5"
+              [showButtons]="true"
+              buttonLayout="horizontal"
+              spinnerMode="horizontal"
+              decrementButtonClass="p-button-secondary"
+              incrementButtonClass="p-button-secondary"
+              incrementButtonIcon="pi pi-plus"
+              decrementButtonIcon="pi pi-minus"
+              [ngClass]="{ 'ng-invalid ng-dirty': durationError }">
+            </p-inputNumber>
+            @if (durationError) {
+              <small class="p-error">{{ durationError }}</small>
+            }
+          </div>
+
+          <!-- Price -->
+          <div class="form-field">
+            <label for="price">Precio (opcional)</label>
+            <p-inputNumber 
+              id="price"
+              formControlName="price"
+              mode="currency"
+              currency="USD"
+              locale="en-US"
+              [minFractionDigits]="2"
+              placeholder="0.00">
+            </p-inputNumber>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <p-button 
+            type="button"
+            label="Cancelar"
+            severity="secondary"
+            routerLink="/bo/services"
+            [disabled]="saving()">
+          </p-button>
+          <p-button 
+            type="submit"
+            [label]="saving() ? 'Guardando...' : 'Guardar'"
+            [disabled]="saving()"
+            [loading]="saving()">
+          </p-button>
+        </div>
+      </form>
+    </p-card>
+  }
+</div>
+
+<p-toast></p-toast>

@@ -1,0 +1,158 @@
+.employees-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  ::ng-deep .p-card-content {
+    padding: 3rem;
+  }
+}
+
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: var(--text-secondary);
+
+  .empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+    color: #9DC183;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin: 0 0 1rem 0;
+  }
+}
+
+.employees-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.employee-card {
+  ::ng-deep .p-card-content {
+    padding: 1.25rem;
+  }
+
+  &.inactive ::ng-deep .p-card {
+    opacity: 0.7;
+  }
+}
+
+.employee-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.employee-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.employee-info {
+  flex: 1;
+  min-width: 0;
+
+  .employee-name {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  ::ng-deep .status-tag {
+    font-size: 0.75rem;
+  }
+}
+
+.employee-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+
+  i {
+    font-size: 0.875rem;
+    color: #9DC183;
+  }
+
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.employee-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--surface-200);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .employees-container {
+    padding: 1rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .employees-grid {
+    grid-template-columns: 1fr;
+  }
+}

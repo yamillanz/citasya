@@ -1,0 +1,267 @@
+.dashboard-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  color: var(--text-secondary);
+}
+
+/* Header */
+.dashboard-header {
+  margin-bottom: 1.5rem;
+}
+
+.user-welcome {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.welcome-text {
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin: 0.25rem 0 0 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+}
+
+/* Stats Section */
+.stats-section {
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  ::ng-deep .p-card-content {
+    padding: 1.5rem;
+  }
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.text-primary {
+  color: #9DC183;
+}
+
+.text-success {
+  color: #22c55e;
+}
+
+.text-warning {
+  color: #f59e0b;
+}
+
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Quick Actions */
+.quick-actions {
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+  }
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.action-card {
+  ::ng-deep .p-card-content {
+    padding: 0;
+  }
+}
+
+.action-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+
+    .action-icon {
+      background-color: #9DC183;
+      color: white;
+    }
+  }
+}
+
+.action-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--surface-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: 1.75rem;
+  }
+}
+
+.action-label {
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+/* Appointments Section */
+.appointments-section {
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+  }
+}
+
+.empty-state {
+  ::ng-deep .p-card-content {
+    padding: 3rem;
+  }
+}
+
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: var(--text-secondary);
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.appointment-item {
+  ::ng-deep .p-card-content {
+    padding: 1rem 1.25rem;
+  }
+}
+
+.appointment-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.apt-time {
+  min-width: 60px;
+
+  .time-text {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-primary);
+  }
+}
+
+.apt-info {
+  flex: 1;
+  min-width: 0;
+
+  .apt-client {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+  }
+
+  .apt-service {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+}
+
+.apt-status {
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .appointment-content {
+    flex-wrap: wrap;
+  }
+
+  .apt-status {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}

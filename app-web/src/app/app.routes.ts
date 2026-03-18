@@ -65,6 +65,15 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public/booking-form/booking-form.component')
       .then(m => m.BookingFormComponent)
   },
+  // Back Office Manager routes
+  {
+    path: 'bo',
+    loadComponent: () => import('./features/backoffice/backoffice.component')
+      .then(m => m.BackofficeComponent),
+    canActivate: [authGuard, managerGuard],
+    loadChildren: () => import('./features/backoffice/manager/manager.routes')
+      .then(m => m.MANAGER_ROUTES)
+  },
   {
     path: '**',
     redirectTo: 'dashboard'

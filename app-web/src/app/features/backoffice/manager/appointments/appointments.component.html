@@ -1,0 +1,166 @@
+<div class="appointments-container">
+  <header class="page-header">
+    <h1>Gestión de Citas</h1>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <p>Cargando citas...</p>
+    </div>
+  } @else {
+    <!-- Filters -->
+    <p-card styleClass="filters-card">
+      <div class="filters-grid">
+        <div class="filter-field">
+          <label>Empleado</label>
+          <p-dropdown 
+            [options]="employeeOptions()"
+            [(ngModel)]="filterEmployee"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Todos los empleados"
+            [showClear]="true"
+            styleClass="w-full">
+          </p-dropdown>
+        </div>
+
+        <div class="filter-field">
+          <label>Fecha</label>
+          <p-calendar 
+            [(ngModel)]="filterDate"
+            [showIcon]="true"
+            placeholder="Seleccionar fecha"
+            dateFormat="dd/mm/yy"
+            styleClass="w-full"
+            inputStyleClass="w-full">
+          </p-calendar>
+        </div>
+
+        <div class="filter-field">
+          <label>Estado</label>
+          <p-dropdown 
+            [options]="statusOptions"
+            [(ngModel)]="filterStatus"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Todos los estados"
+            [showClear]="true"
+            styleClass="w-full">
+          </p-dropdown>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Appointments List -->
+    <div class="appointments-list">
+      @if (filteredAppointments().length === 0) {
+        <p-card styleClass="empty-state">
+          <div class="empty-content">
+            <i class="pi pi-calendar-times empty-icon"></i>
+            <p>No se encontraron citas con los filtros seleccionados</p>
+          </div>
+        </p-card>
+      } @else {
+        @for (apt of filteredAppointments(); track apt.id) {
+          <p-card styleClass="appointment-card">
+            <div class="appointment-content">
+              <div class="appointment-main">
+                <div class="appointment-datetime">
+                  <span class="date">{{ formatDate(apt.appointment_date) }}</span>
+                  <span class="time">{{ apt.appointment_time }}</span>
+                </div>
+
+                <div class="appointment-details">
+                  <div class="client-name">{{ apt.client_name }}</div>
+                  <div class="service-employee">
+                    <span class="service">{{ (apt as any).service?.name }}</span>
+                    <span class="separator">•</span>
+                    <span class="employee">{{ (apt as any).employee?.full_name }}</span>
+                  </div>
+                </div>
+
+                <div class="appointment-status">
+                  <p-tag 
+                    [value]="getStatusLabel(apt.status)" 
+                    [severity]="getStatusSeverity(apt.status)">
+                  </p-tag>
+                </div>
+              </div>
+
+              @if (apt.status === 'pending') {
+                <div class="appointment-actions">
+                  <p-button 
+                    label="Completar"
+                    icon="pi pi-check"
+                    severity="success"
+                    size="small"
+                    (onClick)="openStatusDialog(apt, 'completed')">
+                  </p-button>
+                  <p-button 
+                    label="Cancelar"
+                    icon="pi pi-times"
+                    severity="danger"
+                    size="small"
+                    [outlined]="true"
+                    (onClick)="updateStatus('cancelled')">
+                  </p-button>
+                  <p-button 
+                    label="No asistió"
+                    icon="pi pi-user-minus"
+                    severity="secondary"
+                    size="small"
+                    [outlined]="true"
+                    (onClick)="updateStatus('no_show')">
+                  </p-button>
+                </div>
+              }
+
+              @if (apt.status === 'completed' && apt.amount_collected) {
+                <div class="appointment-amount">
+                  <i class="pi pi-dollar"></i>
+                  <span>{{ apt.amount_collected | number:'1.2-2' }}</span>
+                </div>
+              }
+            </div>
+          </p-card>
+        }
+      }
+    </div>
+  }
+</div>
+
+<!-- Status Update Dialog -->
+<p-dialog 
+  [(visible)]="showStatusDialog" 
+  [header]="'Completar Cita'"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '400px' }">
+  <div class="status-dialog-content">
+    <p>¿Cuánto se cobró por esta cita?</p>
+    <p-inputNumber 
+      [(ngModel)]="amountCollected"
+      mode="currency"
+      currency="USD"
+      locale="en-US"
+      [minFractionDigits]="2"
+      placeholder="0.00"
+      styleClass="w-full mt-3">
+    </p-inputNumber>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Cancelar"
+      severity="secondary"
+      (onClick)="showStatusDialog.set(false)"
+      [text]="true">
+    </p-button>
+    <p-button 
+      label="Completar Cita"
+      severity="success"
+      (onClick)="updateStatus('completed')">
+    </p-button>
+  </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>

@@ -94,4 +94,54 @@ export class AppointmentService {
     
     if (error) throw error;
   }
+
+  async getByCompany(companyId: string): Promise<Appointment[]> {
+    const { data, error } = await this.supabase
+      .from('appointments')
+      .select(`
+        *,
+        service:service_id (name),
+        employee:employee_id (full_name)
+      `)
+      .eq('company_id', companyId)
+      .order('appointment_date', { ascending: false })
+      .order('appointment_time', { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  async getByDate(companyId: string, date: string): Promise<Appointment[]> {
+    const { data, error } = await this.supabase
+      .from('appointments')
+      .select(`
+        *,
+        service:service_id (name),
+        employee:employee_id (full_name)
+      `)
+      .eq('company_id', companyId)
+      .eq('appointment_date', date)
+      .order('appointment_time', { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  async updateStatus(id: string, status: AppointmentStatus, amountCollected?: number): Promise<void> {
+    const updateData: Partial<Appointment> = { 
+      status, 
+      updated_at: new Date().toISOString() 
+    };
+    
+    if (amountCollected !== undefined) {
+      updateData.amount_collected = amountCollected;
+    }
+
+    const { error } = await this.supabase
+      .from('appointments')
+      .update(updateData)
+      .eq('id', id);
+    
+    if (error) throw error;
+  }
 }

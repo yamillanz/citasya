@@ -1,0 +1,111 @@
+<div class="employee-form-container">
+  <header class="page-header">
+    <h1>{{ isEdit() ? 'Editar' : 'Nuevo' }} Empleado</h1>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <p>Cargando empleado...</p>
+    </div>
+  } @else {
+    <p-card styleClass="form-card">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Full Name -->
+          <div class="form-field">
+            <label for="full_name">Nombre Completo *</label>
+            <input 
+              id="full_name"
+              type="text"
+              pInputText
+              formControlName="full_name"
+              placeholder="Ej: Juan Pérez"
+              [ngClass]="{ 'ng-invalid ng-dirty': fullNameError }">
+            @if (fullNameError) {
+              <small class="p-error">{{ fullNameError }}</small>
+            }
+          </div>
+
+          <!-- Email -->
+          <div class="form-field">
+            <label for="email">Email *</label>
+            <input 
+              id="email"
+              type="email"
+              pInputText
+              formControlName="email"
+              placeholder="ejemplo@email.com"
+              [ngClass]="{ 'ng-invalid ng-dirty': emailError }">
+            @if (emailError) {
+              <small class="p-error">{{ emailError }}</small>
+            }
+          </div>
+
+          <!-- Phone -->
+          <div class="form-field">
+            <label for="phone">Teléfono</label>
+            <input 
+              id="phone"
+              type="tel"
+              pInputText
+              formControlName="phone"
+              placeholder="Ej: 555-123-4567">
+          </div>
+
+          <!-- Photo URL -->
+          <div class="form-field">
+            <label for="photo_url">URL de Foto</label>
+            <input 
+              id="photo_url"
+              type="url"
+              pInputText
+              formControlName="photo_url"
+              placeholder="https://ejemplo.com/foto.jpg">
+          </div>
+        </div>
+
+        <!-- Services Assignment -->
+        @if (services().length > 0) {
+          <div class="services-section">
+            <h3>Servicios que ofrece</h3>
+            <div class="services-grid">
+              @for (service of services(); track service.id) {
+                <div class="service-checkbox">
+                  <p-checkbox 
+                    [inputId]="'service-' + service.id"
+                    [value]="service.id"
+                    [binary]="true"
+                    [ngModel]="isServiceSelected(service.id)"
+                    (ngModelChange)="onServiceToggle(service.id)"
+                    [ngModelOptions]="{standalone: true}">
+                  </p-checkbox>
+                  <label [for]="'service-' + service.id">
+                    {{ service.name }} ({{ service.duration_minutes }} min)
+                  </label>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="form-actions">
+          <p-button 
+            type="button"
+            label="Cancelar"
+            severity="secondary"
+            routerLink="/bo/employees"
+            [disabled]="saving()">
+          </p-button>
+          <p-button 
+            type="submit"
+            [label]="saving() ? 'Guardando...' : 'Guardar'"
+            [disabled]="saving()"
+            [loading]="saving()">
+          </p-button>
+        </div>
+      </form>
+    </p-card>
+  }
+</div>
+
+<p-toast></p-toast>

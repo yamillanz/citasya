@@ -1,0 +1,90 @@
+<div class="employees-container">
+  <header class="page-header">
+    <h1>Gestión de Empleados</h1>
+    <p-button 
+      label="Nuevo Empleado" 
+      icon="pi pi-plus"
+      routerLink="/bo/employees/new">
+    </p-button>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <p>Cargando empleados...</p>
+    </div>
+  } @else if (employees().length === 0) {
+    <p-card styleClass="empty-state">
+      <div class="empty-content">
+        <i class="pi pi-users empty-icon"></i>
+        <h3>No hay empleados registrados</h3>
+        <p>Comienza agregando tu primer empleado</p>
+        <p-button 
+          label="Agregar Empleado" 
+          icon="pi pi-plus"
+          routerLink="/bo/employees/new"
+          styleClass="mt-3">
+        </p-button>
+      </div>
+    </p-card>
+  } @else {
+    <div class="employees-grid">
+      @for (employee of employees(); track employee.id) {
+        <p-card 
+          styleClass="employee-card"
+          [ngClass]="{ 'inactive': !employee.is_active }">
+          <div class="employee-content">
+            <div class="employee-header">
+              <p-avatar 
+                [label]="employee.full_name.charAt(0)"
+                [image]="employee.photo_url || undefined"
+                size="large"
+                shape="circle"
+                [style]="{ 'background-color': employee.is_active ? '#9DC183' : '#9ca3af', color: '#ffffff' }">
+              </p-avatar>
+              <div class="employee-info">
+                <h3 class="employee-name">{{ employee.full_name }}</h3>
+                <p-tag 
+                  [value]="employee.is_active ? 'Activo' : 'Inactivo'"
+                  [severity]="employee.is_active ? 'success' : 'secondary'"
+                  styleClass="status-tag">
+                </p-tag>
+              </div>
+            </div>
+
+            <div class="employee-details">
+              <div class="detail-item">
+                <i class="pi pi-envelope"></i>
+                <span>{{ employee.email }}</span>
+              </div>
+              @if (employee.phone) {
+                <div class="detail-item">
+                  <i class="pi pi-phone"></i>
+                  <span>{{ employee.phone }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="employee-actions">
+              <p-button 
+                icon="pi pi-pencil"
+                severity="secondary"
+                [text]="true"
+                [routerLink]="['/bo/employees', employee.id]"
+                pTooltip="Editar">
+              </p-button>
+              <p-button 
+                [icon]="employee.is_active ? 'pi pi-ban' : 'pi pi-check'"
+                [severity]="employee.is_active ? 'danger' : 'success'"
+                [text]="true"
+                (onClick)="toggleEmployeeStatus(employee)"
+                [pTooltip]="employee.is_active ? 'Desactivar' : 'Activar'">
+              </p-button>
+            </div>
+          </div>
+        </p-card>
+      }
+    </div>
+  }
+</div>
+
+<p-toast></p-toast>

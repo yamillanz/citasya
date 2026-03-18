@@ -1,0 +1,220 @@
+.appointments-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: var(--text-secondary);
+}
+
+/* Filters */
+.filters-card {
+  margin-bottom: 1.5rem;
+
+  ::ng-deep .p-card-content {
+    padding: 1.25rem;
+  }
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+  }
+
+  ::ng-deep .p-dropdown,
+  ::ng-deep .p-calendar {
+    width: 100%;
+  }
+}
+
+/* Appointments List */
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.empty-state {
+  ::ng-deep .p-card-content {
+    padding: 3rem;
+  }
+}
+
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: var(--text-secondary);
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.appointment-card {
+  ::ng-deep .p-card-content {
+    padding: 1rem 1.25rem;
+  }
+}
+
+.appointment-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.appointment-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.appointment-datetime {
+  display: flex;
+  flex-direction: column;
+  min-width: 100px;
+
+  .date {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+  }
+
+  .time {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+}
+
+.appointment-details {
+  flex: 1;
+  min-width: 200px;
+
+  .client-name {
+    font-weight: 600;
+    font-size: 1.0625rem;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+  }
+
+  .service-employee {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    flex-wrap: wrap;
+
+    .service {
+      color: #9DC183;
+      font-weight: 500;
+    }
+
+    .separator {
+      color: var(--text-secondary);
+      opacity: 0.5;
+    }
+  }
+}
+
+.appointment-status {
+  flex-shrink: 0;
+}
+
+.appointment-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--surface-200);
+}
+
+.appointment-amount {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--surface-200);
+  color: #22c55e;
+  font-weight: 600;
+
+  i {
+    font-size: 0.875rem;
+  }
+}
+
+/* Status Dialog */
+.status-dialog-content {
+  p {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-secondary);
+  }
+
+  ::ng-deep .p-inputnumber {
+    width: 100%;
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .appointments-container {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .appointment-main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .appointment-actions {
+    flex-direction: column;
+
+    p-button {
+      width: 100%;
+    }
+  }
+}

@@ -1,0 +1,261 @@
+.daily-close-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: var(--text-secondary);
+}
+
+/* Date Card */
+.date-card {
+  margin-bottom: 1.5rem;
+
+  ::ng-deep .p-card-content {
+    padding: 1.25rem;
+  }
+}
+
+.date-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  label {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  ::ng-deep .p-calendar {
+    width: auto;
+  }
+}
+
+/* Closed Alert */
+.closed-alert {
+  margin-bottom: 1.5rem;
+
+  ::ng-deep .p-card-content {
+    padding: 1rem 1.25rem;
+    background-color: #d1fae5;
+  }
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #065f46;
+
+  i {
+    font-size: 1.25rem;
+  }
+}
+
+/* Summary Grid */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-card {
+  ::ng-deep .p-card-content {
+    padding: 1.5rem;
+  }
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.summary-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+
+  &.text-success {
+    color: #22c55e;
+  }
+
+  &.text-primary {
+    color: #9DC183;
+  }
+}
+
+.summary-label {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Table Card */
+.table-card {
+  margin-bottom: 1.5rem;
+
+  ::ng-deep .p-card-content {
+    padding: 1.25rem;
+  }
+}
+
+.table-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+
+  &.completed {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  &.pending {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+
+  &.cancelled {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.no_show {
+    background-color: #f3f4f6;
+    color: #4b5563;
+  }
+}
+
+/* Breakdown Card */
+.breakdown-card {
+  margin-bottom: 1.5rem;
+
+  ::ng-deep .p-card-content {
+    padding: 1.25rem;
+  }
+}
+
+.breakdown-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: var(--surface-100);
+  border-radius: 6px;
+
+  .employee-name {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .breakdown-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+
+      i {
+        font-size: 0.75rem;
+      }
+
+      &.amount {
+        color: #22c55e;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+/* Generate Action */
+.generate-action {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: var(--surface-100);
+  border-radius: 8px;
+
+  p-button {
+    ::ng-deep .p-button {
+      padding: 1rem 2rem;
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .daily-close-container {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .date-selector {
+    flex-direction: column;
+    align-items: flex-start;
+
+    ::ng-deep .p-calendar {
+      width: 100%;
+    }
+  }
+
+  .breakdown-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

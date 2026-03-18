@@ -1,0 +1,150 @@
+.services-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  ::ng-deep .p-card-content {
+    padding: 3rem;
+  }
+}
+
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: var(--text-secondary);
+
+  .empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+    color: #9DC183;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin: 0 0 1rem 0;
+  }
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.service-card {
+  ::ng-deep .p-card-content {
+    padding: 1.25rem;
+  }
+}
+
+.service-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.service-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.service-name {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.service-duration {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  white-space: nowrap;
+
+  i {
+    font-size: 0.875rem;
+  }
+}
+
+.service-price {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  .price-label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .price-value {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: #9DC183;
+  }
+}
+
+.service-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--surface-200);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .services-container {
+    padding: 1rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+}

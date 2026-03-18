@@ -1,0 +1,143 @@
+.employee-form-container {
+  padding: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  color: var(--text-secondary);
+}
+
+.form-card {
+  ::ng-deep .p-card-content {
+    padding: 1.5rem;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+  }
+
+  input {
+    width: 100%;
+  }
+
+  small.p-error {
+    color: #ef4444;
+    font-size: 0.875rem;
+  }
+}
+
+/* Services Section */
+.services-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--surface-200);
+
+  h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 0.75rem;
+}
+
+.service-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: var(--surface-100);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--surface-200);
+  }
+
+  label {
+    cursor: pointer;
+    flex: 1;
+    font-size: 0.9375rem;
+    color: var(--text-primary);
+  }
+
+  ::ng-deep .p-checkbox {
+    flex-shrink: 0;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--surface-200);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .employee-form-container {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .form-card ::ng-deep .p-card-content {
+    padding: 1rem;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    
+    p-button {
+      width: 100%;
+    }
+  }
+}
