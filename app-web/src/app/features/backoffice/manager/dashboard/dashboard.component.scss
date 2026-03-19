@@ -1,195 +1,363 @@
-.dashboard-container {
-  padding: 1.5rem;
+.dashboard-page {
+  padding: var(--space-xl) var(--space-lg);
   max-width: 1200px;
   margin: 0 auto;
+  animation: fadeIn 0.4s ease;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ================================
+   Loading State
+   ================================ */
 .loading-state {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  align-items: center;
   min-height: 400px;
-  color: var(--text-secondary);
-}
-
-/* Header */
-.dashboard-header {
-  margin-bottom: 1.5rem;
-}
-
-.user-welcome {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.welcome-text {
-  h1 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
+  gap: var(--space-md);
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-sage-pale);
+    border-top-color: var(--color-sage);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
   }
-
+  
   p {
-    margin: 0.25rem 0 0 0;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
   }
 }
 
-/* Stats Section */
-.stats-section {
-  margin-bottom: 2rem;
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
-  h2 {
-    font-size: 1.25rem;
+/* ================================
+   Header
+   ================================ */
+.dashboard-header {
+  margin-bottom: var(--space-xl);
+}
+
+.header-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.welcome-section {
+  .welcome-badge {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-md);
+    background: var(--color-sage-pale);
+    color: var(--color-sage-dark);
+    font-size: 0.75rem;
     font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-sm);
   }
+  
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-xs);
+  }
+  
+  p {
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+    text-transform: capitalize;
+  }
+}
+
+.header-date {
+  .date-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    
+    i {
+      color: var(--color-sage);
+    }
+    
+    span {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+  }
+}
+
+/* ================================
+   Stats Section
+   ================================ */
+.stats-section {
+  margin-bottom: var(--space-2xl);
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md);
 }
 
 .stat-card {
-  ::ng-deep .p-card-content {
-    padding: 1.5rem;
+  position: relative;
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  overflow: hidden;
+  transition: all var(--duration-normal) var(--ease-out-expo);
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    transition: all var(--duration-normal) ease;
+  }
+  
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+  }
+  
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--color-text-primary);
+  }
+  
+  .stat-label {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    margin-top: var(--space-xs);
+  }
+  
+  .stat-decoration {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    opacity: 0.1;
   }
 }
 
-.stat-content {
+.stat-primary {
+  .stat-icon {
+    background: var(--color-sage-pale);
+    color: var(--color-sage-dark);
+  }
+  .stat-decoration {
+    background: var(--color-sage);
+  }
+}
+
+.stat-success {
+  .stat-icon {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+  }
+  .stat-decoration {
+    background: #22c55e;
+  }
+}
+
+.stat-warning {
+  .stat-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+  }
+  .stat-decoration {
+    background: #f59e0b;
+  }
+}
+
+.stat-info {
+  .stat-icon {
+    background: rgba(59, 156, 236, 0.1);
+    color: #3b9df5;
+  }
+  .stat-decoration {
+    background: #3b9df5;
+  }
+}
+
+/* ================================
+   Quick Actions
+   ================================ */
+.quick-actions-section {
+  margin-bottom: var(--space-2xl);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-lg);
+}
+
+.section-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  
+  .section-title {
+    margin-bottom: 0;
+  }
 }
 
-.stat-value {
-  font-size: 2.5rem;
-  font-weight: 700;
-  line-height: 1;
-  margin-bottom: 0.5rem;
-}
-
-.text-primary {
-  color: #9DC183;
-}
-
-.text-success {
-  color: #22c55e;
-}
-
-.text-warning {
-  color: #f59e0b;
-}
-
-.stat-label {
-  color: var(--text-secondary);
+.view-all-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
   font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Quick Actions */
-.quick-actions {
-  margin-bottom: 2rem;
-
-  h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
+  font-weight: 500;
+  color: var(--color-sage-dark);
+  
+  i {
+    font-size: 0.75rem;
+    transition: transform var(--duration-fast) ease;
+  }
+  
+  &:hover {
+    color: var(--color-sage);
+    
+    i {
+      transform: translateX(4px);
+    }
   }
 }
 
 .actions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-md);
 }
 
 .action-card {
-  ::ng-deep .p-card-content {
-    padding: 0;
-  }
-}
-
-.action-link {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
+  padding: var(--space-xl);
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
   text-decoration: none;
-  color: var(--text-primary);
-  transition: transform 0.2s ease;
-
+  transition: all var(--duration-normal) var(--ease-out-expo);
+  
   &:hover {
-    transform: translateY(-4px);
-
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+    
     .action-icon {
-      background-color: #9DC183;
+      background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
       color: white;
+      transform: scale(1.1);
     }
   }
-}
-
-.action-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: var(--surface-100);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.75rem;
-  transition: all 0.2s ease;
-
-  i {
-    font-size: 1.75rem;
+  
+  .action-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-sage-pale);
+    color: var(--color-sage-dark);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-md);
+    transition: all var(--duration-normal) ease;
+    
+    i {
+      font-size: 1.5rem;
+    }
   }
-}
-
-.action-label {
-  font-weight: 500;
-  font-size: 0.9375rem;
-}
-
-/* Appointments Section */
-.appointments-section {
-  h2 {
-    font-size: 1.25rem;
+  
+  .action-label {
     font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
+    font-size: 0.9375rem;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-xs);
   }
+  
+  .action-desc {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+}
+
+/* ================================
+   Appointments Section
+   ================================ */
+.appointments-section {
+  margin-bottom: var(--space-xl);
 }
 
 .empty-state {
-  ::ng-deep .p-card-content {
-    padding: 3rem;
-  }
-}
-
-.empty-content {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  padding: var(--space-3xl);
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
   text-align: center;
-  color: var(--text-secondary);
-
-  .empty-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
+  
+  .empty-illustration {
+    margin-bottom: var(--space-lg);
   }
-
+  
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-sm);
+  }
+  
   p {
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
     margin: 0;
   }
 }
@@ -197,44 +365,67 @@
 .appointments-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-sm);
 }
 
 .appointment-item {
-  ::ng-deep .p-card-content {
-    padding: 1rem 1.25rem;
-  }
-}
-
-.appointment-content {
   display: flex;
   align-items: center;
-  gap: 1rem;
-}
-
-.apt-time {
-  min-width: 60px;
-
-  .time-text {
-    font-weight: 600;
-    font-size: 1rem;
-    color: var(--text-primary);
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--duration-fast) ease;
+  
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
   }
 }
 
-.apt-info {
+.apt-time-badge {
+  min-width: 60px;
+  
+  .time {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-sage-pale);
+    color: var(--color-sage-dark);
+    font-weight: 700;
+    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+  }
+}
+
+.apt-details {
   flex: 1;
   min-width: 0;
+}
 
-  .apt-client {
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: 0.25rem;
-  }
+.apt-client {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
 
-  .apt-service {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+.apt-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  
+  span {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    
+    i {
+      font-size: 0.75rem;
+    }
   }
 }
 
@@ -242,26 +433,78 @@
   flex-shrink: 0;
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .dashboard-container {
-    padding: 1rem;
+.status-badge {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: var(--radius-full);
+  
+  &.status-completed {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
   }
+  
+  &.status-pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+  }
+  
+  &.status-cancelled {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+  }
+  
+  &.status-no_show {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+  }
+}
 
+/* ================================
+   Responsive
+   ================================ */
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: var(--space-lg) var(--space-md);
+  }
+  
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
-
+  
   .actions-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-
-  .appointment-content {
+  
+  .appointment-item {
     flex-wrap: wrap;
   }
-
+  
   .apt-status {
     width: 100%;
-    margin-top: 0.5rem;
+    margin-top: var(--space-sm);
+    
+    .status-badge {
+      width: 100%;
+      text-align: center;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .actions-grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CardModule } from 'primeng/card';
@@ -32,10 +32,29 @@ export class DashboardComponent implements OnInit {
 
   user = signal<User | null>(null);
   todayAppointments = signal<Appointment[]>([]);
-  totalToday = signal(0);
-  completedToday = signal(0);
-  pendingToday = signal(0);
   loading = signal(true);
+
+  todayFormatted = new Date().toLocaleDateString('es-ES', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long'
+  });
+
+  totalToday = computed(() => this.todayAppointments().length);
+  
+  completedToday = computed(() => 
+    this.todayAppointments().filter(a => a.status === 'completed').length
+  );
+  
+  pendingToday = computed(() => 
+    this.todayAppointments().filter(a => a.status === 'pending').length
+  );
+
+  totalRevenue = computed(() =>
+    this.todayAppointments()
+      .filter(a => a.status === 'completed')
+      .reduce((sum, apt) => sum + (apt.amount_collected || 0), 0)
+  );
 
   async ngOnInit() {
     this.user.set(await this.authService.getCurrentUser());
@@ -53,9 +72,6 @@ export class DashboardComponent implements OnInit {
     );
     
     this.todayAppointments.set(appointments);
-    this.totalToday.set(appointments.length);
-    this.completedToday.set(appointments.filter(a => a.status === 'completed').length);
-    this.pendingToday.set(appointments.filter(a => a.status === 'pending').length);
   }
 
   getStatusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' | undefined {
