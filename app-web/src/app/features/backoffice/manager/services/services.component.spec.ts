@@ -1,9 +1,11 @@
 import { ComponentFixture, TestBed, waitForAsync, NO_ERRORS_SCHEMA } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ServicesComponent } from './services.component';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ServiceService } from '../../../../core/services/service.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
 
 describe('ServicesComponent - Behavior Driven Tests', () => {
   let component: ServicesComponent;
@@ -66,12 +68,13 @@ describe('ServicesComponent - Behavior Driven Tests', () => {
     } as any;
 
     await TestBed.configureTestingModule({
-      imports: [ServicesComponent, RouterTestingModule],
+      imports: [ServicesComponent, RouterTestingModule, TooltipModule],
       providers: [
         { provide: AuthService, useValue: authServiceMock },
         { provide: ServiceService, useValue: serviceServiceMock },
         ConfirmationService,
-        MessageService
+        MessageService,
+        provideNoopAnimations()
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
