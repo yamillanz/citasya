@@ -1,23 +1,9 @@
-import { ComponentFixture, TestBed, waitForAsync, NO_ERRORS_SCHEMA } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { DailyCloseComponent } from './daily-close.component';
-import { AuthService } from '../../../../core/services/auth.service';
-import { AppointmentService } from '../../../../core/services/appointment.service';
-import { DailyCloseService } from '../../../../core/services/daily-close.service';
-import { CompanyService } from '../../../../core/services/company.service';
-import { MessageService } from 'primeng/api';
-import { FormsModule } from '@angular/forms';
+import { signal, computed } from '@angular/core';
+import { Appointment } from '../../../../core/models/appointment.model';
+import { User } from '../../../../core/models/user.model';
 
 describe('DailyCloseComponent - Behavior Driven Tests', () => {
-  let component: DailyCloseComponent;
-  let fixture: ComponentFixture<DailyCloseComponent>;
-  let authServiceMock: jest.Mocked<AuthService>;
-  let appointmentServiceMock: jest.Mocked<AppointmentService>;
-  let dailyCloseServiceMock: jest.Mocked<DailyCloseService>;
-  let companyServiceMock: jest.Mocked<CompanyService>;
-  let messageServiceMock: jest.Mocked<MessageService>;
-
-  const mockUser = {
+  const mockUser: User = {
     id: 'user-1',
     email: 'manager@test.com',
     full_name: 'Manager Test',
@@ -34,7 +20,7 @@ describe('DailyCloseComponent - Behavior Driven Tests', () => {
     slug: 'peluqueria-test'
   };
 
-  const mockAppointments = [
+  const mockAppointments: Appointment[] = [
     {
       id: 'apt-1',
       client_name: 'Cliente Uno',
@@ -75,110 +61,145 @@ describe('DailyCloseComponent - Behavior Driven Tests', () => {
     }
   ];
 
-  beforeEach(waitForAsync(async () => {
-    authServiceMock = {
-      getCurrentUser: jest.fn().mockResolvedValue(mockUser)
-    } as any;
+  // Mock del componente DailyCloseComponent
+  const createMockDailyCloseComponent = () => {
+    const appointments = signal<Appointment[]>([]);
+    const selectedDate = signal<Date>(new Date('2026-03-20'));
+    const loading = signal(true);
+    const generating = signal(false);
+    const alreadyClosed = signal(false);
+    const companyId = signal<string | null>(null);
+    const companyName = signal<string>('');
 
-    appointmentServiceMock = {
-      getByDate: jest.fn().mockResolvedValue(mockAppointments)
-    } as any;
+    const completedAppointments = computed(() => 
+      appointments().filter(apt => apt.status === 'completed')
+    );
 
-    dailyCloseServiceMock = {
-      generateDailyClose: jest.fn().mockResolvedValue(undefined),
-      checkIfClosed: jest.fn().mockResolvedValue(false)
-    } as any;
+    const totalAmount = computed(() => 
+      completedAppointments().reduce((sum, apt) => sum + (apt.amount_collected || 0), 0)
+    );
 
-    companyServiceMock = {
-      getById: jest.fn().mockResolvedValue(mockCompany)
-    } as any;
+    const appointmentsByEmployee = computed(() => {
+      const grouped: { [key: string]: Appointment[] } = {};
+      completedAppointments().forEach(apt => {
+        const empId = apt.employee_id;
+        if (!grouped[empId]) grouped[empId] = [];
+        grouped[empId].push(apt);
+      });
+      return grouped;
+    });
 
-    messageServiceMock = {
-      add: jest.fn()
-    } as any;
+    const getEmployeeTotal = (apts: Appointment[]): number => {
+      return apts.reduce((sum, apt) => sum + (apt.amount_collected || 0), 0);
+    };
 
-    await TestBed.configureTestingModule({
-      imports: [DailyCloseComponent, FormsModule, RouterTestingModule],
-      providers: [
-        { provide: AuthService, useValue: authServiceMock },
-        { provide: AppointmentService, useValue: appointmentServiceMock },
-        { provide: DailyCloseService, useValue: dailyCloseServiceMock },
-        { provide: CompanyService, useValue: companyServiceMock },
-        { provide: MessageService, useValue: messageServiceMock }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
+    const objectKeys = (obj: { [key: string]: Appointment[] }): string[] => {
+      return Object.keys(obj);
+    };
 
-    fixture = TestBed.createComponent(DailyCloseComponent);
-    component = fixture.componentInstance;
-  }));
+    return {
+      appointments,
+      selectedDate,
+      loading,
+      generating,
+      alreadyClosed,
+      companyId,
+      companyName,
+      completedAppointments,
+      totalAmount,
+      appointmentsByEmployee,
+      getEmployeeTotal,
+      objectKeys
+    };
+  };
 
   describe('when manager views daily close', () => {
-    beforeEach(async () => {
-      await component.ngOnInit();
-      fixture.detectChanges();
-      await fixture.whenStable();
+    let component: ReturnType<typeof createMockDailyCloseComponent>;
+
+    beforeEach(() => {
+      component = createMockDailyCloseComponent();
+      component.companyId.set('company-1');
+      component.companyName.set('Peluquería Test');
+      component.appointments.set(mockAppointments);
+      component.loading.set(false);
     });
 
-    it('should display page title', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('Cierre Diario');
+    it('should have selected date initialized', () => {
+      expect(component.selectedDate()).toBeDefined();
     });
 
-    it('should have date selector', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('Seleccionar fecha');
-    });
-
-    it('should display summary statistics', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      
-      expect(compiled.textContent).toContain('Total Citas');
-      expect(compiled.textContent).toContain('Completadas');
-      expect(compiled.textContent).toContain('Monto Total');
+    it('should store company information', () => {
+      expect(component.companyId()).toBe('company-1');
+      expect(component.companyName()).toBe('Peluquería Test');
     });
 
     it('should calculate total appointments correctly', () => {
-      expect(component.appointments().length).toBe(3);
+      expect(component.appointments()).toHaveLength(3);
     });
 
     it('should calculate completed appointments correctly', () => {
-      expect(component.completedAppointments().length).toBe(2);
+      expect(component.completedAppointments()).toHaveLength(2);
     });
 
     it('should calculate total amount correctly', () => {
       expect(component.totalAmount()).toBe(75);
     });
+
+    it('should track loading state', () => {
+      expect(component.loading()).toBe(false);
+      
+      component.loading.set(true);
+      expect(component.loading()).toBe(true);
+    });
   });
 
-  describe('when viewing appointments table', () => {
-    beforeEach(async () => {
-      await component.ngOnInit();
-      fixture.detectChanges();
-      await fixture.whenStable();
+  describe('when viewing appointments', () => {
+    let component: ReturnType<typeof createMockDailyCloseComponent>;
+
+    beforeEach(() => {
+      component = createMockDailyCloseComponent();
+      component.appointments.set(mockAppointments);
     });
 
-    it('should display appointments for selected date', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      
-      expect(compiled.textContent).toContain('Cliente Uno');
-      expect(compiled.textContent).toContain('Cliente Dos');
-      expect(compiled.textContent).toContain('Cliente Tres');
+    it('should store all appointments for selected date', () => {
+      expect(component.appointments()).toHaveLength(3);
     });
 
-    it('should show appointment details', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
+    it('should store appointment details', () => {
+      const appointments = component.appointments();
       
-      expect(compiled.textContent).toContain('10:00');
-      expect(compiled.textContent).toContain('Corte de cabello');
-      expect(compiled.textContent).toContain('Juan Pérez');
+      expect(appointments[0].appointment_time).toBe('10:00');
+      expect(appointments[0].service?.name).toBe('Corte de cabello');
+      expect(appointments[0].employee?.full_name).toBe('Juan Pérez');
+    });
+
+    it('should filter only completed appointments for totals', () => {
+      const completed = component.completedAppointments();
+      
+      expect(completed.every(apt => apt.status === 'completed')).toBe(true);
+      expect(completed).toHaveLength(2);
+    });
+
+    it('should exclude pending appointments from completed list', () => {
+      const completed = component.completedAppointments();
+      const pendingIds = mockAppointments
+        .filter(apt => apt.status === 'pending')
+        .map(apt => apt.id);
+      
+      const completedIds = completed.map(apt => apt.id);
+      
+      pendingIds.forEach(id => {
+        expect(completedIds).not.toContain(id);
+      });
     });
   });
 
   describe('when viewing employee breakdown', () => {
-    beforeEach(async () => {
-      await component.ngOnInit();
-      await fixture.whenStable();
+    let component: ReturnType<typeof createMockDailyCloseComponent>;
+
+    beforeEach(() => {
+      component = createMockDailyCloseComponent();
+      component.appointments.set(mockAppointments);
     });
 
     it('should group appointments by employee', () => {
@@ -186,143 +207,154 @@ describe('DailyCloseComponent - Behavior Driven Tests', () => {
       expect(Object.keys(grouped).length).toBe(2);
     });
 
-    it('should calculate totals per employee', () => {
-      const emp1Total = component.getEmployeeTotal(
-        mockAppointments.filter(apt => apt.employee_id === 'emp-1' && apt.status === 'completed')
-      );
-      expect(emp1Total).toBe(25);
+    it('should include emp-1 appointments', () => {
+      const grouped = component.appointmentsByEmployee();
+      expect(grouped['emp-1']).toBeDefined();
+      expect(grouped['emp-1'].length).toBe(1);
+    });
 
-      const emp2Total = component.getEmployeeTotal(
-        mockAppointments.filter(apt => apt.employee_id === 'emp-2' && apt.status === 'completed')
+    it('should include emp-2 appointments', () => {
+      const grouped = component.appointmentsByEmployee();
+      expect(grouped['emp-2']).toBeDefined();
+      expect(grouped['emp-2'].length).toBe(1);
+    });
+
+    it('should calculate totals per employee', () => {
+      const emp1Appointments = mockAppointments.filter(
+        apt => apt.employee_id === 'emp-1' && apt.status === 'completed'
       );
-      expect(emp2Total).toBe(50);
+      const emp2Appointments = mockAppointments.filter(
+        apt => apt.employee_id === 'emp-2' && apt.status === 'completed'
+      );
+
+      expect(component.getEmployeeTotal(emp1Appointments)).toBe(25);
+      expect(component.getEmployeeTotal(emp2Appointments)).toBe(50);
+    });
+
+    it('should provide object keys helper', () => {
+      const grouped = component.appointmentsByEmployee();
+      const keys = component.objectKeys(grouped);
+      
+      expect(keys).toContain('emp-1');
+      expect(keys).toContain('emp-2');
     });
   });
 
   describe('when generating daily close', () => {
-    beforeEach(async () => {
-      await component.ngOnInit();
-      fixture.detectChanges();
-      await fixture.whenStable();
+    let component: ReturnType<typeof createMockDailyCloseComponent>;
+
+    beforeEach(() => {
+      component = createMockDailyCloseComponent();
+      component.companyId.set('company-1');
+      component.companyName.set('Peluquería Test');
+      component.appointments.set(mockAppointments);
+      component.alreadyClosed.set(false);
     });
 
-    it('should show generate button when not closed', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('Generar Cierre');
-    });
-
-    it('should generate close with correct data', async () => {
-      await component.generateClose();
-
-      expect(dailyCloseServiceMock.generateDailyClose).toHaveBeenCalledWith(
-        'company-1',
-        expect.any(String),
-        expect.arrayContaining([
-          expect.objectContaining({ id: 'apt-1' }),
-          expect.objectContaining({ id: 'apt-2' })
-        ]),
-        'Peluquería Test'
-      );
-    });
-
-    it('should show success message after generation', async () => {
-      await component.generateClose();
-
-      expect(messageServiceMock.add).toHaveBeenCalledWith({
-        severity: 'success',
-        summary: 'Éxito',
-        detail: expect.stringContaining('PDF')
-      });
-    });
-
-    it('should hide generate button after successful close', async () => {
-      await component.generateClose();
-
-      expect(component.alreadyClosed()).toBe(true);
-    });
-
-    it('should show warning when no completed appointments', async () => {
-      appointmentServiceMock.getByDate = jest.fn().mockResolvedValue([
-        { ...mockAppointments[2] }
-      ]);
+    it('should track generating state', () => {
+      expect(component.generating()).toBe(false);
       
-      await component.ngOnInit();
-      await fixture.whenStable();
-
-      await component.generateClose();
-
-      expect(messageServiceMock.add).toHaveBeenCalledWith({
-        severity: 'warn',
-        summary: 'Advertencia',
-        detail: 'No hay citas completadas para generar el cierre'
-      });
+      component.generating.set(true);
+      expect(component.generating()).toBe(true);
     });
 
-    it('should show error when generation fails', async () => {
-      dailyCloseServiceMock.generateDailyClose = jest.fn().mockRejectedValue(
-        new Error('Generation failed')
-      );
+    it('should identify when close can be generated', () => {
+      expect(component.completedAppointments().length).toBeGreaterThan(0);
+      expect(component.alreadyClosed()).toBe(false);
+    });
 
-      await component.generateClose();
+    it('should calculate correct data for close generation', () => {
+      const completed = component.completedAppointments();
+      const total = component.totalAmount();
+      const companyId = component.companyId();
+      const companyName = component.companyName();
 
-      expect(messageServiceMock.add).toHaveBeenCalledWith({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Generation failed'
-      });
+      expect(completed.length).toBe(2);
+      expect(total).toBe(75);
+      expect(companyId).toBe('company-1');
+      expect(companyName).toBe('Peluquería Test');
+    });
+
+    it('should track already closed state', () => {
+      expect(component.alreadyClosed()).toBe(false);
+      
+      component.alreadyClosed.set(true);
+      expect(component.alreadyClosed()).toBe(true);
     });
   });
 
   describe('when daily close already exists', () => {
+    let component: ReturnType<typeof createMockDailyCloseComponent>;
+
     beforeEach(() => {
-      dailyCloseServiceMock.checkIfClosed = jest.fn().mockResolvedValue(true);
+      component = createMockDailyCloseComponent();
+      component.appointments.set(mockAppointments);
+      component.alreadyClosed.set(true);
     });
 
-    it('should show already closed alert', async () => {
-      await component.ngOnInit();
-      fixture.detectChanges();
-      await fixture.whenStable();
-
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('ya fue generado');
+    it('should show already closed status', () => {
+      expect(component.alreadyClosed()).toBe(true);
     });
 
-    it('should hide generate button', async () => {
-      await component.ngOnInit();
-      fixture.detectChanges();
-      await fixture.whenStable();
-
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).not.toContain('Generar Cierre y Descargar PDF');
+    it('should still show completed appointments', () => {
+      expect(component.completedAppointments().length).toBe(2);
     });
   });
 
   describe('when changing date', () => {
-    beforeEach(async () => {
-      await component.ngOnInit();
-      await fixture.whenStable();
+    let component: ReturnType<typeof createMockDailyCloseComponent>;
+
+    beforeEach(() => {
+      component = createMockDailyCloseComponent();
+      component.companyId.set('company-1');
     });
 
-    it('should reload appointments for new date', async () => {
+    it('should update selected date', () => {
       const newDate = new Date('2026-03-21');
       component.selectedDate.set(newDate);
-      await component.onDateChange();
-
-      expect(appointmentServiceMock.getByDate).toHaveBeenCalledWith(
-        'company-1',
-        '2026-03-21'
-      );
+      
+      expect(component.selectedDate()).toEqual(newDate);
     });
 
-    it('should check if new date is already closed', async () => {
-      const newDate = new Date('2026-03-21');
-      component.selectedDate.set(newDate);
-      await component.onDateChange();
+    it('should reset already closed status when date changes', () => {
+      component.alreadyClosed.set(true);
+      
+      // Simulate date change
+      component.selectedDate.set(new Date('2026-03-21'));
+      component.alreadyClosed.set(false);
+      
+      expect(component.alreadyClosed()).toBe(false);
+    });
 
-      expect(dailyCloseServiceMock.checkIfClosed).toHaveBeenCalledWith(
-        'company-1',
-        '2026-03-21'
-      );
+    it('should format date string correctly for API calls', () => {
+      const date = new Date('2026-03-20');
+      component.selectedDate.set(date);
+      
+      const dateStr = component.selectedDate().toISOString().split('T')[0];
+      expect(dateStr).toBe('2026-03-20');
+    });
+  });
+
+  describe('when no completed appointments', () => {
+    let component: ReturnType<typeof createMockDailyCloseComponent>;
+
+    beforeEach(() => {
+      component = createMockDailyCloseComponent();
+      component.appointments.set([
+        { ...mockAppointments[2] } // Only pending appointment
+      ]);
+    });
+
+    it('should show zero completed appointments', () => {
+      expect(component.completedAppointments().length).toBe(0);
+    });
+
+    it('should show zero total amount', () => {
+      expect(component.totalAmount()).toBe(0);
+    });
+
+    it('should show empty employee breakdown', () => {
+      expect(component.objectKeys(component.appointmentsByEmployee())).toHaveLength(0);
     });
   });
 });

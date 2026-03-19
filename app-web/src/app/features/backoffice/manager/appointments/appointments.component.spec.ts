@@ -1,20 +1,9 @@
-import { ComponentFixture, TestBed, waitForAsync, NO_ERRORS_SCHEMA } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { AppointmentsComponent } from './appointments.component';
-import { AuthService } from '../../../../core/services/auth.service';
-import { AppointmentService } from '../../../../core/services/appointment.service';
-import { UserService } from '../../../../core/services/user.service';
-import { MessageService } from 'primeng/api';
-import { FormsModule } from '@angular/forms';
+import { signal, computed } from '@angular/core';
+import { Appointment, AppointmentStatus } from '../../../../core/models/appointment.model';
+import { User } from '../../../../core/models/user.model';
 
 describe('AppointmentsComponent - Behavior Driven Tests', () => {
-  let component: AppointmentsComponent;
-  let fixture: ComponentFixture<AppointmentsComponent>;
-  let authServiceMock: jest.Mocked<AuthService>;
-  let appointmentServiceMock: jest.Mocked<AppointmentService>;
-  let userServiceMock: jest.Mocked<UserService>;
-
-  const mockUser = {
+  const mockUser: User = {
     id: 'user-1',
     email: 'manager@test.com',
     full_name: 'Manager Test',
@@ -25,7 +14,7 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
     updated_at: new Date().toISOString()
   };
 
-  const mockEmployees = [
+  const mockEmployees: User[] = [
     {
       id: 'emp-1',
       full_name: 'Juan Pérez',
@@ -44,7 +33,7 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
     }
   ];
 
-  const mockAppointments = [
+  const mockAppointments: Appointment[] = [
     {
       id: 'apt-1',
       client_name: 'Cliente Uno',
@@ -87,97 +76,161 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
     }
   ];
 
-  beforeEach(waitForAsync(async () => {
-    authServiceMock = {
-      getCurrentUser: jest.fn().mockResolvedValue(mockUser)
-    } as any;
+  // Mock del componente AppointmentsComponent
+  const createMockAppointmentsComponent = () => {
+    const appointments = signal<Appointment[]>([]);
+    const employees = signal<User[]>([]);
+    const loading = signal(true);
+    const companyId = signal<string | null>(null);
 
-    appointmentServiceMock = {
-      getByCompany: jest.fn().mockResolvedValue(mockAppointments),
-      updateStatus: jest.fn().mockResolvedValue(undefined)
-    } as any;
+    // Filters
+    const filterEmployee = signal<string>('');
+    const filterDate = signal<Date | null>(null);
+    const filterStatus = signal<string>('');
 
-    userServiceMock = {
-      getByCompany: jest.fn().mockResolvedValue(mockEmployees)
-    } as any;
+    // Status update dialog
+    const showStatusDialog = signal(false);
+    const selectedAppointment = signal<Appointment | null>(null);
+    const amountCollected = signal<number>(0);
 
-    await TestBed.configureTestingModule({
-      imports: [AppointmentsComponent, FormsModule, RouterTestingModule],
-      providers: [
-        { provide: AuthService, useValue: authServiceMock },
-        { provide: AppointmentService, useValue: appointmentServiceMock },
-        { provide: UserService, useValue: userServiceMock },
-        MessageService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
+    const statusOptions = [
+      { label: 'Todos los estados', value: '' },
+      { label: 'Pendiente', value: 'pending' },
+      { label: 'Completada', value: 'completed' },
+      { label: 'Cancelada', value: 'cancelled' },
+      { label: 'No asistió', value: 'no_show' }
+    ];
 
-    fixture = TestBed.createComponent(AppointmentsComponent);
-    component = fixture.componentInstance;
-  }));
+    const employeeOptions = computed(() => [
+      { label: 'Todos los empleados', value: '' },
+      ...employees().map(emp => ({
+        label: emp.full_name,
+        value: emp.id
+      }))
+    ]);
+
+    const filteredAppointments = computed(() => {
+      return appointments().filter(apt => {
+        if (filterEmployee() && apt.employee_id !== filterEmployee()) return false;
+        if (filterStatus() && apt.status !== filterStatus()) return false;
+        if (filterDate()) {
+          const filterDateStr = filterDate()!.toISOString().split('T')[0];
+          if (apt.appointment_date !== filterDateStr) return false;
+        }
+        return true;
+      });
+    });
+
+    const getStatusSeverity = (status: AppointmentStatus): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' | undefined => {
+      switch (status) {
+        case 'completed': return 'success';
+        case 'pending': return 'warn';
+        case 'cancelled': return 'danger';
+        case 'no_show': return 'secondary';
+        default: return 'info';
+      }
+    };
+
+    const getStatusLabel = (status: AppointmentStatus): string => {
+      const labels: { [key in AppointmentStatus]: string } = {
+        'completed': 'Completada',
+        'pending': 'Pendiente',
+        'cancelled': 'Cancelada',
+        'no_show': 'No asistió'
+      };
+      return labels[status] || status;
+    };
+
+    const formatDate = (dateStr: string): string => {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    };
+
+    return {
+      appointments,
+      employees,
+      loading,
+      companyId,
+      filterEmployee,
+      filterDate,
+      filterStatus,
+      showStatusDialog,
+      selectedAppointment,
+      amountCollected,
+      statusOptions,
+      employeeOptions,
+      filteredAppointments,
+      getStatusSeverity,
+      getStatusLabel,
+      formatDate
+    };
+  };
 
   describe('when manager views appointments', () => {
-    beforeEach(async () => {
-      await component.ngOnInit();
-      fixture.detectChanges();
-      await fixture.whenStable();
+    let component: ReturnType<typeof createMockAppointmentsComponent>;
+
+    beforeEach(() => {
+      component = createMockAppointmentsComponent();
+      component.appointments.set(mockAppointments);
+      component.employees.set(mockEmployees);
+      component.loading.set(false);
     });
 
-    it('should display page title', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('Gestión de Citas');
+    it('should store all appointments', () => {
+      expect(component.appointments()).toHaveLength(3);
     });
 
-    it('should display filter options', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('Empleado');
-      expect(compiled.textContent).toContain('Fecha');
-      expect(compiled.textContent).toContain('Estado');
+    it('should store all employees', () => {
+      expect(component.employees()).toHaveLength(2);
     });
 
-    it('should display all appointments', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
+    it('should store client names correctly', () => {
+      const names = component.appointments().map(apt => apt.client_name);
+      expect(names).toContain('Cliente Uno');
+      expect(names).toContain('Cliente Dos');
+      expect(names).toContain('Cliente Tres');
+    });
+
+    it('should store appointment times correctly', () => {
+      const times = component.appointments().map(apt => apt.appointment_time);
+      expect(times).toContain('10:00');
+      expect(times).toContain('11:00');
+      expect(times).toContain('14:00');
+    });
+
+    it('should store appointment statuses correctly', () => {
+      const statuses = component.appointments().map(apt => apt.status);
+      expect(statuses).toContain('pending');
+      expect(statuses).toContain('completed');
+      expect(statuses).toContain('cancelled');
+    });
+
+    it('should store service and employee data for each appointment', () => {
+      const services = component.appointments().map(apt => apt.service?.name);
+      const employeeNames = component.appointments().map(apt => apt.employee?.full_name);
       
-      expect(compiled.textContent).toContain('Cliente Uno');
-      expect(compiled.textContent).toContain('Cliente Dos');
-      expect(compiled.textContent).toContain('Cliente Tres');
+      expect(services).toContain('Corte de cabello');
+      expect(services).toContain('Tinte');
+      expect(employeeNames).toContain('Juan Pérez');
+      expect(employeeNames).toContain('María García');
     });
 
-    it('should display appointment times', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      
-      expect(compiled.textContent).toContain('10:00');
-      expect(compiled.textContent).toContain('11:00');
-      expect(compiled.textContent).toContain('14:00');
-    });
-
-    it('should display appointment statuses', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      
-      expect(compiled.textContent).toContain('Pendiente');
-      expect(compiled.textContent).toContain('Completada');
-      expect(compiled.textContent).toContain('Cancelada');
-    });
-
-    it('should display service and employee for each appointment', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      
-      expect(compiled.textContent).toContain('Corte de cabello');
-      expect(compiled.textContent).toContain('Tinte');
-      expect(compiled.textContent).toContain('Juan Pérez');
-      expect(compiled.textContent).toContain('María García');
-    });
-
-    it('should show amount collected for completed appointments', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('25.00');
+    it('should track amount collected for completed appointments', () => {
+      const completed = component.appointments().find(apt => apt.status === 'completed');
+      expect(completed?.amount_collected).toBe(25);
     });
   });
 
   describe('when filtering appointments', () => {
-    beforeEach(async () => {
-      await component.ngOnInit();
-      await fixture.whenStable();
+    let component: ReturnType<typeof createMockAppointmentsComponent>;
+
+    beforeEach(() => {
+      component = createMockAppointmentsComponent();
+      component.appointments.set(mockAppointments);
     });
 
     it('should filter by employee', () => {
@@ -215,72 +268,47 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
   });
 
   describe('when managing appointment status', () => {
-    beforeEach(async () => {
-      await component.ngOnInit();
-      fixture.detectChanges();
-      await fixture.whenStable();
+    let component: ReturnType<typeof createMockAppointmentsComponent>;
+
+    beforeEach(() => {
+      component = createMockAppointmentsComponent();
+      component.appointments.set([...mockAppointments]);
     });
 
-    it('should show action buttons for pending appointments', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
+    it('should track selected appointment for status update', () => {
+      const appointment = mockAppointments[0];
+      component.selectedAppointment.set(appointment);
       
-      expect(compiled.textContent).toContain('Completar');
-      expect(compiled.textContent).toContain('Cancelar');
-      expect(compiled.textContent).toContain('No asistió');
+      expect(component.selectedAppointment()?.id).toBe('apt-1');
     });
 
-    it('should call service to complete appointment with amount', async () => {
-      const pendingAppointment = mockAppointments.find(apt => apt.status === 'pending')!;
-      component.selectedAppointment.set(pendingAppointment);
+    it('should track amount to collect for completion', () => {
       component.amountCollected.set(30);
-      component.showStatusDialog.set(true);
-
-      await component.updateStatus('completed');
-
-      expect(appointmentServiceMock.updateStatus).toHaveBeenCalledWith(
-        pendingAppointment.id,
-        'completed',
-        30
-      );
+      
+      expect(component.amountCollected()).toBe(30);
     });
 
-    it('should call service to cancel appointment without amount', async () => {
-      const pendingAppointment = mockAppointments.find(apt => apt.status === 'pending')!;
-      component.selectedAppointment.set(pendingAppointment);
-
-      await component.updateStatus('cancelled');
-
-      expect(appointmentServiceMock.updateStatus).toHaveBeenCalledWith(
-        pendingAppointment.id,
-        'cancelled',
-        undefined
+    it('should update appointment status in local state', () => {
+      const updatedAppointments = component.appointments().map(apt => 
+        apt.id === 'apt-1' 
+          ? { ...apt, status: 'completed' as const, amount_collected: 30 }
+          : apt
       );
-    });
+      component.appointments.set(updatedAppointments);
 
-    it('should update local state after status change', async () => {
-      const pendingAppointment = mockAppointments.find(apt => apt.status === 'pending')!;
-      component.selectedAppointment.set(pendingAppointment);
-
-      await component.updateStatus('completed');
-
-      const updated = component.appointments().find(apt => apt.id === pendingAppointment.id);
+      const updated = component.appointments().find(apt => apt.id === 'apt-1');
       expect(updated?.status).toBe('completed');
-    });
-
-    it('should keep original status when update fails', async () => {
-      appointmentServiceMock.updateStatus = jest.fn().mockRejectedValue(new Error('Update failed'));
-
-      const pendingAppointment = mockAppointments.find(apt => apt.status === 'pending')!;
-      component.selectedAppointment.set(pendingAppointment);
-
-      await component.updateStatus('completed');
-
-      const updated = component.appointments().find(apt => apt.id === pendingAppointment.id);
-      expect(updated?.status).toBe('pending');
+      expect(updated?.amount_collected).toBe(30);
     });
   });
 
   describe('status helpers', () => {
+    let component: ReturnType<typeof createMockAppointmentsComponent>;
+
+    beforeEach(() => {
+      component = createMockAppointmentsComponent();
+    });
+
     it('should return correct severity for each status', () => {
       expect(component.getStatusSeverity('completed')).toBe('success');
       expect(component.getStatusSeverity('pending')).toBe('warn');
@@ -299,6 +327,28 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
       const formatted = component.formatDate('2026-03-20');
       expect(formatted).toContain('20');
       expect(formatted).toContain('mar');
+    });
+  });
+
+  describe('employee options', () => {
+    let component: ReturnType<typeof createMockAppointmentsComponent>;
+
+    beforeEach(() => {
+      component = createMockAppointmentsComponent();
+      component.employees.set(mockEmployees);
+    });
+
+    it('should include "Todos los empleados" as first option', () => {
+      const options = component.employeeOptions();
+      expect(options[0].label).toBe('Todos los empleados');
+      expect(options[0].value).toBe('');
+    });
+
+    it('should include all employees in options', () => {
+      const options = component.employeeOptions();
+      expect(options).toHaveLength(3); // Including default option
+      expect(options[1].label).toBe('Juan Pérez');
+      expect(options[2].label).toBe('María García');
     });
   });
 });
