@@ -13,7 +13,7 @@
       <div class="filters-grid">
         <div class="filter-field">
           <label>Empleado</label>
-          <p-dropdown 
+          <p-select 
             [options]="employeeOptions()"
             [(ngModel)]="filterEmployee"
             optionLabel="label"
@@ -21,24 +21,24 @@
             placeholder="Todos los empleados"
             [showClear]="true"
             styleClass="w-full">
-          </p-dropdown>
+          </p-select>
         </div>
 
         <div class="filter-field">
           <label>Fecha</label>
-          <p-calendar 
+          <p-datepicker 
             [(ngModel)]="filterDate"
             [showIcon]="true"
             placeholder="Seleccionar fecha"
             dateFormat="dd/mm/yy"
             styleClass="w-full"
             inputStyleClass="w-full">
-          </p-calendar>
+          </p-datepicker>
         </div>
 
         <div class="filter-field">
           <label>Estado</label>
-          <p-dropdown 
+          <p-select 
             [options]="statusOptions"
             [(ngModel)]="filterStatus"
             optionLabel="label"
@@ -46,7 +46,7 @@
             placeholder="Todos los estados"
             [showClear]="true"
             styleClass="w-full">
-          </p-dropdown>
+          </p-select>
         </div>
       </div>
     </p-card>

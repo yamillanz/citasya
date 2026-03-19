@@ -5,11 +5,12 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { AvatarModule } from 'primeng/avatar';
+import { LandingHeaderComponent } from '../../../shared/components/landing-header/landing-header.component';
 
 @Component({
   selector: 'app-landing-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonModule, CardModule, DividerModule, AvatarModule],
+  imports: [CommonModule, RouterLink, ButtonModule, CardModule, DividerModule, AvatarModule, LandingHeaderComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

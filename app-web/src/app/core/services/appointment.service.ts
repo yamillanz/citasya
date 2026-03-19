@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Appointment, CreateAppointmentDto } from '../models/appointment.model';
+import { Appointment, AppointmentStatus, CreateAppointmentDto } from '../models/appointment.model';
 import { ScheduleService } from './schedule.service';
 
 @Injectable({ providedIn: 'root' })

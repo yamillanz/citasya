@@ -4,7 +4,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuModule } from 'primeng/menu';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../core/services/auth.service';
 import { User } from '../../core/models/user.model';
@@ -20,7 +20,7 @@ import { User } from '../../core/models/user.model';
     ButtonModule,
     AvatarModule,
     MenuModule,
-    SidebarModule,
+    DrawerModule,
     ToastModule
   ],
   templateUrl: './backoffice.component.html',

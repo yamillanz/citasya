@@ -12,14 +12,14 @@
     <p-card styleClass="date-card">
       <div class="date-selector">
         <label for="close-date">Seleccionar fecha:</label>
-        <p-calendar 
+        <p-datepicker 
           id="close-date"
           [(ngModel)]="selectedDate"
           (ngModelChange)="onDateChange()"
           [showIcon]="true"
           dateFormat="dd/mm/yy"
-          [maxDate]="new Date()">
-        </p-calendar>
+          [maxDate]="maxDateValue">
+        </p-datepicker>
       </div>
     </p-card>
 
@@ -65,8 +65,8 @@
         [value]="appointments()" 
         [paginator]="true" 
         [rows]="10"
-        styleClass="p-datatable-sm"
-        [emptyMessage]="'No hay citas para esta fecha'">
+        styleClass="p-datatable-sm">
+        
         <ng-template pTemplate="header">
           <tr>
             <th>Hora</th>

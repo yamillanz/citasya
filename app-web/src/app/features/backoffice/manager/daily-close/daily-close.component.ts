@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
-import { CalendarModule } from 'primeng/calendar';
+import { DatePickerModule } from 'primeng/datepicker';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
@@ -21,7 +21,7 @@ import { Appointment } from '../../../../core/models/appointment.model';
     FormsModule,
     CardModule,
     ButtonModule,
-    CalendarModule,
+    DatePickerModule,
     TableModule,
     ToastModule
   ],
@@ -38,6 +38,7 @@ export class DailyCloseComponent implements OnInit {
 
   appointments = signal<Appointment[]>([]);
   selectedDate = signal<Date>(new Date());
+  maxDateValue = new Date();
   loading = signal(true);
   generating = signal(false);
   alreadyClosed = signal(false);

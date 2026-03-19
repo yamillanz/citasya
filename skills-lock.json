@@ -51,6 +51,11 @@
       "sourceType": "github",
       "computedHash": "8e99026256fdd857520640b72e0181221ae02bcba16bdb9d644191c1b1b3b9e4"
     },
+    "landing-page-design": {
+      "source": "inferen-sh/skills",
+      "sourceType": "github",
+      "computedHash": "081e388a6bd35c8e11a7b08de47fea59e64fc5422bf1bb898f2d94175ab0eda3"
+    },
     "openspec": {
       "source": "itechmeat/llm-code",
       "sourceType": "github",

@@ -1,0 +1,121 @@
+<header class="landing-header">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-20">
+      <!-- Logo -->
+      <a routerLink="/" class="flex items-center gap-3 text-primary font-bold hover:opacity-80 transition-opacity">
+        <svg 
+          width="160" 
+          height="40" 
+          viewBox="0 0 160 40" 
+          fill="none" 
+          xmlns="http://www.w3.org/2000/svg"
+          class="logo-svg"
+        >
+          <text 
+            x="0" 
+            y="28" 
+            font-family="system-ui, -apple-system, sans-serif" 
+            font-size="24" 
+            font-weight="700"
+          >
+            <tspan fill="#9DC183">CITASYA</tspan><tspan fill="#5D6D7E">.APP</tspan>
+          </text>
+        </svg>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden lg:flex items-center gap-8">
+        @for (item of menuItems; track item.label) {
+          @if (item.routerLink) {
+            <a 
+              [routerLink]="item.routerLink" 
+              [fragment]="item.fragment"
+              class="text-surface-600 hover:text-primary transition-colors font-medium"
+            >
+              {{ item.label }}
+            </a>
+          } @else {
+            <a 
+              [href]="'#' + item.fragment"
+              class="text-surface-600 hover:text-primary transition-colors font-medium"
+            >
+              {{ item.label }}
+            </a>
+          }
+        }
+      </div>
+
+      <!-- Auth Buttons -->
+      <div class="hidden lg:flex items-center gap-3">
+        <p-button 
+          label="Iniciar sesión" 
+          styleClass="p-button-text p-button-secondary"
+          routerLink="/login"
+        />
+        <p-button 
+          label="Registrarse" 
+          styleClass="p-button-primary"
+          routerLink="/signup"
+        />
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <p-button 
+        icon="pi pi-bars" 
+        styleClass="p-button-rounded p-button-text lg:hidden"
+        (onClick)="mobileMenuVisible = true"
+      />
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <p-dialog 
+    [(visible)]="mobileMenuVisible" 
+    [modal]="true" 
+    [style]="{ width: '80vw', maxWidth: '320px' }"
+    [closable]="true"
+    [showHeader]="true"
+    header="Menú"
+    styleClass="lg:hidden"
+  >
+    <div class="flex flex-col gap-4 py-4">
+      @for (item of menuItems; track item.label) {
+        @if (item.routerLink) {
+          <a 
+            [routerLink]="item.routerLink" 
+            [fragment]="item.fragment"
+            class="text-surface-700 hover:text-primary transition-colors font-medium py-2 text-lg"
+            (click)="mobileMenuVisible = false"
+          >
+            {{ item.label }}
+          </a>
+        } @else {
+          <a 
+            [href]="'#' + item.fragment"
+            class="text-surface-700 hover:text-primary transition-colors font-medium py-2 text-lg"
+            (click)="mobileMenuVisible = false"
+          >
+            {{ item.label }}
+          </a>
+        }
+      }
+      
+      <p-divider />
+      
+      <div class="flex flex-col gap-3">
+        <p-button 
+          label="Iniciar sesión" 
+          styleClass="p-button-outlined w-full"
+          routerLink="/login"
+          (onClick)="mobileMenuVisible = false"
+        />
+        <p-button 
+          label="Registrarse" 
+          styleClass="p-button-primary w-full"
+          routerLink="/signup"
+          (onClick)="mobileMenuVisible = false"
+        />
+      </div>
+    </div>
+  </p-dialog>
+</header>

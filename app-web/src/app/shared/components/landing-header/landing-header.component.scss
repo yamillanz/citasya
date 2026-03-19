@@ -1,0 +1,17 @@
+.landing-header {
+  @apply fixed top-0 left-0 right-0 z-50;
+  @apply bg-white/95 backdrop-blur-sm;
+  @apply border-b border-surface-100;
+  @apply shadow-sm;
+}
+
+.logo-svg {
+  height: 40px;
+  width: auto;
+}
+
+:host ::ng-deep {
+  .p-dialog-header {
+    @apply border-b border-surface-100;
+  }
+}
