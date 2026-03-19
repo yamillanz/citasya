@@ -1,38 +1,18 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { Button } from 'primeng/button';
-import { Card } from 'primeng/card';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-unauthorized',
-  imports: [Button, Card],
-  template: `
-    <div class="unauthorized-container">
-      <p-card styleClass="text-center">
-        <ng-template pTemplate="header">
-          <div class="lock-icon">
-            <i class="pi pi-lock"></i>
-          </div>
-        </ng-template>
-        
-        <h1 class="title">Acceso Denegado</h1>
-        <p class="subtitle">No tienes permiso para acceder a esta página.</p>
-        
-        <ng-template pTemplate="footer">
-          <p-button 
-            label="Volver al Inicio" 
-            (onClick)="goHome()"
-            styleClass="p-button-primary"
-          />
-        </ng-template>
-      </p-card>
-    </div>
-  `
+  standalone: true,
+  imports: [RouterLink, ButtonModule],
+  templateUrl: './unauthorized.component.html',
+  styleUrl: './unauthorized.component.scss'
 })
 export class UnauthorizedComponent {
-  constructor(private router: Router) {}
+  private router = inject(Router);
   
   goHome() {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/']);
   }
 }

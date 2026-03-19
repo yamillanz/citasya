@@ -1,0 +1,45 @@
+<div class="unauthorized-page">
+  <!-- Background Elements -->
+  <div class="unauthorized-bg">
+    <div class="unauth-blob unauth-blob-1"></div>
+    <div class="unauth-blob unauth-blob-2"></div>
+  </div>
+
+  <div class="unauthorized-container">
+    <div class="unauthorized-card">
+      <!-- Icon -->
+      <div class="unauth-icon">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="40" fill="#FEF2F2"/>
+          <path d="M40 22C31.1634 22 24 29.1634 24 38C24 42.4183 25.8219 46.3734 28.8 49.2L26.8 56H53.2L51.2 49.2C54.1781 46.3734 56 42.4183 56 38C56 29.1634 48.8366 22 40 22ZM32.8 38C32.8 33.4624 36.4624 29.8 41 29.8C45.5376 29.8 49.2 33.4624 49.2 38C49.2 42.5376 45.5376 46.2 41 46.2C36.4624 46.2 32.8 42.5376 32.8 38ZM38.4 36.6V41.2C38.4 42.738 39.662 44 41.2 44C42.738 44 44 42.738 44 41.2V36.6C46.3340 35.9458 48 34.0184 48 31.8C48 28.9891 45.7109 26.7 42.9 26.7C40.0891 26.7 38.4 28.9891 38.4 31.8C38.4 34.0184 40.0658 35.9458 42.4 36.6Z" fill="#E07A5F"/>
+        </svg>
+      </div>
+
+      <!-- Content -->
+      <div class="unauth-content">
+        <h1>Acceso Denegado</h1>
+        <p>No tienes permisos para acceder a esta página. Contacta al administrador si crees que esto es un error.</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="unauth-actions">
+        <p-button 
+          label="Volver al Dashboard" 
+          icon="pi pi-home"
+          styleClass="primary-btn"
+          (onClick)="goHome()"
+        />
+        <p-button 
+          label="Ir al Inicio" 
+          styleClass="secondary-btn"
+          [routerLink]="['/']"
+        />
+      </div>
+
+      <!-- Help Text -->
+      <div class="unauth-help">
+        <p>¿Necesitas ayuda? <a href="mailto:soporte@citasya.app">Contacta a soporte</a></p>
+      </div>
+    </div>
+  </div>
+</div>
