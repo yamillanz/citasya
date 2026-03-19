@@ -1,9 +1,8 @@
-import { ComponentFixture, TestBed, NO_ERRORS_SCHEMA } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync, NO_ERRORS_SCHEMA } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
 import { BackofficeComponent } from './backoffice.component';
-import { AuthService } from '../../../core/services/auth.service';
-import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { Router } from '@angular/router';
 
 describe('BackofficeComponent - Behavior Driven Tests', () => {
   let component: BackofficeComponent;
@@ -28,22 +27,30 @@ describe('BackofficeComponent - Behavior Driven Tests', () => {
       signOut: jest.fn().mockResolvedValue(undefined)
     } as any;
 
+    routerMock = {
+      navigate: jest.fn().mockResolvedValue(true)
+    } as any;
 
     await TestBed.configureTestingModule({
       imports: [BackofficeComponent, RouterTestingModule],
       providers: [
         { provide: AuthService, useValue: authServiceMock },
         { provide: Router, useValue: routerMock }
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(BackofficeComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
-    await fixture.whenStable();
   }));
 
   describe('when manager accesses backoffice', () => {
+    beforeEach(async () => {
+      await component.ngOnInit();
+      fixture.detectChanges();
+      await fixture.whenStable();
+    });
+
     it('should display brand name', () => {
       const compiled = fixture.nativeElement as HTMLElement;
       expect(compiled.textContent).toContain('CitasYa');
@@ -54,23 +61,29 @@ describe('BackofficeComponent - Behavior Driven Tests', () => {
       expect(compiled.textContent).toContain('Manager');
     });
 
-    it('should load current user information', async () => {
+    it('should load current user information', () => {
       expect(authServiceMock.getCurrentUser).toHaveBeenCalled();
       expect(component.user()).toEqual(mockUser);
-    }));
+    });
 
-    it('should display user name in sidebar', async () => {
+    it('should display user name in sidebar', () => {
       const compiled = fixture.nativeElement as HTMLElement;
       expect(compiled.textContent).toContain('Manager Test');
-    }));
+    });
 
-    it('should display user email in sidebar', async () => {
+    it('should display user email in sidebar', () => {
       const compiled = fixture.nativeElement as HTMLElement;
       expect(compiled.textContent).toContain('manager@test.com');
-    }));
+    });
   });
 
   describe('navigation menu', () => {
+    beforeEach(async () => {
+      await component.ngOnInit();
+      fixture.detectChanges();
+      await fixture.whenStable();
+    });
+
     it('should display dashboard navigation item', () => {
       const compiled = fixture.nativeElement as HTMLElement;
       expect(compiled.textContent).toContain('Dashboard');
@@ -108,31 +121,34 @@ describe('BackofficeComponent - Behavior Driven Tests', () => {
 
     it('should highlight active navigation item', () => {
       const compiled = fixture.nativeElement as HTMLElement;
-      // Check that RouterLinkActive directive is present
       const navItems = compiled.querySelectorAll('a[routerlinkactive]');
       expect(navItems.length).toBeGreaterThan(0);
     });
   });
 
   describe('logout functionality', () => {
+    beforeEach(async () => {
+      await component.ngOnInit();
+      fixture.detectChanges();
+      await fixture.whenStable();
+    });
+
     it('should display logout button', () => {
       const compiled = fixture.nativeElement as HTMLElement;
       expect(compiled.textContent).toContain('Cerrar Sesión');
     });
 
-    it('should call signOut when clicking logout', fakeAsync(async () => {
+    it('should call signOut when clicking logout', async () => {
       await component.logout();
-      // tick replaced by await
 
       expect(authServiceMock.signOut).toHaveBeenCalled();
-    }));
+    });
 
-    it('should navigate to login after logout', fakeAsync(async () => {
+    it('should navigate to login after logout', async () => {
       await component.logout();
-      // tick replaced by await
 
       expect(routerMock.navigate).toHaveBeenCalledWith(['/login']);
-    }));
+    });
   });
 
   describe('mobile responsiveness', () => {
