@@ -1,212 +1,303 @@
 <app-landing-header />
 
-<section class="hero-section min-h-screen flex items-center justify-center bg-gradient-to-br from-surface-50 to-white p-4 pt-28">
-  <div class="max-w-6xl mx-auto w-full">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <!-- Hero Content -->
-      <div class="text-center lg:text-left">
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-primary mb-6 leading-tight">
-          Gestiona tus citas profesionales desde un solo lugar
-        </h1>
-        <p class="text-xl text-surface-600 mb-8 max-w-xl mx-auto lg:mx-0">
-          La solución perfecta para salones de belleza, clínicas dentales y profesionales independientes
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-          <p-button 
-            label="Comenzar prueba gratuita" 
-            icon="pi pi-arrow-right" 
-            iconPos="right"
-            styleClass="p-button-lg p-button-primary"
-            [routerLink]="['/signup']"
-          />
-          <p-button 
-            label="Ver características" 
-            styleClass="p-button-lg p-button-outlined p-button-secondary"
-            [routerLink]="['/features']"
-          />
-        </div>
+<!-- Hero Section -->
+<section class="hero-section">
+  <!-- Background Elements -->
+  <div class="hero-bg">
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    <div class="hero-grid"></div>
+  </div>
+  
+  <div class="hero-container">
+    <div class="hero-content">
+      <!-- Badge -->
+      <div class="hero-badge animate-fade-in-up">
+        <span class="badge-dot"></span>
+        <span>Nuevo: Reportes avanzados disponibles</span>
       </div>
       
-      <!-- Hero Visual -->
-      <div class="flex justify-center lg:justify-end">
-        <div class="relative">
-          <div class="w-80 h-80 md:w-96 md:h-96 bg-primary/10 rounded-full flex items-center justify-center">
-            <div class="w-64 h-64 md:w-72 md:h-72 bg-white rounded-2xl shadow-2xl flex items-center justify-center">
-              <div class="text-center">
-                <p-avatar icon="pi pi-calendar" styleClass="mr-2" size="xlarge" shape="circle" class="bg-primary text-white text-4xl p-4 mb-4"></p-avatar>
-                <p class="text-2xl font-bold text-primary">CitasYa</p>
-                <p class="text-surface-500">Tu agenda digital</p>
+      <!-- Headline -->
+      <h1 class="hero-headline animate-fade-in-up delay-100">
+        Gestiona tus citas<br>
+        <span class="headline-accent">desde un solo lugar</span>
+      </h1>
+      
+      <!-- Subheadline -->
+      <p class="hero-subheadline animate-fade-in-up delay-200">
+        La solución perfecta para salones de belleza, clínicas dentales y profesionales independientes. 
+        <strong>Sin complicaciones, sin contratos.</strong>
+      </p>
+      
+      <!-- CTA Buttons -->
+      <div class="hero-cta animate-fade-in-up delay-300">
+        <p-button 
+          label="Comenzar prueba gratuita" 
+          icon="pi pi-arrow-right" 
+          iconPos="right"
+          styleClass="hero-btn-primary"
+          [routerLink]="['/signup']"
+        />
+        <p-button 
+          label="Ver características" 
+          styleClass="hero-btn-outline"
+          [routerLink]="['#features']"
+        />
+      </div>
+      
+      <!-- Social Proof -->
+      <div class="hero-social-proof animate-fade-in-up delay-400">
+        <div class="proof-avatars">
+          <div class="proof-avatar">MG</div>
+          <div class="proof-avatar">CS</div>
+          <div class="proof-avatar">AR</div>
+          <div class="proof-avatar">LP</div>
+        </div>
+        <p class="proof-text">
+          <strong>+500 profesionales</strong> ya confían en CitasYa
+        </p>
+      </div>
+    </div>
+    
+    <!-- Hero Visual -->
+    <div class="hero-visual animate-fade-in-up delay-200">
+      <div class="visual-card">
+        <div class="visual-card-header">
+          <div class="card-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="card-title">Panel de Citas</span>
+        </div>
+        <div class="visual-card-content">
+          <div class="mock-calendar">
+            <div class="mock-header">
+              <span class="mock-month">Marzo 2026</span>
+              <div class="mock-nav">
+                <i class="pi pi-chevron-left"></i>
+                <i class="pi pi-chevron-right"></i>
               </div>
+            </div>
+            <div class="mock-days">
+              <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+            </div>
+            <div class="mock-dates">
+              <span class="empty"></span><span class="empty"></span>
+              <span class="date">1</span><span class="date">2</span><span class="date">3</span><span class="date">4</span><span class="date">5</span>
+              <span class="date">6</span><span class="date">7</span><span class="date has-apt">8</span><span class="date">9</span><span class="date">10</span><span class="date">11</span><span class="date">12</span>
+              <span class="date">13</span><span class="date has-apt">14</span><span class="date">15</span><span class="date today">16</span><span class="date">17</span><span class="date">18</span><span class="date">19</span>
+              <span class="date">20</span><span class="date">21</span><span class="date">22</span><span class="date">23</span><span class="date">24</span><span class="date">25</span><span class="date">26</span>
+              <span class="date">27</span><span class="date">28</span><span class="date">29</span><span class="date">30</span><span class="date">31</span><span class="empty"></span><span class="empty"></span>
+            </div>
+          </div>
+          <div class="mock-appointments">
+            <div class="mock-apt apt-1">
+              <span class="apt-time">10:00</span>
+              <span class="apt-info">María García - Corte</span>
+            </div>
+            <div class="mock-apt apt-2">
+              <span class="apt-time">11:30</span>
+              <span class="apt-info">Carlos López - Manicure</span>
+            </div>
+            <div class="mock-apt apt-3">
+              <span class="apt-time">15:00</span>
+              <span class="apt-info">Ana Rodríguez - Tintura</span>
             </div>
           </div>
         </div>
       </div>
+      <div class="visual-glow"></div>
     </div>
   </div>
 </section>
 
-<p-divider></p-divider>
-
 <!-- Features Section -->
-<section class="features-section py-20 px-4 bg-white">
-  <div class="max-w-6xl mx-auto">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold text-primary mb-4">¿Por qué elegir CitasYa?</h2>
-      <p class="text-xl text-surface-600 max-w-2xl mx-auto">
+<section class="features-section" id="features">
+  <div class="section-container">
+    <div class="section-header">
+      <span class="section-badge">Características</span>
+      <h2 class="section-title">¿Por qué elegir CitasYa?</h2>
+      <p class="section-subtitle">
         Todo lo que necesitas para gestionar tu negocio de servicios profesionales
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="features-grid">
       <!-- Feature 1 -->
-      <p-card styleClass="h-full hover:shadow-lg transition-shadow duration-300">
-        <ng-template pTemplate="header">
-          <div class="p-6 pb-0">
-            <p-avatar icon="pi pi-calendar-plus" styleClass="mr-2" size="large" shape="circle" class="bg-primary text-white text-2xl"></p-avatar>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="title">
-          <h3 class="text-xl font-semibold">Citas sin registro</h3>
-        </ng-template>
-        <ng-template pTemplate="content">
-          <p class="text-surface-600 m-0">
-            Tus clientes agendan sin necesidad de crear cuenta. Reduce la fricción y aumenta tus reservas.
-          </p>
-        </ng-template>
-      </p-card>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 8L12 12M12 12L8 16M12 12L16 16M12 12L8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">Citas sin registro</h3>
+        <p class="feature-description">
+          Tus clientes agendan sin necesidad de crear cuenta. Reduce la fricción y aumenta tus reservas.
+        </p>
+        <div class="feature-decoration"></div>
+      </div>
 
       <!-- Feature 2 -->
-      <p-card styleClass="h-full hover:shadow-lg transition-shadow duration-300">
-        <ng-template pTemplate="header">
-          <div class="p-6 pb-0">
-            <p-avatar icon="pi pi-file-pdf" styleClass="mr-2" size="large" shape="circle" class="bg-primary text-white text-2xl"></p-avatar>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="title">
-          <h3 class="text-xl font-semibold">Cierre diario</h3>
-        </ng-template>
-        <ng-template pTemplate="content">
-          <p class="text-surface-600 m-0">
-            Genera reportes PDF con un clic. Control total de ingresos por día y empleado.
-          </p>
-        </ng-template>
-      </p-card>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 2V8H20M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">Cierre diario</h3>
+        <p class="feature-description">
+          Genera reportes PDF con un clic. Control total de ingresos por día y empleado.
+        </p>
+        <div class="feature-decoration"></div>
+      </div>
 
       <!-- Feature 3 -->
-      <p-card styleClass="h-full hover:shadow-lg transition-shadow duration-300">
-        <ng-template pTemplate="header">
-          <div class="p-6 pb-0">
-            <p-avatar icon="pi pi-users" styleClass="mr-2" size="large" shape="circle" class="bg-primary text-white text-2xl"></p-avatar>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="title">
-          <h3 class="text-xl font-semibold">Gestión de equipo</h3>
-        </ng-template>
-        <ng-template pTemplate="content">
-          <p class="text-surface-600 m-0">
-            Administra empleados y asigna servicios. Controla quién puede hacer qué.
-          </p>
-        </ng-template>
-      </p-card>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+            <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">Gestión de equipo</h3>
+        <p class="feature-description">
+          Administra empleados y asigna servicios. Controla quién puede hacer qué.
+        </p>
+        <div class="feature-decoration"></div>
+      </div>
 
       <!-- Feature 4 -->
-      <p-card styleClass="h-full hover:shadow-lg transition-shadow duration-300">
-        <ng-template pTemplate="header">
-          <div class="p-6 pb-0">
-            <p-avatar icon="pi pi-mobile" styleClass="mr-2" size="large" shape="circle" class="bg-primary text-white text-2xl"></p-avatar>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="title">
-          <h3 class="text-xl font-semibold">100% Mobile First</h3>
-        </ng-template>
-        <ng-template pTemplate="content">
-          <p class="text-surface-600 m-0">
-            Diseñado para funcionar perfectamente en smartphones. Tus clientes reservan desde cualquier lugar.
-          </p>
-        </ng-template>
-      </p-card>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <rect x="5" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 18H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">100% Mobile First</h3>
+        <p class="feature-description">
+          Diseñado para funcionar perfectamente en smartphones. Tus clientes reservan desde cualquier lugar.
+        </p>
+        <div class="feature-decoration"></div>
+      </div>
 
       <!-- Feature 5 -->
-      <p-card styleClass="h-full hover:shadow-lg transition-shadow duration-300">
-        <ng-template pTemplate="header">
-          <div class="p-6 pb-0">
-            <p-avatar icon="pi pi-clock" styleClass="mr-2" size="large" shape="circle" class="bg-primary text-white text-2xl"></p-avatar>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="title">
-          <h3 class="text-xl font-semibold">Disponibilidad en tiempo real</h3>
-        </ng-template>
-        <ng-template pTemplate="content">
-          <p class="text-surface-600 m-0">
-            Los clientes ven solo los horarios disponibles. Sin conflictos de agenda.
-          </p>
-        </ng-template>
-      </p-card>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">Disponibilidad en tiempo real</h3>
+        <p class="feature-description">
+          Los clientes ven solo los horarios disponibles. Sin conflictos de agenda.
+        </p>
+        <div class="feature-decoration"></div>
+      </div>
 
       <!-- Feature 6 -->
-      <p-card styleClass="h-full hover:shadow-lg transition-shadow duration-300">
-        <ng-template pTemplate="header">
-          <div class="p-6 pb-0">
-            <p-avatar icon="pi pi-chart-line" styleClass="mr-2" size="large" shape="circle" class="bg-primary text-white text-2xl"></p-avatar>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="title">
-          <h3 class="text-xl font-semibold">Reportes detallados</h3>
-        </ng-template>
-        <ng-template pTemplate="content">
-          <p class="text-surface-600 m-0">
-            Visualiza ingresos por empleado, servicios más demandados y tendencias.
-          </p>
-        </ng-template>
-      </p-card>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <path d="M18 20V10M12 20V4M6 20V14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">Reportes detallados</h3>
+        <p class="feature-description">
+          Visualiza ingresos por empleado, servicios más demandados y tendencias.
+        </p>
+        <div class="feature-decoration"></div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- How It Works Section -->
-<section class="how-it-works py-20 px-4 bg-surface-50">
-  <div class="max-w-6xl mx-auto">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold text-primary mb-4">¿Cómo funciona?</h2>
-      <p class="text-xl text-surface-600">En 4 simples pasos</p>
+<section class="how-it-works-section">
+  <div class="section-container">
+    <div class="section-header">
+      <span class="section-badge">Proceso</span>
+      <h2 class="section-title">¿Cómo funciona?</h2>
+      <p class="section-subtitle">En 4 simples pasos</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div class="steps-container">
       @for (step of steps; track $index) {
-        <div class="text-center">
-          <p-avatar 
-            [label]="($index + 1).toString()"
-            styleClass="bg-primary text-white text-3xl font-bold mb-4"
-            size="xlarge"
-            shape="circle"
-          ></p-avatar>
-          <h3 class="text-xl font-semibold mb-2">{{step.title}}</h3>
-          <p class="text-surface-600">{{step.description}}</p>
+        <div class="step-card" [style.animation-delay]="($index * 150) + 'ms'">
+          <div class="step-number">{{ $index + 1 }}</div>
+          <div class="step-connector" *ngIf="$index < steps.length - 1"></div>
+          <h3 class="step-title">{{ step.title }}</h3>
+          <p class="step-description">{{ step.description }}</p>
         </div>
       }
     </div>
   </div>
 </section>
 
-<p-divider></p-divider>
-
 <!-- CTA Section -->
-<section class="cta-section py-20 px-4">
-  <div class="max-w-4xl mx-auto text-center">
-    <p-card styleClass="bg-primary text-white p-8">
-      <ng-template pTemplate="content">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">¿Listo para empezar?</h2>
-        <p class="text-xl mb-8 opacity-90">
-          Únete a cientos de profesionales que ya gestionan sus citas con CitasYa
-        </p>
+<section class="cta-section">
+  <div class="cta-bg">
+    <div class="cta-blob cta-blob-1"></div>
+    <div class="cta-blob cta-blob-2"></div>
+  </div>
+  <div class="cta-container">
+    <div class="cta-card">
+      <span class="cta-badge">Empieza hoy</span>
+      <h2 class="cta-title">¿Listo para transformar tu negocio?</h2>
+      <p class="cta-description">
+        Únete a cientos de profesionales que ya gestionan sus citas con CitasYa. 
+        Sin tarjeta de crédito, sin compromisos.
+      </p>
+      <div class="cta-actions">
         <p-button 
           label="Crear cuenta gratuita" 
           icon="pi pi-user-plus" 
           iconPos="right"
-          styleClass="p-button-lg p-button-outlined p-button-white"
+          styleClass="cta-btn-primary"
           [routerLink]="['/signup']"
         />
-      </ng-template>
-    </p-card>
+      </div>
+      <p class="cta-note">Tardas menos de 2 minutos en configurar</p>
+    </div>
   </div>
 </section>
+
+<!-- Footer -->
+<footer class="landing-footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <svg width="120" height="32" viewBox="0 0 140 36" fill="none">
+        <text x="0" y="26" font-family="var(--font-display)" font-size="22" font-weight="600">
+          <tspan fill="#9DC183">CITASYA</tspan><tspan fill="#5D6D7E">.APP</tspan>
+        </text>
+      </svg>
+      <p class="footer-tagline">Gestión de citas simplificada</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-column">
+        <h4>Producto</h4>
+        <a href="#features">Características</a>
+        <a routerLink="/pricing">Precios</a>
+        <a href="#">Integraciones</a>
+      </div>
+      <div class="footer-column">
+        <h4>Empresa</h4>
+        <a routerLink="/about">Sobre nosotros</a>
+        <a routerLink="/contact">Contacto</a>
+        <a routerLink="/faq">FAQ</a>
+      </div>
+      <div class="footer-column">
+        <h4>Legal</h4>
+        <a href="#">Términos de uso</a>
+        <a href="#">Privacidad</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CitasYa. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</footer>
