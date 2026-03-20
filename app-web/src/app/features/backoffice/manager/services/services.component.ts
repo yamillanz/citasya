@@ -1,7 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CardModule } from 'primeng/card';
+import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
@@ -18,7 +18,7 @@ import { Service } from '../../../../core/models/service.model';
   imports: [
     CommonModule,
     RouterLink,
-    CardModule,
+    FormsModule,
     ButtonModule,
     ConfirmDialogModule,
     ToastModule,
@@ -37,6 +37,17 @@ export class ServicesComponent implements OnInit {
   services = signal<Service[]>([]);
   loading = signal(true);
   companyId = signal<string | null>(null);
+  searchQuery = signal('');
+  viewMode = signal<'grid' | 'list'>('grid');
+
+  filteredServices = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return this.services();
+    
+    return this.services().filter(s => 
+      s.name.toLowerCase().includes(query)
+    );
+  });
 
   async ngOnInit() {
     const user = await this.authService.getCurrentUser();
@@ -60,6 +71,15 @@ export class ServicesComponent implements OnInit {
         detail: 'No se pudieron cargar los servicios'
       });
     }
+  }
+
+  onSearch(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery.set(input.value);
+  }
+
+  clearFilters() {
+    this.searchQuery.set('');
   }
 
   confirmDelete(service: Service) {

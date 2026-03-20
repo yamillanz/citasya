@@ -1,142 +1,218 @@
-<div class="daily-close-container">
+<div class="daily-close-page">
+  <!-- Header -->
   <header class="page-header">
-    <h1>Cierre Diario</h1>
+    <div class="header-content">
+      <div class="header-text">
+        <div class="header-badge">Reportes</div>
+        <h1>Cierre Diario</h1>
+        <p>Resumen de operaciones y generación de reportes</p>
+      </div>
+    </div>
   </header>
 
   @if (loading()) {
     <div class="loading-state">
+      <div class="loading-spinner"></div>
       <p>Cargando datos...</p>
     </div>
   } @else {
-    <!-- Date Selector -->
-    <p-card styleClass="date-card">
-      <div class="date-selector">
-        <label for="close-date">Seleccionar fecha:</label>
+    <!-- Date Selector Card -->
+    <div class="date-card">
+      <div class="date-content">
+        <div class="date-info">
+          <div class="date-icon">
+            <i class="pi pi-calendar"></i>
+          </div>
+          <div class="date-text">
+            <span class="date-label">Fecha seleccionada</span>
+            <span class="date-value">{{ formatDate(selectedDate()) }}</span>
+          </div>
+        </div>
         <p-datepicker 
-          id="close-date"
           [(ngModel)]="selectedDate"
           (ngModelChange)="onDateChange()"
           [showIcon]="true"
           dateFormat="dd/mm/yy"
-          [maxDate]="maxDateValue">
+          [maxDate]="maxDateValue"
+          styleClass="date-picker">
         </p-datepicker>
       </div>
-    </p-card>
+    </div>
 
     <!-- Already Closed Alert -->
     @if (alreadyClosed()) {
-      <p-card styleClass="closed-alert">
-        <div class="alert-content">
-          <i class="pi pi-check-circle"></i>
-          <span>El cierre para esta fecha ya fue generado</span>
+      <div class="closed-alert">
+        <div class="alert-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-      </p-card>
+        <div class="alert-content">
+          <span class="alert-title">Cierre ya generado</span>
+          <span class="alert-desc">El reporte de cierre para este día ya fue generado anteriormente.</span>
+        </div>
+      </div>
     }
 
-    <!-- Summary Cards -->
-    <div class="summary-grid">
-      <p-card styleClass="summary-card">
-        <div class="summary-content">
-          <span class="summary-value">{{ appointments().length }}</span>
-          <span class="summary-label">Total Citas</span>
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card stat-primary">
+        <div class="stat-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
         </div>
-      </p-card>
+        <div class="stat-content">
+          <span class="stat-value">{{ appointments().length }}</span>
+          <span class="stat-label">Total Citas</span>
+        </div>
+        <div class="stat-decoration"></div>
+      </div>
 
-      <p-card styleClass="summary-card">
-        <div class="summary-content">
-          <span class="summary-value text-success">{{ completedAppointments().length }}</span>
-          <span class="summary-label">Completadas</span>
+      <div class="stat-card stat-success">
+        <div class="stat-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-      </p-card>
+        <div class="stat-content">
+          <span class="stat-value">{{ completedAppointments().length }}</span>
+          <span class="stat-label">Completadas</span>
+        </div>
+        <div class="stat-decoration"></div>
+      </div>
 
-      <p-card styleClass="summary-card">
-        <div class="summary-content">
-          <span class="summary-value text-primary">${{ totalAmount() | number:'1.2-2' }}</span>
-          <span class="summary-label">Monto Total</span>
+      <div class="stat-card stat-info">
+        <div class="stat-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-      </p-card>
+        <div class="stat-content">
+          <span class="stat-value">${{ totalAmount() | number:'1.0-0' }}</span>
+          <span class="stat-label">Ingresos</span>
+        </div>
+        <div class="stat-decoration"></div>
+      </div>
     </div>
 
-    <!-- Appointments Table -->
-    <p-card styleClass="table-card">
-      <h3 class="table-title">Citas del día</h3>
-      
-      <p-table 
-        [value]="appointments()" 
-        [paginator]="true" 
-        [rows]="10"
-        styleClass="p-datatable-sm">
+    @if (appointments().length === 0) {
+      <!-- Empty State -->
+      <div class="empty-state">
+        <div class="empty-illustration">
+          <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="50" r="50" fill="#F5F2ED"/>
+            <rect x="25" y="28" width="50" height="44" rx="4" stroke="#B8D4A3" stroke-width="2.5"/>
+            <path d="M25 40H75" stroke="#B8D4A3" stroke-width="2.5"/>
+            <path d="M35 52H65M35 64H55" stroke="#B8D4A3" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Sin citas para esta fecha</h3>
+        <p>No hay citas registradas para el {{ formatDate(selectedDate()) }}.</p>
+      </div>
+    } @else {
+      <!-- Appointments List -->
+      <div class="appointments-section">
+        <div class="section-header">
+          <h2>Citas del Día</h2>
+          <span class="count-badge">{{ appointments().length }}</span>
+        </div>
         
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Hora</th>
-            <th>Cliente</th>
-            <th>Servicio</th>
-            <th>Empleado</th>
-            <th>Estado</th>
-            <th>Monto</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-apt>
-          <tr>
-            <td>{{ apt.appointment_time }}</td>
-            <td>{{ apt.client_name }}</td>
-            <td>{{ $any(apt).service?.name || 'N/A' }}</td>
-            <td>{{ $any(apt).employee?.full_name || 'N/A' }}</td>
-            <td>
-              <span 
-                class="status-badge"
-                [class]="apt.status">
-                {{ apt.status === 'completed' ? 'Completada' : 
-                   apt.status === 'pending' ? 'Pendiente' : 
-                   apt.status === 'cancelled' ? 'Cancelada' : 'No asistió' }}
-              </span>
-            </td>
-            <td>${{ (apt.amount_collected || 0) | number:'1.2-2' }}</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </p-card>
-
-    <!-- Employee Breakdown -->
-    @if (objectKeys(appointmentsByEmployee()).length > 0) {
-      <p-card styleClass="breakdown-card">
-        <h3 class="breakdown-title">Resumen por Empleado</h3>
-        
-        <div class="breakdown-list">
-          @for (empId of objectKeys(appointmentsByEmployee()); track empId) {
-            <div class="breakdown-item">
-              <span class="employee-name">
-                {{ $any(appointmentsByEmployee()[empId][0]).employee?.full_name }}
-              </span>
-              <div class="breakdown-stats">
-                <span class="stat">
-                  <i class="pi pi-calendar"></i>
-                  {{ appointmentsByEmployee()[empId].length }} citas
+        <div class="appointments-list">
+          @for (apt of appointments(); track apt.id) {
+            <div class="appointment-item" [class]="'status-' + apt.status">
+              <div class="item-time">{{ apt.appointment_time }}</div>
+              <div class="item-info">
+                <span class="item-client">{{ apt.client_name }}</span>
+                <span class="item-meta">
+                  <i class="pi pi-tag"></i>
+                  {{ $any(apt).service?.name || 'N/A' }}
+                  <span class="separator">•</span>
+                  <i class="pi pi-user"></i>
+                  {{ $any(apt).employee?.full_name || 'N/A' }}
                 </span>
-                <span class="stat amount">
-                  <i class="pi pi-dollar"></i>
-                  {{ getEmployeeTotal(appointmentsByEmployee()[empId]) | number:'1.2-2' }}
+              </div>
+              <div class="item-status">
+                <span class="status-badge" [class]="apt.status">
+                  {{ getStatusLabel(apt.status) }}
                 </span>
+              </div>
+              <div class="item-amount">
+                @if (apt.amount_collected) {
+                  ${{ apt.amount_collected | number:'1.2-2' }}
+                } @else {
+                  -
+                }
               </div>
             </div>
           }
         </div>
-      </p-card>
-    }
-
-    <!-- Generate Button -->
-    @if (!alreadyClosed() && completedAppointments().length > 0) {
-      <div class="generate-action">
-        <p-button 
-          label="Generar Cierre y Descargar PDF"
-          icon="pi pi-file-pdf"
-          size="large"
-          (onClick)="generateClose()"
-          [loading]="generating()"
-          [disabled]="generating()">
-        </p-button>
       </div>
+
+      <!-- Employee Breakdown -->
+      @if (objectKeys(appointmentsByEmployee()).length > 0) {
+        <div class="breakdown-section">
+          <div class="section-header">
+            <h2>Resumen por Empleado</h2>
+          </div>
+          
+          <div class="breakdown-grid">
+            @for (empId of objectKeys(appointmentsByEmployee()); track empId) {
+              <div class="breakdown-card">
+                <div class="breakdown-header">
+                  <div class="employee-avatar">
+                    {{ getEmployeeInitials(empId) }}
+                  </div>
+                  <div class="employee-info">
+                    <span class="employee-name">{{ $any(appointmentsByEmployee()[empId][0]).employee?.full_name }}</span>
+                    <span class="employee-role">Empleado</span>
+                  </div>
+                </div>
+                <div class="breakdown-stats">
+                  <div class="breakdown-stat">
+                    <span class="stat-value">{{ appointmentsByEmployee()[empId].length }}</span>
+                    <span class="stat-label">Citas</span>
+                  </div>
+                  <div class="breakdown-stat highlight">
+                    <span class="stat-value">${{ getEmployeeTotal(appointmentsByEmployee()[empId]) | number:'1.2-2' }}</span>
+                    <span class="stat-label">Total</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Generate PDF Button -->
+      @if (!alreadyClosed() && completedAppointments().length > 0) {
+        <div class="generate-action">
+          <div class="generate-content">
+            <div class="generate-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14 2V8H20M8 13H16M8 17H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="generate-text">
+              <span class="generate-title">Generar Reporte PDF</span>
+              <span class="generate-desc">Descarga el resumen completo del día {{ formatDateShort(selectedDate()) }}</span>
+            </div>
+          </div>
+          <p-button 
+            label="Generar y Descargar"
+            icon="pi pi-file-pdf"
+            size="large"
+            (onClick)="generateClose()"
+            [loading]="generating()"
+            [disabled]="generating()"
+            styleClass="btn-generate">
+          </p-button>
+        </div>
+      }
     }
   }
 </div>

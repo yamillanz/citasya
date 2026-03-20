@@ -1,75 +1,127 @@
-<div class="employees-container">
+<div class="employees-page">
+  <!-- Header -->
   <header class="page-header">
-    <h1>Gestión de Empleados</h1>
-    <p-button 
-      label="Nuevo Empleado" 
-      icon="pi pi-plus"
-      routerLink="/bo/employees/new">
-    </p-button>
+    <div class="header-content">
+      <div class="header-text">
+        <div class="header-badge">Recursos Humanos</div>
+        <h1>Empleados</h1>
+        <p>Gestiona tu equipo de trabajo</p>
+      </div>
+      <div class="header-actions">
+        <p-button 
+          label="Nuevo Empleado" 
+          icon="pi pi-plus"
+          routerLink="/bo/employees/new"
+          styleClass="btn-primary">
+        </p-button>
+      </div>
+    </div>
   </header>
 
+  <!-- Filters & Search -->
+  @if (!loading() && employees().length > 0) {
+    <div class="filters-bar">
+      <div class="search-box">
+        <i class="pi pi-search"></i>
+        <input 
+          type="text" 
+          placeholder="Buscar empleado..."
+          (input)="onSearch($event)">
+      </div>
+      <div class="filter-chips">
+        <button 
+          class="filter-chip"
+          [class.active]="statusFilter() === 'all'"
+          (click)="statusFilter.set('all')">
+          Todos ({{ employees().length }})
+        </button>
+        <button 
+          class="filter-chip"
+          [class.active]="statusFilter() === 'active'"
+          (click)="statusFilter.set('active')">
+          Activos ({{ activeCount() }})
+        </button>
+        <button 
+          class="filter-chip"
+          [class.active]="statusFilter() === 'inactive'"
+          (click)="statusFilter.set('inactive')">
+          Inactivos ({{ inactiveCount() }})
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Loading State -->
   @if (loading()) {
     <div class="loading-state">
+      <div class="loading-spinner"></div>
       <p>Cargando empleados...</p>
     </div>
-  } @else if (employees().length === 0) {
-    <p-card styleClass="empty-state">
-      <div class="empty-content">
-        <i class="pi pi-users empty-icon"></i>
+  } @else if (filteredEmployees().length === 0) {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-illustration">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="50" fill="#F5F2ED"/>
+          <circle cx="50" cy="38" r="16" stroke="#B8D4A3" stroke-width="2.5"/>
+          <path d="M26 78C26 62.536 36.058 50 50 50C63.942 50 74 62.536 74 78" stroke="#B8D4A3" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      @if (employees().length === 0) {
         <h3>No hay empleados registrados</h3>
-        <p>Comienza agregando tu primer empleado</p>
+        <p>Comienza agregando tu primer empleado para gestionar tu equipo.</p>
         <p-button 
           label="Agregar Empleado" 
           icon="pi pi-plus"
           routerLink="/bo/employees/new"
-          styleClass="mt-3">
+          styleClass="btn-primary">
         </p-button>
-      </div>
-    </p-card>
+      } @else {
+        <h3>Sin resultados</h3>
+        <p>No se encontraron empleados con los filtros seleccionados.</p>
+        <p-button 
+          label="Limpiar filtros" 
+          icon="pi pi-filter-slash"
+          severity="secondary"
+          (onClick)="clearFilters()"
+          styleClass="btn-secondary">
+        </p-button>
+      }
+    </div>
   } @else {
+    <!-- Employees Grid -->
     <div class="employees-grid">
-      @for (employee of employees(); track employee.id) {
-        <p-card 
-          styleClass="employee-card"
-          [ngClass]="{ 'inactive': !employee.is_active }">
-          <div class="employee-content">
-            <div class="employee-header">
-              <p-avatar 
-                [label]="employee.full_name.charAt(0)"
-                [image]="employee.photo_url || undefined"
-                size="large"
-                shape="circle"
-                [style]="{ 'background-color': employee.is_active ? '#9DC183' : '#9ca3af', color: '#ffffff' }">
-              </p-avatar>
-              <div class="employee-info">
-                <h3 class="employee-name">{{ employee.full_name }}</h3>
-                <p-tag 
-                  [value]="employee.is_active ? 'Activo' : 'Inactivo'"
-                  [severity]="employee.is_active ? 'success' : 'secondary'"
-                  styleClass="status-tag">
-                </p-tag>
-              </div>
-            </div>
-
-            <div class="employee-details">
-              <div class="detail-item">
-                <i class="pi pi-envelope"></i>
-                <span>{{ employee.email }}</span>
-              </div>
-              @if (employee.phone) {
-                <div class="detail-item">
-                  <i class="pi pi-phone"></i>
-                  <span>{{ employee.phone }}</span>
+      @for (employee of filteredEmployees(); track employee.id) {
+        <div class="employee-card" [class.inactive]="!employee.is_active">
+          <div class="card-decoration"></div>
+          
+          <div class="employee-header">
+            <div class="avatar-wrapper">
+              @if (employee.photo_url) {
+                <img [src]="employee.photo_url" [alt]="employee.full_name" class="avatar-img">
+              } @else {
+                <div class="avatar-placeholder">
+                  {{ employee.full_name.charAt(0) }}
                 </div>
               }
+              <span class="status-dot" [class.active]="employee.is_active"></span>
             </div>
-
-            <div class="employee-actions">
+            
+            <div class="employee-info">
+              <h3 class="employee-name">{{ employee.full_name }}</h3>
+              <span class="employee-role">
+                <i class="pi pi-briefcase"></i>
+                {{ employee.role === 'owner' ? 'Propietario' : 'Empleado' }}
+              </span>
+            </div>
+            
+            <div class="card-actions">
               <p-button 
                 icon="pi pi-pencil"
                 severity="secondary"
                 [text]="true"
                 [routerLink]="['/bo/employees', employee.id]"
+                styleClass="btn-icon"
                 pTooltip="Editar">
               </p-button>
               <p-button 
@@ -77,11 +129,31 @@
                 [severity]="employee.is_active ? 'danger' : 'success'"
                 [text]="true"
                 (onClick)="toggleEmployeeStatus(employee)"
+                styleClass="btn-icon"
                 [pTooltip]="employee.is_active ? 'Desactivar' : 'Activar'">
               </p-button>
             </div>
           </div>
-        </p-card>
+          
+          <div class="employee-details">
+            <div class="detail-row">
+              <i class="pi pi-envelope"></i>
+              <span>{{ employee.email }}</span>
+            </div>
+            @if (employee.phone) {
+              <div class="detail-row">
+                <i class="pi pi-phone"></i>
+                <span>{{ employee.phone }}</span>
+              </div>
+            }
+          </div>
+          
+          <div class="employee-footer">
+            <span class="status-badge" [class.active]="employee.is_active">
+              {{ employee.is_active ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+        </div>
       }
     </div>
   }

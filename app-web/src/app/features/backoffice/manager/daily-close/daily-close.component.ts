@@ -161,7 +161,42 @@ export class DailyCloseComponent implements OnInit {
     return appointments.reduce((sum, apt) => sum + (apt.amount_collected || 0), 0);
   }
 
+  getEmployeeInitials(empId: string): string {
+    const appointments = this.appointmentsByEmployee()[empId];
+    if (appointments && appointments.length > 0) {
+      const name = this.$any(appointments[0]).employee?.full_name || '';
+      return name.charAt(0).toUpperCase();
+    }
+    return '?';
+  }
+
   objectKeys(obj: { [key: string]: Appointment[] }): string[] {
     return Object.keys(obj);
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'completed': return 'Completada';
+      case 'pending': return 'Pendiente';
+      case 'cancelled': return 'Cancelada';
+      case 'no_show': return 'No asistió';
+      default: return status;
+    }
+  }
+
+  formatDate(date: Date): string {
+    return date.toLocaleDateString('es-ES', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  formatDateShort(date: Date): string {
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'short'
+    });
   }
 }

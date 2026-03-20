@@ -13,6 +13,7 @@
 2. Query Context7 MCP for PrimeNG components
 3. Select appropriate components (p-inputText, p-button, p-card)
 4. Implement using PrimeNG - NEVER custom HTML/CSS when PrimeNG alternative exists
+5. This project uses **OpenSpec** for phased development. See commands in `app-web/README.md` or use `/opsx:` in the chat
 ```
 
 ### Componentes disponibles en PrimeNG (memorizar):

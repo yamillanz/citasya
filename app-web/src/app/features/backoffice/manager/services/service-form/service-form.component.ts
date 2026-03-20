@@ -138,6 +138,11 @@ export class ServiceFormComponent implements OnInit {
     });
   }
 
+  setDuration(minutes: number) {
+    this.form.patchValue({ duration_minutes: minutes });
+    this.form.get('duration_minutes')?.markAsDirty();
+  }
+
   get nameError(): string {
     const control = this.form.get('name');
     if (control?.hasError('required') && control?.touched) {

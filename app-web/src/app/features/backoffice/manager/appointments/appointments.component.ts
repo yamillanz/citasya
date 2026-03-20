@@ -1,13 +1,11 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
-import { TagModule } from 'primeng/tag';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { DialogModule } from 'primeng/dialog';
+import { DrawerModule } from 'primeng/drawer';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -21,19 +19,22 @@ interface FilterOption {
   value: string;
 }
 
+interface DateGroup {
+  date: string;
+  appointments: Appointment[];
+}
+
 @Component({
   selector: 'app-appointments',
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
-    CardModule,
     ButtonModule,
     SelectModule,
     DatePickerModule,
-    TagModule,
     InputNumberModule,
-    DialogModule,
+    DrawerModule,
     ToastModule
   ],
   providers: [MessageService],
@@ -55,10 +56,13 @@ export class AppointmentsComponent implements OnInit {
   filterEmployee = signal<string>('');
   filterDate = signal<Date | null>(null);
   filterStatus = signal<string>('');
+  searchQuery = signal<string>('');
+  viewMode = signal<'list' | 'calendar'>('list');
 
-  // Status update dialog
+  // Drawer state
   showStatusDialog = signal(false);
   selectedAppointment = signal<Appointment | null>(null);
+  statusAction = signal<'completed' | 'cancelled' | 'no_show' | null>(null);
   amountCollected = signal<number>(0);
 
   statusOptions: FilterOption[] = [
@@ -77,6 +81,18 @@ export class AppointmentsComponent implements OnInit {
     }))
   ]);
 
+  pendingCount = computed(() => 
+    this.filteredAppointments().filter(apt => apt.status === 'pending').length
+  );
+
+  completedCount = computed(() => 
+    this.filteredAppointments().filter(apt => apt.status === 'completed').length
+  );
+
+  cancelledCount = computed(() => 
+    this.filteredAppointments().filter(apt => apt.status === 'cancelled' || apt.status === 'no_show').length
+  );
+
   filteredAppointments = computed(() => {
     return this.appointments().filter(apt => {
       if (this.filterEmployee() && apt.employee_id !== this.filterEmployee()) return false;
@@ -85,8 +101,32 @@ export class AppointmentsComponent implements OnInit {
         const filterDateStr = this.filterDate()!.toISOString().split('T')[0];
         if (apt.appointment_date !== filterDateStr) return false;
       }
+      const query = this.searchQuery().toLowerCase().trim();
+      if (query && !apt.client_name.toLowerCase().includes(query)) return false;
       return true;
     });
+  });
+
+  groupedAppointments = computed(() => {
+    const grouped: { [key: string]: Appointment[] } = {};
+    
+    this.filteredAppointments()
+      .sort((a, b) => {
+        const dateCompare = a.appointment_date.localeCompare(b.appointment_date);
+        if (dateCompare !== 0) return dateCompare;
+        return a.appointment_time.localeCompare(b.appointment_time);
+      })
+      .forEach(apt => {
+        if (!grouped[apt.appointment_date]) {
+          grouped[apt.appointment_date] = [];
+        }
+        grouped[apt.appointment_date].push(apt);
+      });
+    
+    return Object.entries(grouped).map(([date, appointments]) => ({
+      date,
+      appointments
+    }));
   });
 
   async ngOnInit() {
@@ -118,8 +158,25 @@ export class AppointmentsComponent implements OnInit {
     }
   }
 
+  onSearch(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery.set(input.value);
+  }
+
+  onDateChange() {
+    // Filter date is already reactive via ngModel
+  }
+
+  clearFilters() {
+    this.filterEmployee.set('');
+    this.filterDate.set(null);
+    this.filterStatus.set('');
+    this.searchQuery.set('');
+  }
+
   openStatusDialog(appointment: Appointment, status: AppointmentStatus) {
     this.selectedAppointment.set(appointment);
+    this.statusAction.set(status as any);
     this.showStatusDialog.set(true);
     
     if (status === 'completed') {
@@ -127,15 +184,65 @@ export class AppointmentsComponent implements OnInit {
     }
   }
 
-  async updateStatus(status: AppointmentStatus) {
-    const appointment = this.selectedAppointment();
-    if (!appointment) return;
+  closeDrawer() {
+    this.showStatusDialog.set(false);
+    this.selectedAppointment.set(null);
+    this.statusAction.set(null);
+  }
 
+  getDrawerTitle(): string {
+    const action = this.statusAction();
+    switch (action) {
+      case 'completed': return 'Completar Cita';
+      case 'cancelled': return 'Cancelar Cita';
+      case 'no_show': return 'Marcar como No Asistió';
+      default: return 'Actualizar Estado';
+    }
+  }
+
+  getActionLabel(): string {
+    const action = this.statusAction();
+    switch (action) {
+      case 'completed': return 'Confirmar y Completar';
+      case 'cancelled': return 'Sí, Cancelar';
+      case 'no_show': return 'Sí, No Asistió';
+      default: return 'Aceptar';
+    }
+  }
+
+  getActionSeverity(): 'success' | 'danger' | 'secondary' {
+    const action = this.statusAction();
+    switch (action) {
+      case 'completed': return 'success';
+      case 'cancelled':
+      case 'no_show': return 'danger';
+      default: return 'secondary';
+    }
+  }
+
+  getStatusIcon(status: string): string {
+    switch (status) {
+      case 'completed': return 'pi pi-check-circle';
+      case 'cancelled': return 'pi pi-times-circle';
+      case 'no_show': return 'pi pi-user-minus';
+      default: return 'pi pi-info-circle';
+    }
+  }
+
+  async confirmStatusChange() {
+    const appointment = this.selectedAppointment();
+    const action = this.statusAction();
+    if (!appointment || !action) return;
+
+    await this.updateStatus(appointment, action);
+    this.closeDrawer();
+  }
+
+  async updateStatus(appointment: Appointment, status: AppointmentStatus) {
     try {
       const amount = status === 'completed' ? this.amountCollected() : undefined;
       await this.appointmentService.updateStatus(appointment.id, status, amount);
       
-      // Update local state
       const updated = this.appointments().map(apt => 
         apt.id === appointment.id 
           ? { ...apt, status, amount_collected: amount || apt.amount_collected }
@@ -148,9 +255,6 @@ export class AppointmentsComponent implements OnInit {
         summary: 'Éxito',
         detail: `Cita marcada como ${this.getStatusLabel(status).toLowerCase()}`
       });
-
-      this.showStatusDialog.set(false);
-      this.selectedAppointment.set(null);
     } catch (error: any) {
       this.messageService.add({
         severity: 'error',
@@ -185,6 +289,24 @@ export class AppointmentsComponent implements OnInit {
     return date.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: 'short',
+      year: 'numeric'
+    });
+  }
+
+  formatDateShort(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'short'
+    });
+  }
+
+  formatDateFull(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('es-ES', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
       year: 'numeric'
     });
   }

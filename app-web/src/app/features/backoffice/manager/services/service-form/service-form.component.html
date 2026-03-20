@@ -1,84 +1,167 @@
-<div class="service-form-container">
+<div class="service-form-page">
+  <!-- Header -->
   <header class="page-header">
+    <a routerLink="/bo/services" class="back-link">
+      <i class="pi pi-arrow-left"></i>
+      Volver a Servicios
+    </a>
     <h1>{{ isEdit() ? 'Editar' : 'Nuevo' }} Servicio</h1>
+    <p>{{ isEdit() ? 'Modifica los datos del servicio' : 'Crea un nuevo servicio para tu negocio' }}</p>
   </header>
 
   @if (loading()) {
     <div class="loading-state">
+      <div class="loading-spinner"></div>
       <p>Cargando servicio...</p>
     </div>
   } @else {
-    <p-card styleClass="form-card">
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-grid">
-          <!-- Name -->
+    <div class="form-container">
+      <div class="form-card">
+        <div class="card-header">
+          <div class="header-icon">
+            <i class="pi pi-tag"></i>
+          </div>
+          <div class="header-text">
+            <h2>Información del Servicio</h2>
+            <p>Datos básicos del servicio</p>
+          </div>
+        </div>
+        
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <!-- Service Name -->
           <div class="form-field">
-            <label for="name">Nombre del Servicio *</label>
+            <label for="name">
+              <i class="pi pi-bookmark"></i>
+              Nombre del Servicio *
+            </label>
             <input 
               id="name"
               type="text"
               pInputText
               formControlName="name"
               placeholder="Ej: Corte de cabello"
-              [ngClass]="{ 'ng-invalid ng-dirty': nameError }">
+              [class.ng-invalid]="nameError"
+              [class.ng-dirty]="form.get('name')?.touched">
             @if (nameError) {
-              <small class="p-error">{{ nameError }}</small>
+              <small class="field-error">
+                <i class="pi pi-exclamation-circle"></i>
+                {{ nameError }}
+              </small>
             }
           </div>
 
           <!-- Duration -->
           <div class="form-field">
-            <label for="duration">Duración (minutos) *</label>
-            <p-inputNumber 
-              id="duration"
-              formControlName="duration_minutes"
-              [min]="5"
-              [showButtons]="true"
-              buttonLayout="horizontal"
-              spinnerMode="horizontal"
-              decrementButtonClass="p-button-secondary"
-              incrementButtonClass="p-button-secondary"
-              incrementButtonIcon="pi pi-plus"
-              decrementButtonIcon="pi pi-minus"
-              [ngClass]="{ 'ng-invalid ng-dirty': durationError }">
-            </p-inputNumber>
+            <label for="duration">
+              <i class="pi pi-clock"></i>
+              Duración *
+            </label>
+            <div class="duration-input">
+              <p-inputNumber 
+                id="duration"
+                formControlName="duration_minutes"
+                [min]="5"
+                [max]="480"
+                [showButtons]="true"
+                buttonLayout="horizontal"
+                spinnerMode="horizontal"
+                decrementButtonClass="p-button-secondary"
+                incrementButtonClass="p-button-secondary"
+                incrementButtonIcon="pi pi-plus"
+                decrementButtonIcon="pi pi-minus"
+                [class.ng-invalid]="durationError"
+                [class.ng-dirty]="form.get('duration_minutes')?.touched">
+              </p-inputNumber>
+              <span class="duration-suffix">minutos</span>
+            </div>
             @if (durationError) {
-              <small class="p-error">{{ durationError }}</small>
+              <small class="field-error">
+                <i class="pi pi-exclamation-circle"></i>
+                {{ durationError }}
+              </small>
             }
+            
+            <!-- Duration Presets -->
+            <div class="duration-presets">
+              <span class="presets-label">Tiempos rápidos:</span>
+              <div class="preset-chips">
+                <button type="button" class="preset-chip" (click)="setDuration(15)">15 min</button>
+                <button type="button" class="preset-chip" (click)="setDuration(30)">30 min</button>
+                <button type="button" class="preset-chip" (click)="setDuration(45)">45 min</button>
+                <button type="button" class="preset-chip" (click)="setDuration(60)">1 hora</button>
+                <button type="button" class="preset-chip" (click)="setDuration(90)">1.5 horas</button>
+              </div>
+            </div>
           </div>
 
           <!-- Price -->
           <div class="form-field">
-            <label for="price">Precio (opcional)</label>
-            <p-inputNumber 
-              id="price"
-              formControlName="price"
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-              [minFractionDigits]="2"
-              placeholder="0.00">
-            </p-inputNumber>
+            <label for="price">
+              <i class="pi pi-dollar"></i>
+              Precio (opcional)
+            </label>
+            <div class="price-input">
+              <span class="currency-symbol">$</span>
+              <p-inputNumber 
+                id="price"
+                formControlName="price"
+                mode="decimal"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                placeholder="0.00">
+              </p-inputNumber>
+            </div>
+            <small class="field-hint">
+              <i class="pi pi-info-circle"></i>
+              Deja vacío si el precio es variable o se define en la cita
+            </small>
           </div>
-        </div>
 
-        <div class="form-actions">
-          <p-button 
-            type="button"
-            label="Cancelar"
-            severity="secondary"
-            routerLink="/bo/services"
-            [disabled]="saving()">
-          </p-button>
-          <p-button 
-            type="submit"
-            [label]="saving() ? 'Guardando...' : 'Guardar'"
-            [disabled]="saving()"
-            [loading]="saving()">
-          </p-button>
-        </div>
-      </form>
-    </p-card>
+          <!-- Preview Card -->
+          @if (form.get('name')?.value) {
+            <div class="preview-card">
+              <div class="preview-badge">Vista Previa</div>
+              <div class="preview-content">
+                <div class="preview-icon">
+                  <i class="pi pi-tag"></i>
+                </div>
+                <div class="preview-info">
+                  <span class="preview-name">{{ form.get('name')?.value }}</span>
+                  <span class="preview-meta">
+                    <i class="pi pi-clock"></i>
+                    {{ form.get('duration_minutes')?.value }} min
+                    @if (form.get('price')?.value) {
+                      <span class="separator">•</span>
+                      <i class="pi pi-dollar"></i>
+                      {{ form.get('price')?.value | number:'1.2-2' }}
+                    }
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <p-button 
+              type="button"
+              label="Cancelar"
+              severity="secondary"
+              routerLink="/bo/services"
+              [disabled]="saving()"
+              styleClass="btn-secondary">
+            </p-button>
+            <p-button 
+              type="submit"
+              [label]="saving() ? 'Guardando...' : (isEdit() ? 'Actualizar' : 'Crear Servicio')"
+              [disabled]="saving()"
+              [loading]="saving()"
+              styleClass="btn-primary">
+            </p-button>
+          </div>
+        </form>
+      </div>
+    </div>
   }
 </div>
 

@@ -1,110 +1,188 @@
-<div class="employee-form-container">
+<div class="employee-form-page">
+  <!-- Header -->
   <header class="page-header">
+    <a routerLink="/bo/employees" class="back-link">
+      <i class="pi pi-arrow-left"></i>
+      Volver a Empleados
+    </a>
     <h1>{{ isEdit() ? 'Editar' : 'Nuevo' }} Empleado</h1>
+    <p>{{ isEdit() ? 'Modifica los datos del empleado' : 'Agrega un nuevo miembro a tu equipo' }}</p>
   </header>
 
   @if (loading()) {
     <div class="loading-state">
+      <div class="loading-spinner"></div>
       <p>Cargando empleado...</p>
     </div>
   } @else {
-    <p-card styleClass="form-card">
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-grid">
-          <!-- Full Name -->
-          <div class="form-field">
-            <label for="full_name">Nombre Completo *</label>
-            <input 
-              id="full_name"
-              type="text"
-              pInputText
-              formControlName="full_name"
-              placeholder="Ej: Juan Pérez"
-              [ngClass]="{ 'ng-invalid ng-dirty': fullNameError }">
-            @if (fullNameError) {
-              <small class="p-error">{{ fullNameError }}</small>
-            }
-          </div>
-
-          <!-- Email -->
-          <div class="form-field">
-            <label for="email">Email *</label>
-            <input 
-              id="email"
-              type="email"
-              pInputText
-              formControlName="email"
-              placeholder="ejemplo@email.com"
-              [ngClass]="{ 'ng-invalid ng-dirty': emailError }">
-            @if (emailError) {
-              <small class="p-error">{{ emailError }}</small>
-            }
-          </div>
-
-          <!-- Phone -->
-          <div class="form-field">
-            <label for="phone">Teléfono</label>
-            <input 
-              id="phone"
-              type="tel"
-              pInputText
-              formControlName="phone"
-              placeholder="Ej: 555-123-4567">
-          </div>
-
-          <!-- Photo URL -->
-          <div class="form-field">
-            <label for="photo_url">URL de Foto</label>
-            <input 
-              id="photo_url"
-              type="url"
-              pInputText
-              formControlName="photo_url"
-              placeholder="https://ejemplo.com/foto.jpg">
-          </div>
+    <div class="form-layout">
+      <!-- Main Form Card -->
+      <div class="form-card">
+        <div class="card-header">
+          <h2>Información Personal</h2>
+          <p> Datos básicos del empleado</p>
         </div>
-
-        <!-- Services Assignment -->
-        @if (services().length > 0) {
-          <div class="services-section">
-            <h3>Servicios que ofrece</h3>
-            <div class="services-grid">
-              @for (service of services(); track service.id) {
-                <div class="service-checkbox">
-                  <p-checkbox 
-                    [inputId]="'service-' + service.id"
-                    [value]="service.id"
-                    [binary]="true"
-                    [ngModel]="isServiceSelected(service.id)"
-                    (ngModelChange)="onServiceToggle(service.id)"
-                    [ngModelOptions]="{standalone: true}">
-                  </p-checkbox>
-                  <label [for]="'service-' + service.id">
-                    {{ service.name }} ({{ service.duration_minutes }} min)
-                  </label>
+        
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <!-- Avatar Section -->
+          <div class="avatar-section">
+            <div class="avatar-preview">
+              @if (form.get('photo_url')?.value) {
+                <img [src]="form.get('photo_url')?.value" alt="Avatar preview">
+              } @else {
+                <div class="avatar-placeholder">
+                  <i class="pi pi-user"></i>
                 </div>
               }
             </div>
+            <div class="avatar-info">
+              <span class="avatar-label">Foto de perfil</span>
+              <span class="avatar-hint">URL de imagen o deja vacío para usar inicial</span>
+            </div>
           </div>
-        }
+          
+          <!-- Form Grid -->
+          <div class="form-grid">
+            <!-- Full Name -->
+            <div class="form-field">
+              <label for="full_name">
+                <i class="pi pi-user"></i>
+                Nombre Completo *
+              </label>
+              <input 
+                id="full_name"
+                type="text"
+                pInputText
+                formControlName="full_name"
+                placeholder="Ej: María García"
+                [class.ng-invalid]="fullNameError"
+                [class.ng-dirty]="form.get('full_name')?.touched">
+              @if (fullNameError) {
+                <small class="field-error">
+                  <i class="pi pi-exclamation-circle"></i>
+                  {{ fullNameError }}
+                </small>
+              }
+            </div>
 
-        <div class="form-actions">
-          <p-button 
-            type="button"
-            label="Cancelar"
-            severity="secondary"
-            routerLink="/bo/employees"
-            [disabled]="saving()">
-          </p-button>
-          <p-button 
-            type="submit"
-            [label]="saving() ? 'Guardando...' : 'Guardar'"
-            [disabled]="saving()"
-            [loading]="saving()">
-          </p-button>
+            <!-- Email -->
+            <div class="form-field">
+              <label for="email">
+                <i class="pi pi-envelope"></i>
+                Email *
+              </label>
+              <input 
+                id="email"
+                type="email"
+                pInputText
+                formControlName="email"
+                placeholder="maria@tuempresa.com"
+                [class.ng-invalid]="emailError"
+                [class.ng-dirty]="form.get('email')?.touched">
+              @if (emailError) {
+                <small class="field-error">
+                  <i class="pi pi-exclamation-circle"></i>
+                  {{ emailError }}
+                </small>
+              }
+            </div>
+
+            <!-- Phone -->
+            <div class="form-field">
+              <label for="phone">
+                <i class="pi pi-phone"></i>
+                Teléfono
+              </label>
+              <input 
+                id="phone"
+                type="tel"
+                pInputText
+                formControlName="phone"
+                placeholder="555-123-4567">
+            </div>
+
+            <!-- Photo URL -->
+            <div class="form-field full-width">
+              <label for="photo_url">
+                <i class="pi pi-image"></i>
+                URL de Foto
+              </label>
+              <input 
+                id="photo_url"
+                type="url"
+                pInputText
+                formControlName="photo_url"
+                placeholder="https://ejemplo.com/foto.jpg">
+            </div>
+          </div>
+          
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <p-button 
+              type="button"
+              label="Cancelar"
+              severity="secondary"
+              routerLink="/bo/employees"
+              [disabled]="saving()"
+              styleClass="btn-secondary">
+            </p-button>
+            <p-button 
+              type="submit"
+              [label]="saving() ? 'Guardando...' : (isEdit() ? 'Actualizar' : 'Crear Empleado')"
+              [disabled]="saving()"
+              [loading]="saving()"
+              styleClass="btn-primary">
+            </p-button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Services Assignment Card -->
+      @if (services().length > 0) {
+        <div class="services-card">
+          <div class="card-header">
+            <h2>Servicios Asignados</h2>
+            <p>Selecciona los servicios que podrá ofrecer</p>
+          </div>
+          
+          <div class="services-list">
+            @for (service of services(); track service.id) {
+              <label class="service-item" [class.selected]="isServiceSelected(service.id)">
+                <p-checkbox 
+                  [inputId]="'service-' + service.id"
+                  [value]="service.id"
+                  [binary]="true"
+                  [ngModel]="isServiceSelected(service.id)"
+                  (ngModelChange)="onServiceToggle(service.id)"
+                  [ngModelOptions]="{standalone: true}">
+                </p-checkbox>
+                <div class="service-info">
+                  <span class="service-name">{{ service.name }}</span>
+                  <span class="service-meta">
+                    <i class="pi pi-clock"></i>
+                    {{ service.duration_minutes }} min
+                    @if (service.price) {
+                      <span class="separator">•</span>
+                      ${{ service.price | number:'1.2-2' }}
+                    }
+                  </span>
+                </div>
+                <div class="service-check">
+                  <i class="pi pi-check"></i>
+                </div>
+              </label>
+            }
+          </div>
+          
+          @if (selectedServices().length > 0) {
+            <div class="services-summary">
+              <i class="pi pi-check-circle"></i>
+              {{ selectedServices().length }} servicio(s) seleccionado(s)
+            </div>
+          }
         </div>
-      </form>
-    </p-card>
+      }
+    </div>
   }
 </div>
 

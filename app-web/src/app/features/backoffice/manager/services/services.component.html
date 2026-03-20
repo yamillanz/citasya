@@ -1,57 +1,179 @@
-<div class="services-container">
+<div class="services-page">
+  <!-- Header -->
   <header class="page-header">
-    <h1>Gestión de Servicios</h1>
-    <p-button 
-      label="Nuevo Servicio" 
-      icon="pi pi-plus"
-      routerLink="/bo/services/new">
-    </p-button>
+    <div class="header-content">
+      <div class="header-text">
+        <div class="header-badge">Catálogo</div>
+        <h1>Servicios</h1>
+        <p>Configura los servicios que ofreces</p>
+      </div>
+      <div class="header-actions">
+        <p-button 
+          label="Nuevo Servicio" 
+          icon="pi pi-plus"
+          routerLink="/bo/services/new"
+          styleClass="btn-primary">
+        </p-button>
+      </div>
+    </div>
   </header>
 
+  <!-- Filters & View Toggle -->
+  @if (!loading() && services().length > 0) {
+    <div class="filters-bar">
+      <div class="search-box">
+        <i class="pi pi-search"></i>
+        <input 
+          type="text" 
+          placeholder="Buscar servicio..."
+          (input)="onSearch($event)">
+      </div>
+      <div class="view-toggle">
+        <button 
+          class="toggle-btn"
+          [class.active]="viewMode() === 'grid'"
+          (click)="viewMode.set('grid')"
+          title="Vista de cuadrícula">
+          <i class="pi pi-th-large"></i>
+        </button>
+        <button 
+          class="toggle-btn"
+          [class.active]="viewMode() === 'list'"
+          (click)="viewMode.set('list')"
+          title="Vista de lista">
+          <i class="pi pi-list"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Loading State -->
   @if (loading()) {
     <div class="loading-state">
+      <div class="loading-spinner"></div>
       <p>Cargando servicios...</p>
     </div>
   } @else if (services().length === 0) {
-    <p-card styleClass="empty-state">
-      <div class="empty-content">
-        <i class="pi pi-briefcase empty-icon"></i>
-        <h3>No hay servicios configurados</h3>
-        <p>Comienza creando tu primer servicio</p>
-        <p-button 
-          label="Crear Servicio" 
-          icon="pi pi-plus"
-          routerLink="/bo/services/new"
-          styleClass="mt-3">
-        </p-button>
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-illustration">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="50" fill="#F5F2ED"/>
+          <rect x="25" y="30" width="50" height="40" rx="4" stroke="#B8D4A3" stroke-width="2.5"/>
+          <path d="M35 45H65M35 55H55" stroke="#B8D4A3" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
       </div>
-    </p-card>
+      <h3>No hay servicios configurados</h3>
+      <p>Comienza creando tu primer servicio para que tus clientes puedan reservar citas.</p>
+      <p-button 
+        label="Crear Servicio" 
+        icon="pi pi-plus"
+        routerLink="/bo/services/new"
+        styleClass="btn-primary">
+      </p-button>
+    </div>
+  } @else if (filteredServices().length === 0) {
+    <!-- No Results -->
+    <div class="empty-state">
+      <div class="empty-illustration">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="50" fill="#F5F2ED"/>
+          <circle cx="44" cy="44" r="20" stroke="#B8D4A3" stroke-width="2.5"/>
+          <path d="M58 58L72 72" stroke="#B8D4A3" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>Sin resultados</h3>
+      <p>No se encontraron servicios con los filtros seleccionados.</p>
+      <p-button 
+        label="Limpiar búsqueda" 
+        icon="pi pi-filter-slash"
+        severity="secondary"
+        (onClick)="clearFilters()"
+        styleClass="btn-secondary">
+      </p-button>
+    </div>
   } @else {
-    <div class="services-grid">
-      @for (service of services(); track service.id) {
-        <p-card styleClass="service-card">
-          <div class="service-content">
-            <div class="service-header">
+    @if (viewMode() === 'grid') {
+      <!-- Grid View -->
+      <div class="services-grid">
+        @for (service of filteredServices(); track service.id) {
+          <div class="service-card">
+            <div class="card-decoration">
+              <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                <circle cx="60" cy="20" r="40" fill="currentColor"/>
+              </svg>
+            </div>
+            
+            <div class="card-content">
+              <div class="service-header">
+                <div class="service-icon">
+                  <i class="pi pi-tag"></i>
+                </div>
+                <div class="card-actions">
+                  <p-button 
+                    icon="pi pi-pencil"
+                    severity="secondary"
+                    [text]="true"
+                    [routerLink]="['/bo/services', service.id]"
+                    styleClass="btn-icon"
+                    pTooltip="Editar">
+                  </p-button>
+                  <p-button 
+                    icon="pi pi-trash"
+                    severity="danger"
+                    [text]="true"
+                    (onClick)="confirmDelete(service)"
+                    styleClass="btn-icon"
+                    pTooltip="Eliminar">
+                  </p-button>
+                </div>
+              </div>
+              
               <h3 class="service-name">{{ service.name }}</h3>
-              <span class="service-duration">
+              
+              <div class="service-meta">
+                <span class="meta-item">
+                  <i class="pi pi-clock"></i>
+                  {{ service.duration_minutes }} min
+                </span>
+                @if (service.price) {
+                  <span class="meta-item price">
+                    <i class="pi pi-dollar"></i>
+                    ${{ service.price | number:'1.2-2' }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- List View -->
+      <div class="services-list">
+        @for (service of filteredServices(); track service.id) {
+          <div class="service-row">
+            <div class="row-icon">
+              <i class="pi pi-tag"></i>
+            </div>
+            <div class="row-info">
+              <h3 class="row-name">{{ service.name }}</h3>
+              <span class="row-meta">
                 <i class="pi pi-clock"></i>
                 {{ service.duration_minutes }} min
               </span>
             </div>
-            
             @if (service.price) {
-              <div class="service-price">
-                <span class="price-label">Precio:</span>
-                <span class="price-value">${{ service.price | number:'1.2-2' }}</span>
+              <div class="row-price">
+                ${{ service.price | number:'1.2-2' }}
               </div>
             }
-
-            <div class="service-actions">
+            <div class="row-actions">
               <p-button 
                 icon="pi pi-pencil"
                 severity="secondary"
                 [text]="true"
                 [routerLink]="['/bo/services', service.id]"
+                styleClass="btn-icon-sm"
                 pTooltip="Editar">
               </p-button>
               <p-button 
@@ -59,13 +181,14 @@
                 severity="danger"
                 [text]="true"
                 (onClick)="confirmDelete(service)"
+                styleClass="btn-icon-sm"
                 pTooltip="Eliminar">
               </p-button>
             </div>
           </div>
-        </p-card>
-      }
-    </div>
+        }
+      </div>
+    }
   }
 </div>
 
