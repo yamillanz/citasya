@@ -1,285 +1,350 @@
-<section class="faq-header py-20 px-4 bg-gradient-to-br from-surface-50 to-white">
-  <div class="max-w-4xl mx-auto text-center">
-    <h1 class="text-4xl md:text-5xl font-bold text-primary mb-6">
-      Preguntas Frecuentes
-    </h1>
-    <p class="text-xl text-surface-600 max-w-2xl mx-auto">
-      Encuentra respuestas a las preguntas más comunes sobre CitasYa
-    </p>
-  </div>
-</section>
+<div class="faq-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+    </div>
+    
+    <div class="hero-content">
+      <div class="hero-badge">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="10" fill="currentColor"/>
+          <path d="M7.5 8C7.5 7.17157 8.17157 6.5 9 6.5C9.82843 6.5 10.5 7.17157 10.5 8C10.5 8.82843 9.82843 9.5 9 9.5C8.17157 9.5 7.5 8.82843 7.5 8ZM9 11.5H9.01V12H9V11.5Z" fill="white"/>
+        </svg>
+        <span>Centro de ayuda</span>
+      </div>
+      
+      <h1 class="hero-title">Preguntas Frecuentes</h1>
+      <p class="hero-subtitle">
+        Encuentra respuestas a las preguntas más comunes sobre CitasYa
+      </p>
+      
+      <div class="search-box">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2"/>
+          <path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="text" placeholder="Busca una pregunta..." [(ngModel)]="searchQuery" (input)="filterFaqs()">
+      </div>
+    </div>
+  </section>
 
-<section class="faq-content py-12 px-4 bg-white">
-  <div class="max-w-4xl mx-auto">
-    <!-- General Questions -->
-    <p-card header="Preguntas Generales" styleClass="mb-8">
-      <p-accordion [multiple]="true">
-        <p-accordion-panel value="0">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-question-circle" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Qué es CitasYa?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              CitasYa es una plataforma SaaS que permite a pequeños negocios de servicios (peluquerías, clínicas dentales, spas, etc.) gestionar sus citas y empleados de manera eficiente. Los clientes pueden agendar sin necesidad de registrarse, y los negocios obtienen un back office completo para administrar todo.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-
-        <p-accordion-panel value="1">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-question-circle" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Necesito tarjeta de crédito para la prueba gratuita?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              No. Ofrecemos 14 días de prueba gratuita en el plan Básico sin necesidad de ingresar información de pago. Solo necesitas crear una cuenta con tu email.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-
-        <p-accordion-panel value="2">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-question-circle" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Hay contrato de permanencia?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              Absolutamente no. Puedes cancelar tu suscripción en cualquier momento sin penalizaciones. Tu negocio, tus reglas.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-
-        <p-accordion-panel value="3">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-question-circle" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Puedo cambiar de plan?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              Sí, puedes actualizar o cambiar tu plan en cualquier momento. Los cambios se aplicarán en tu próximo ciclo de facturación. Si subes de plan, tendrás acceso inmediato a las nuevas funcionalidades.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-      </p-accordion>
-    </p-card>
-
-    <!-- Technical Questions -->
-    <p-card header="Preguntas Técnicas" styleClass="mb-8">
-      <p-accordion [multiple]="true">
-        <p-accordion-panel value="4">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-cog" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Funciona en móvil?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed mb-4">
-              Sí, CitasYa está diseñado con enfoque "Mobile First". Funciona perfectamente en smartphones, tablets y computadoras. Además:
-            </p>
-            <ul class="list-disc list-inside text-surface-600 space-y-2 ml-4">
-              <li>Tus clientes pueden agendar desde cualquier dispositivo</li>
-              <li>Tú y tu equipo pueden gestionar citas desde el móvil</li>
-              <li>Es una Progressive Web App (PWA), por lo que se puede instalar como app en el teléfono</li>
-            </ul>
-          </p-accordion-content>
-        </p-accordion-panel>
-
-        <p-accordion-panel value="5">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-cog" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Necesito instalar algo?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              No es necesario. CitasYa es una aplicación web, funciona directamente en tu navegador. Sin embargo, puedes instalarla como PWA en tu móvil para acceso más rápido y notificaciones push.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-
-        <p-accordion-panel value="6">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-cog" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Qué pasa si se cae internet?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              Como es una aplicación web, necesitas conexión a internet para usar CitasYa. Sin embargo, gracias a la tecnología PWA, algunas funcionalidades básicas pueden funcionar offline. Recomendamos tener un plan de respaldo (como una agenda física) para casos extremos.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-
-        <p-accordion-panel value="7">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-cog" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Es seguro?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              Absolutamente. Usamos encriptación SSL/TLS para todas las comunicaciones. Los datos se almacenan en servidores seguros con múltiples copias de respaldo. Implementamos autenticación robusta y políticas de seguridad a nivel de fila (RLS) para garantizar que solo tú veas tus datos.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-      </p-accordion>
-    </p-card>
-
-    <!-- Business Questions -->
-    <p-card header="Preguntas sobre el Negocio" styleClass="mb-8">
-      <p-accordion [multiple]="true">
-        <p-accordion-panel value="8">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-briefcase" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Cuántos empleados puedo tener?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              Depende de tu plan:
-            </p>
-            <ul class="list-disc list-inside text-surface-600 space-y-2 ml-4 mt-2">
-              <li><strong>Básico ($25/mes):</strong> Hasta 10 usuarios (1 manager + 9 empleados)</li>
-              <li><strong>Medio ($60/mes):</strong> Hasta 20 usuarios (1 manager + 19 empleados)</li>
-              <li><strong>Custom:</strong> Usuarios ilimitados</li>
-            </ul>
-          </p-accordion-content>
-        </p-accordion-panel>
-
-        <p-accordion-panel value="9">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-briefcase" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Puedo tener múltiples sucursales?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              Sí. El plan Básico incluye 1 empresa, el plan Medio incluye 2 empresas, y el plan Custom te permite gestionar empresas ilimitadas. Cada empresa tiene su propio calendario, empleados y configuración.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-
-        <p-accordion-panel value="10">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-briefcase" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Los clientes necesitan registrarse?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              No, y esa es una de nuestras ventajas principales. Tus clientes pueden agendar citas simplemente proporcionando su nombre y teléfono. Esto reduce la fricción y aumenta la tasa de conversión. Si lo deseas, pueden proporcionar email opcional para recibir confirmaciones.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-
-        <p-accordion-panel value="11">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-briefcase" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Cómo funciona el cierre diario?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              Al final del día, el manager puede generar un "cierre diario" con un clic. El sistema calcula automáticamente el total de citas atendidas, ingresos por empleado, y genera un PDF que puedes descargar o imprimir. Es ideal para conciliar caja y llevar control financiero.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-      </p-accordion>
-    </p-card>
-
-    <!-- Support Questions -->
-    <p-card header="Soporte" styleClass="mb-8">
-      <p-accordion [multiple]="true">
-        <p-accordion-panel value="12">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-headphones" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Qué tipo de soporte ofrecen?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              Depende de tu plan:
-            </p>
-            <ul class="list-disc list-inside text-surface-600 space-y-2 ml-4 mt-2">
-              <li><strong>Básico:</strong> Soporte por email, respuesta en 24-48 horas</li>
-              <li><strong>Medio:</strong> Soporte prioritario, respuesta en 12-24 horas</li>
-              <li><strong>Custom:</strong> Soporte dedicado 24/7 con chat en vivo</li>
-            </ul>
-          </p-accordion-content>
-        </p-accordion-panel>
-
-        <p-accordion-panel value="13">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-headphones" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Ofrecen capacitación?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              Sí, tenemos videos tutoriales, guías escritas y webinars mensuales gratuitos. Para planes Custom, ofrecemos capacitación personalizada para tu equipo.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-
-        <p-accordion-panel value="14">
-          <p-accordion-header>
-            <div class="flex items-center gap-3">
-              <p-avatar icon="pi pi-headphones" styleClass="bg-primary text-white" size="normal" shape="circle"></p-avatar>
-              <span>¿Tienen documentación?</span>
-            </div>
-          </p-accordion-header>
-          <p-accordion-content>
-            <p class="m-0 text-surface-600 leading-relaxed">
-              Sí, contamos con una base de conocimiento completa con artículos, guías paso a paso, y video tutoriales. También tenemos una comunidad de usuarios donde puedes hacer preguntas y compartir tips.
-            </p>
-          </p-accordion-content>
-        </p-accordion-panel>
-      </p-accordion>
-    </p-card>
-  </div>
-</section>
-
-<p-divider></p-divider>
-
-<!-- Still have questions -->
-<section class="still-have-questions py-12 px-4 bg-surface-50">
-  <div class="max-w-4xl mx-auto text-center">
-    <p-card>
-      <ng-template pTemplate="content">
-        <div class="py-8">
-          <p-avatar icon="pi pi-envelope" styleClass="bg-primary text-white text-3xl mb-4" size="xlarge" shape="circle"></p-avatar>
-          <h2 class="text-2xl font-bold text-primary mb-4">¿Aún tienes dudas?</h2>
-          <p class="text-surface-600 mb-6 max-w-xl mx-auto">
-            No dudes en contactarnos. Nuestro equipo está listo para ayudarte con cualquier pregunta que tengas.
-          </p>
-          <p-button 
-            label="Contactar soporte" 
-            icon="pi pi-send"
-            iconPos="right"
-            styleClass="p-button-lg p-button-primary"
-            [routerLink]="['/contact']"
-          />
+  <!-- FAQ Content -->
+  <section class="faq-content">
+    <div class="faq-container">
+      
+      <!-- General Questions -->
+      <div class="faq-category">
+        <div class="category-header">
+          <div class="category-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" fill="currentColor"/>
+              <path d="M12 7V12M12 16H12.01" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h2>Preguntas Generales</h2>
         </div>
-      </ng-template>
-    </p-card>
-  </div>
-</section>
+        
+        <div class="faq-list">
+          <div class="faq-item" [class.open]="openFaqIndex === 0" (click)="toggleFaq(0)">
+            <div class="faq-question">
+              <span>¿Qué es CitasYa?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>CitasYa es una plataforma SaaS que permite a pequeños negocios de servicios (peluquerías, clínicas dentales, spas, etc.) gestionar sus citas y empleados de manera eficiente. Los clientes pueden agendar sin necesidad de registrarse, y los negocios obtienen un back office completo para administrar todo.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" [class.open]="openFaqIndex === 1" (click)="toggleFaq(1)">
+            <div class="faq-question">
+              <span>¿Necesito tarjeta de crédito para la prueba gratuita?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>No. Ofrecemos 14 días de prueba gratuita en el plan Básico sin necesidad de ingresar información de pago. Solo necesitas crear una cuenta con tu email.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" [class.open]="openFaqIndex === 2" (click)="toggleFaq(2)">
+            <div class="faq-question">
+              <span>¿Hay contrato de permanencia?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>Absolutamente no. Puedes cancelar tu suscripción en cualquier momento sin penalizaciones. Tu negocio, tus reglas.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" [class.open]="openFaqIndex === 3" (click)="toggleFaq(3)">
+            <div class="faq-question">
+              <span>¿Puedo cambiar de plan?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>Sí, puedes actualizar o cambiar tu plan en cualquier momento. Los cambios se aplicarán en tu próximo ciclo de facturación. Si subes de plan, tendrás acceso inmediato a las nuevas funcionalidades.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Questions -->
+      <div class="faq-category">
+        <div class="category-header">
+          <div class="category-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" fill="currentColor"/>
+              <path d="M8 12H16M12 8V16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h2>Preguntas Técnicas</h2>
+        </div>
+        
+        <div class="faq-list">
+          <div class="faq-item" [class.open]="openFaqIndex === 4" (click)="toggleFaq(4)">
+            <div class="faq-question">
+              <span>¿Funciona en móvil?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>Sí, CitasYa está diseñado con enfoque "Mobile First". Funciona perfectamente en smartphones, tablets y computadoras. Además:</p>
+              <ul>
+                <li>Tus clientes pueden agendar desde cualquier dispositivo</li>
+                <li>Tú y tu equipo pueden gestionar citas desde el móvil</li>
+                <li>Es una Progressive Web App (PWA), por lo que se puede instalar como app en el teléfono</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="faq-item" [class.open]="openFaqIndex === 5" (click)="toggleFaq(5)">
+            <div class="faq-question">
+              <span>¿Necesito instalar algo?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>No es necesario. CitasYa es una aplicación web, funciona directamente en tu navegador. Sin embargo, puedes instalarla como PWA en tu móvil para acceso más rápido y notificaciones push.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" [class.open]="openFaqIndex === 6" (click)="toggleFaq(6)">
+            <div class="faq-question">
+              <span>¿Qué pasa si se cae internet?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>Como es una aplicación web, necesitas conexión a internet para usar CitasYa. Sin embargo, gracias a la tecnología PWA, algunas funcionalidades básicas pueden funcionar offline. Recomendamos tener un plan de respaldo (como una agenda física) para casos extremos.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" [class.open]="openFaqIndex === 7" (click)="toggleFaq(7)">
+            <div class="faq-question">
+              <span>¿Es seguro?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>Absolutamente. Usamos encriptación SSL/TLS para todas las comunicaciones. Los datos se almacenan en servidores seguros con múltiples copias de respaldo. Implementamos autenticación robusta y políticas de seguridad a nivel de fila (RLS) para garantizar que solo tú veas tus datos.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Questions -->
+      <div class="faq-category">
+        <div class="category-header">
+          <div class="category-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="6" width="18" height="14" rx="2" fill="currentColor"/>
+              <path d="M8 6V4C8 2.89543 8.89543 2 10 2H14C15.1046 2 16 2.89543 16 4V6" stroke="white" stroke-width="2"/>
+            </svg>
+          </div>
+          <h2>Preguntas sobre el Negocio</h2>
+        </div>
+        
+        <div class="faq-list">
+          <div class="faq-item" [class.open]="openFaqIndex === 8" (click)="toggleFaq(8)">
+            <div class="faq-question">
+              <span>¿Cuántos empleados puedo tener?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>Depende de tu plan:</p>
+              <ul>
+                <li><strong>Básico ($25/mes):</strong> Hasta 10 usuarios (1 manager + 9 empleados)</li>
+                <li><strong>Medio ($60/mes):</strong> Hasta 20 usuarios (1 manager + 19 empleados)</li>
+                <li><strong>Custom:</strong> Usuarios ilimitados</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="faq-item" [class.open]="openFaqIndex === 9" (click)="toggleFaq(9)">
+            <div class="faq-question">
+              <span>¿Puedo tener múltiples sucursales?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>Sí. El plan Básico incluye 1 empresa, el plan Medio incluye 2 empresas, y el plan Custom te permite gestionar empresas ilimitadas. Cada empresa tiene su propio calendario, empleados y configuración.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" [class.open]="openFaqIndex === 10" (click)="toggleFaq(10)">
+            <div class="faq-question">
+              <span>¿Los clientes necesitan registrarse?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>No, y esa es una de nuestras ventajas principales. Tus clientes pueden agendar citas simplemente proporcionando su nombre y teléfono. Esto reduce la fricción y aumenta la tasa de conversión. Si lo deseas, pueden proporcionar email opcional para recibir confirmaciones.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" [class.open]="openFaqIndex === 11" (click)="toggleFaq(11)">
+            <div class="faq-question">
+              <span>¿Cómo funciona el cierre diario?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>Al final del día, el manager puede generar un "cierre diario" con un clic. El sistema calcula automáticamente el total de citas atendidas, ingresos por empleado, y genera un PDF que puedes descargar o imprimir. Es ideal para conciliar caja y llevar control financiero.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Support Questions -->
+      <div class="faq-category">
+        <div class="category-header">
+          <div class="category-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" fill="currentColor"/>
+              <path d="M12 8V12M12 15H12.01" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h2>Soporte</h2>
+        </div>
+        
+        <div class="faq-list">
+          <div class="faq-item" [class.open]="openFaqIndex === 12" (click)="toggleFaq(12)">
+            <div class="faq-question">
+              <span>¿Qué tipo de soporte ofrecen?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>Depende de tu plan:</p>
+              <ul>
+                <li><strong>Básico:</strong> Soporte por email, respuesta en 24-48 horas</li>
+                <li><strong>Medio:</strong> Soporte prioritario, respuesta en 12-24 horas</li>
+                <li><strong>Custom:</strong> Soporte dedicado 24/7 con chat en vivo</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="faq-item" [class.open]="openFaqIndex === 13" (click)="toggleFaq(13)">
+            <div class="faq-question">
+              <span>¿Ofrecen capacitación?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>Sí, tenemos videos tutoriales, guías escritas y webinars mensuales gratuitos. Para planes Custom, ofrecemos capacitación personalizada para tu equipo.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" [class.open]="openFaqIndex === 14" (click)="toggleFaq(14)">
+            <div class="faq-question">
+              <span>¿Tienen documentación?</span>
+              <div class="faq-arrow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-answer">
+              <p>Sí, contamos con una base de conocimiento completa con artículos, guías paso a paso, y video tutoriales. También tenemos una comunidad de usuarios donde puedes hacer preguntas y compartir tips.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Still have questions CTA -->
+  <section class="cta-section">
+    <div class="cta-card">
+      <div class="cta-decoration">
+        <svg width="300" height="300" viewBox="0 0 300 300" fill="none">
+          <circle cx="150" cy="150" r="150" fill="currentColor"/>
+        </svg>
+      </div>
+      
+      <div class="cta-content">
+        <div class="cta-icon">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <path d="M24 44C24 44 6 30 6 19C6 12.3726 11.3726 7 18 7C21.5 7 24.5 8.5 24 8.5C23.5 8.5 26.5 7 30 7C36.6274 7 42 12.3726 42 19C42 30 24 44 24 44Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h2>¿Aún tienes dudas?</h2>
+        <p>No dudes en contactarnos. Nuestro equipo está listo para ayudarte con cualquier pregunta que tengas.</p>
+        <a routerLink="/contact" class="cta-btn">
+          <span>Contactar soporte</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>

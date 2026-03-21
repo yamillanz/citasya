@@ -1,168 +1,222 @@
-<p-toast></p-toast>
+<div class="contact-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+    </div>
+    
+    <div class="hero-content">
+      <div class="hero-badge">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M2 5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="2"/>
+          <path d="M2 5L10 10L18 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Estamos para ayudarte</span>
+      </div>
+      
+      <h1 class="hero-title">Contáctanos</h1>
+      <p class="hero-subtitle">
+        ¿Tienes preguntas? Estamos aquí para ayudarte. Completa el formulario y te responderemos en menos de 24 horas.
+      </p>
+    </div>
+  </section>
 
-<section class="contact-header py-20 px-4 bg-gradient-to-br from-surface-50 to-white">
-  <div class="max-w-4xl mx-auto text-center">
-    <h1 class="text-4xl md:text-5xl font-bold text-primary mb-6">
-      Contáctanos
-    </h1>
-    <p class="text-xl text-surface-600 max-w-2xl mx-auto">
-      ¿Tienes preguntas? Estamos aquí para ayudarte. Completa el formulario y te responderemos en menos de 24 horas.
-    </p>
-  </div>
-</section>
-
-<section class="contact-section py-12 px-4 bg-white">
-  <div class="max-w-6xl mx-auto">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+  <!-- Contact Content -->
+  <section class="contact-section">
+    <div class="contact-grid">
       <!-- Contact Form -->
-      <div>
-        <p-card header="Envíanos un mensaje" styleClass="h-full">
-          <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="field">
-                <label for="name" class="block text-sm font-medium text-surface-700 mb-2">
-                  Nombre completo <span class="text-red-500">*</span>
-                </label>
+      <div class="form-card">
+        <div class="form-header">
+          <h2>Envíanos un mensaje</h2>
+          <p>Completa el formulario y nos pondremos en contacto contigo</p>
+        </div>
+        
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="name">Nombre completo</label>
+              <div class="input-wrapper" [class.error]="contactForm.get('name')?.invalid && contactForm.get('name')?.touched">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <circle cx="9" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M3 15C3 12.2386 5.68629 10 9 10C12.3137 10 15 12.2386 15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
                 <input 
                   id="name"
                   type="text" 
-                  pInputText 
                   formControlName="name"
-                  placeholder="Tu nombre"
-                  class="w-full"
-                  [ngClass]="{'ng-invalid ng-dirty': contactForm.get('name')?.invalid && contactForm.get('name')?.touched}"
-                />
-                <small class="p-error block mt-1" *ngIf="contactForm.get('name')?.invalid && contactForm.get('name')?.touched">
-                  El nombre es requerido
-                </small>
+                  placeholder="Tu nombre completo"
+                >
               </div>
-              
-              <div class="field">
-                <label for="email" class="block text-sm font-medium text-surface-700 mb-2">
-                  Email <span class="text-red-500">*</span>
-                </label>
+              @if (contactForm.get('name')?.invalid && contactForm.get('name')?.touched) {
+                <span class="error-message">El nombre es requerido</span>
+              }
+            </div>
+            
+            <div class="form-field">
+              <label for="email">Email</label>
+              <div class="input-wrapper" [class.error]="contactForm.get('email')?.invalid && contactForm.get('email')?.touched">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <rect x="2" y="4" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M2 6L9 10L16 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
                 <input 
                   id="email"
                   type="email" 
-                  pInputText 
                   formControlName="email"
                   placeholder="tu@email.com"
-                  class="w-full"
-                  [ngClass]="{'ng-invalid ng-dirty': contactForm.get('email')?.invalid && contactForm.get('email')?.touched}"
-                />
-                <small class="p-error block mt-1" *ngIf="contactForm.get('email')?.invalid && contactForm.get('email')?.touched">
-                  Ingresa un email válido
-                </small>
+                >
               </div>
+              @if (contactForm.get('email')?.invalid && contactForm.get('email')?.touched) {
+                <span class="error-message">Ingresa un email válido</span>
+              }
             </div>
+          </div>
 
-            <div class="field">
-              <label for="phone" class="block text-sm font-medium text-surface-700 mb-2">
-                Teléfono (opcional)
-              </label>
+          <div class="form-field">
+            <label for="phone">Teléfono (opcional)</label>
+            <div class="input-wrapper">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M16 12V15C16 15.5304 15.7893 16.0391 15.4142 16.4142C15.0391 16.7893 14.5304 17 14 17H4C3.46957 17 2.96086 16.7893 2.58579 16.4142C2.21071 16.0391 2 15.5304 2 15V12C2 11.4696 2.21071 10.9609 2.58579 10.5858C2.96086 10.2107 3.46957 10 4 10H5.5L7 8.5C7.4 8.1 7.7 7.5 7.7 7C7.7 6.5 7.4 5.9 7 5.5C8.6 3.5 10.5 2.5 12 2.5C12.5 2.5 13 2.6 13.5 2.7L15 3.5C15.4 3.7 15.7 4 15.9 4.4C16.3 5.1 16.5 6 15.5 7C14.3 8.2 13.2 9.3 12 10.5C11.8 10.7 11.6 11 11.4 11.2L11 11.5H14C14.5304 11.5 15.0391 11.7107 15.4142 12.0858C15.7893 12.4609 16 12.9696 16 13V12Z" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
               <input 
                 id="phone"
                 type="tel" 
-                pInputText 
                 formControlName="phone"
                 placeholder="+52 123 456 7890"
-                class="w-full"
-              />
+              >
             </div>
-
-          <div class="field">
-            <label for="message" class="block text-sm font-medium text-surface-700 mb-2">
-              Mensaje <span class="text-red-500">*</span>
-            </label>
-            <textarea 
-              id="message"
-              pTextarea 
-              formControlName="message"
-              rows="5"
-              placeholder="¿En qué podemos ayudarte?"
-              class="w-full"
-              [ngClass]="{'ng-invalid ng-dirty': contactForm.get('message')?.invalid && contactForm.get('message')?.touched}"
-            ></textarea>
-            <small class="p-error block mt-1" *ngIf="contactForm.get('message')?.invalid && contactForm.get('message')?.touched">
-              El mensaje es requerido
-            </small>
           </div>
 
-            <p-button 
-              type="submit"
-              label="Enviar mensaje" 
-              icon="pi pi-send"
-              iconPos="right"
-              styleClass="w-full p-button-lg p-button-primary"
-              [loading]="loading"
-              [disabled]="contactForm.invalid"
-            />
-          </form>
-        </p-card>
+          <div class="form-field">
+            <label for="message">Mensaje</label>
+            <div class="input-wrapper textarea" [class.error]="contactForm.get('message')?.invalid && contactForm.get('message')?.touched">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" class="textarea-icon">
+                <path d="M3 4C3 2.89543 3.89543 2 5 2H13C14.1046 2 15 2.89543 15 4V12C15 13.1046 14.1046 14 13 14H5C3.89543 14 3 13.1046 3 12V4Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M6 6H12M6 9H12M6 12H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <textarea 
+                id="message"
+                formControlName="message"
+                rows="5"
+                placeholder="¿En qué podemos ayudarte?"
+              ></textarea>
+            </div>
+            @if (contactForm.get('message')?.invalid && contactForm.get('message')?.touched) {
+              <span class="error-message">El mensaje es requerido</span>
+            }
+          </div>
+
+          <button type="submit" class="submit-btn" [class.loading]="loading" [disabled]="contactForm.invalid || loading">
+            @if (loading) {
+              <div class="spinner"></div>
+              <span>Enviando...</span>
+            } @else {
+              <span>Enviar mensaje</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            }
+          </button>
+        </form>
       </div>
 
       <!-- Contact Info -->
-      <div class="space-y-6">
-        <p-card header="Información de contacto">
-          <div class="space-y-6">
-            <div class="flex items-start gap-4">
-              <p-avatar icon="pi pi-envelope" styleClass="bg-primary text-white" shape="circle"></p-avatar>
-              <div>
-                <h3 class="font-semibold text-surface-700">Email</h3>
-                <p class="text-surface-600">hola&#64;citasya.app</p>
+      <div class="info-column">
+        <div class="info-card">
+          <h3>Información de contacto</h3>
+          
+          <div class="info-list">
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M3 7L10 11L17 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Email</span>
+                <span class="info-value">hola&#64;citasya.app</span>
               </div>
             </div>
 
-            <p-divider></p-divider>
-
-            <div class="flex items-start gap-4">
-              <p-avatar icon="pi pi-phone" styleClass="bg-primary text-white" shape="circle"></p-avatar>
-              <div>
-                <h3 class="font-semibold text-surface-700">Teléfono</h3>
-                <p class="text-surface-600">+52 55 1234 5678</p>
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M18 15V17C18 17.5304 17.7893 18.0391 17.4142 18.4142C17.0391 18.7893 16.5304 19 16 19H4C3.46957 19 2.96086 18.7893 2.58579 18.4142C2.21071 18.0391 2 17.5304 2 17V15M14 5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5M6 5C6 3.89543 5.10457 3 4 3C2.89543 3 2 3.89543 2 5C2 8 5 10 10 13C15 10 18 8 18 5C18 3.89543 17.1046 3 16 3C14.8954 3 14 3.89543 14 5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Teléfono</span>
+                <span class="info-value">+52 55 1234 5678</span>
               </div>
             </div>
 
-            <p-divider></p-divider>
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M10 6V10L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Horario de atención</span>
+                <span class="info-value">Lunes a Viernes: 9:00 - 18:00</span>
+                <span class="info-value">Sábado: 10:00 - 14:00</span>
+              </div>
+            </div>
 
-            <div class="flex items-start gap-4">
-              <p-avatar icon="pi pi-clock" styleClass="bg-primary text-white" shape="circle"></p-avatar>
-              <div>
-                <h3 class="font-semibold text-surface-700">Horario de atención</h3>
-                <p class="text-surface-600">Lunes a Viernes: 9:00 - 18:00</p>
-                <p class="text-surface-600">Sábado: 10:00 - 14:00</p>
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 2C6.68629 2 4 4.68629 4 8C4 11.5 7 15 10 17C13 15 16 11.5 16 8C16 4.68629 13.3137 2 10 2Z" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="10" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Ubicación</span>
+                <span class="info-value">Ciudad de México, México</span>
               </div>
             </div>
           </div>
-        </p-card>
+        </div>
 
-        <p-panel header="¿Necesitas ayuda inmediata?" styleClass="bg-surface-50">
-          <p class="m-0 text-surface-600 mb-4">
-            Si tienes una pregunta urgente, puedes revisar nuestras guías y documentación.
-          </p>
-          <p-button 
-            label="Ver centro de ayuda" 
-            icon="pi pi-question-circle"
-            styleClass="p-button-outlined p-button-secondary"
-          />
-        </p-panel>
-      </div>
-    </div>
-  </div>
-</section>
-
-<p-divider></p-divider>
-
-<!-- Map Section (Placeholder) -->
-<section class="map-section py-12 px-4 bg-surface-50">
-  <div class="max-w-6xl mx-auto">
-    <p-card header="Ubicación">
-      <div class="h-64 bg-surface-200 rounded-lg flex items-center justify-center">
-        <div class="text-center">
-          <p-avatar icon="pi pi-map-marker" styleClass="bg-primary text-white text-2xl mb-4" size="xlarge" shape="circle"></p-avatar>
-          <p class="text-surface-600">Ciudad de México, México</p>
+        <div class="help-card">
+          <div class="help-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <circle cx="14" cy="14" r="12" fill="currentColor"/>
+              <path d="M10 11C10 9.89543 10.8954 9 12 9C13.1046 9 14 9.89543 14 11C14 12.1046 13.1046 13 12 13C11.5 13 11 13.1 10.6 13.3C10.2 12.5 10 11.8 10 11Z" fill="white"/>
+              <path d="M14 17H14.01V16H14V17Z" fill="white"/>
+            </svg>
+          </div>
+          <h3>¿Necesitas ayuda inmediata?</h3>
+          <p>Si tienes una pregunta urgente, puedes revisar nuestras guías y documentación.</p>
+          <a routerLink="/faq" class="help-link">
+            <span>Ver FAQ</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
         </div>
       </div>
-    </p-card>
-  </div>
-</section>
+    </div>
+  </section>
+
+  <!-- Map Section -->
+  <section class="map-section">
+    <div class="map-card">
+      <div class="map-placeholder">
+        <div class="map-content">
+          <div class="map-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <path d="M24 4C16.268 4 10 10.268 10 18C10 29.5 24 44 24 44C24 44 38 29.5 38 18C38 10.268 31.732 4 24 4Z" stroke="currentColor" stroke-width="2.5"/>
+              <circle cx="24" cy="18" r="5" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <h3>Ciudad de México</h3>
+          <p>México</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

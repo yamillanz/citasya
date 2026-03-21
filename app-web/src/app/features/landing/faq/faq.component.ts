@@ -1,17 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AccordionModule } from 'primeng/accordion';
-import { CardModule } from 'primeng/card';
-import { DividerModule } from 'primeng/divider';
-import { PanelModule } from 'primeng/panel';
-import { AvatarModule } from 'primeng/avatar';
-import { ButtonModule } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-faq',
   standalone: true,
-  imports: [CommonModule, AccordionModule, CardModule, DividerModule, PanelModule, AvatarModule, ButtonModule, RouterLink],
-  templateUrl: './faq.component.html'
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './faq.component.html',
+  styleUrl: './faq.component.scss'
 })
-export class FaqComponent {}
+export class FaqComponent {
+  openFaqIndex: number | null = null;
+  searchQuery = '';
+
+  toggleFaq(index: number) {
+    this.openFaqIndex = this.openFaqIndex === index ? null : index;
+  }
+
+  filterFaqs() {
+    // Search functionality placeholder - can be enhanced later
+  }
+}

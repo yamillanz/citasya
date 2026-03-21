@@ -1,0 +1,413 @@
+.faq-page {
+  min-height: 100vh;
+  background: var(--color-cream);
+}
+
+/* ================================
+   Hero Section
+   ================================ */
+.hero-section {
+  position: relative;
+  padding: var(--space-4xl) var(--space-lg) var(--space-3xl);
+  background: linear-gradient(135deg, var(--color-sage-pale) 0%, var(--color-cream) 100%);
+  overflow: hidden;
+}
+
+.hero-background {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  background: linear-gradient(135deg, var(--color-sage-light) 0%, var(--color-sage-pale) 100%);
+  opacity: 0.6;
+
+  &.blob-1 {
+    width: 500px;
+    height: 500px;
+    top: -200px;
+    right: -150px;
+    animation: float 10s ease-in-out infinite;
+  }
+
+  &.blob-2 {
+    width: 400px;
+    height: 400px;
+    bottom: -150px;
+    left: -100px;
+    animation: float 8s ease-in-out infinite reverse;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+.hero-content {
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  animation: fadeInUp 0.6s var(--ease-out-expo);
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(157, 193, 131, 0.3);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-sage-dark);
+  margin-bottom: var(--space-xl);
+
+  svg {
+    color: var(--color-sage);
+  }
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-lg);
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--color-text-secondary);
+  max-width: 500px;
+  margin: 0 auto var(--space-xl);
+  line-height: 1.7;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  max-width: 400px;
+  margin: 0 auto;
+  padding: var(--space-md) var(--space-xl);
+  background: white;
+  border: 1px solid var(--color-sage-pale);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--duration-fast) ease;
+
+  &:focus-within {
+    border-color: var(--color-sage);
+    box-shadow: var(--shadow-md), 0 0 0 3px rgba(157, 193, 131, 0.1);
+  }
+
+  svg {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    background: none;
+    font-size: 0.9375rem;
+    color: var(--color-text-primary);
+    outline: none;
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+  }
+}
+
+/* ================================
+   FAQ Content
+   ================================ */
+.faq-content {
+  padding: var(--space-3xl) var(--space-lg) var(--space-4xl);
+}
+
+.faq-container {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.faq-category {
+  animation: fadeInUp 0.5s var(--ease-out-expo) forwards;
+  opacity: 0;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+}
+
+.category-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+  border-radius: var(--radius-md);
+  color: white;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.faq-item {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out-expo);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  &.open {
+    box-shadow: var(--shadow-md);
+
+    .faq-question {
+      background: var(--color-sage-pale);
+    }
+
+    .faq-arrow svg {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      max-height: 500px;
+    }
+  }
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-xl);
+  background: white;
+  transition: background var(--duration-fast) ease;
+
+  span {
+    font-weight: 500;
+    font-size: 0.9375rem;
+    color: var(--color-text-primary);
+  }
+}
+
+.faq-arrow {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+
+  svg {
+    transition: transform var(--duration-normal) var(--ease-out-expo);
+  }
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--duration-normal) var(--ease-out-expo);
+
+  p {
+    padding: 0 var(--space-xl) var(--space-lg);
+    padding-top: var(--space-sm);
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  ul {
+    padding: 0 var(--space-xl) var(--space-lg);
+    padding-top: var(--space-sm);
+    margin: 0;
+    list-style: none;
+
+    li {
+      position: relative;
+      padding-left: var(--space-lg);
+      font-size: 0.9375rem;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-sm);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 10px;
+        width: 6px;
+        height: 6px;
+        background: var(--color-sage);
+        border-radius: 50%;
+      }
+
+      strong {
+        color: var(--color-text-primary);
+      }
+    }
+  }
+}
+
+/* ================================
+   CTA Section
+   ================================ */
+.cta-section {
+  padding: 0 var(--space-lg) var(--space-4xl);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.cta-card {
+  position: relative;
+  background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3xl);
+  overflow: hidden;
+  text-align: center;
+  animation: fadeInUp 0.6s var(--ease-out-expo);
+}
+
+.cta-decoration {
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  color: rgba(255, 255, 255, 0.1);
+
+  svg {
+    width: 350px;
+    height: 350px;
+  }
+}
+
+.cta-content {
+  position: relative;
+  z-index: 1;
+}
+
+.cta-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.cta-content h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 500;
+  color: white;
+  margin-bottom: var(--space-md);
+}
+
+.cta-content p {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 400px;
+  margin: 0 auto var(--space-xl);
+  line-height: 1.7;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  background: white;
+  color: var(--color-sage-dark);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: all var(--duration-fast) ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+
+  svg {
+    transition: transform var(--duration-fast) ease;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+
+    svg {
+      transform: translateX(4px);
+    }
+  }
+}
+
+/* ================================
+   Responsive
+   ================================ */
+@media (max-width: 640px) {
+  .hero-section {
+    padding: var(--space-3xl) var(--space-md) var(--space-2xl);
+  }
+
+  .faq-content {
+    padding: var(--space-2xl) var(--space-md) var(--space-3xl);
+  }
+
+  .faq-question {
+    padding: var(--space-md) var(--space-lg);
+
+    span {
+      font-size: 0.875rem;
+    }
+  }
+
+  .faq-answer {
+    p, ul {
+      padding-left: var(--space-lg);
+      padding-right: var(--space-lg);
+      font-size: 0.875rem;
+    }
+  }
+
+  .cta-section {
+    padding: 0 var(--space-md) var(--space-3xl);
+  }
+
+  .cta-card {
+    padding: var(--space-2xl);
+  }
+}
