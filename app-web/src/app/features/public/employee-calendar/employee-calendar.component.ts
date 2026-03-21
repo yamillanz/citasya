@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FullCalendarModule } from '@fullcalendar/angular';
@@ -6,11 +6,8 @@ import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { Button } from 'primeng/button';
-import { Card } from 'primeng/card';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Message } from 'primeng/message';
-import { Avatar } from 'primeng/avatar';
+import { ButtonModule } from 'primeng/button';
+import { AvatarModule } from 'primeng/avatar';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
@@ -26,14 +23,11 @@ import { Service } from '../../../core/models/service.model';
     CommonModule,
     FullCalendarModule,
     RouterLink,
-    Button,
-    Card,
-    ProgressSpinner,
-    Message,
-    Avatar
+    ButtonModule,
+    AvatarModule
   ],
   templateUrl: './employee-calendar.component.html',
-  styleUrls: ['./employee-calendar.component.scss']
+  styleUrl: './employee-calendar.component.scss'
 })
 export class EmployeeCalendarComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -43,23 +37,23 @@ export class EmployeeCalendarComponent implements OnInit {
   private serviceService = inject(ServiceService);
   private appointmentService = inject(AppointmentService);
 
-  company: Company | null = null;
-  employee: User | null = null;
-  services: Service[] = [];
-  selectedDate: string = '';
-  availableSlots: string[] = [];
-  selectedService: Service | null = null;
-  selectedTime: string = '';
-  loading = true;
-  error = '';
+  company = signal<Company | null>(null);
+  employee = signal<User | null>(null);
+  services = signal<Service[]>([]);
+  selectedDate = signal('');
+  availableSlots = signal<string[]>([]);
+  selectedService = signal<Service | null>(null);
+  selectedTime = signal('');
+  loading = signal(true);
+  error = signal('');
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-    initialView: 'timeGridWeek',
+    initialView: 'dayGridMonth',
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
-      right: 'timeGridWeek,dayGridMonth'
+      right: 'dayGridMonth,timeGridWeek'
     },
     slotMinTime: '08:00:00',
     slotMaxTime: '20:00:00',
@@ -76,72 +70,98 @@ export class EmployeeCalendarComponent implements OnInit {
     const employeeId = this.route.snapshot.paramMap.get('employeeId');
 
     if (!slug || !employeeId) {
-      this.error = 'Página no encontrada';
-      this.loading = false;
+      this.error.set('Página no encontrada');
+      this.loading.set(false);
       return;
     }
 
-    this.company = await this.companyService.getBySlug(slug);
-    if (!this.company) {
-      this.error = 'Empresa no encontrada';
-      this.loading = false;
-      return;
-    }
+    try {
+      const company = await this.companyService.getBySlug(slug);
+      if (!company) {
+        this.error.set('Empresa no encontrada');
+        this.loading.set(false);
+        return;
+      }
+      this.company.set(company);
 
-    this.employee = await this.userService.getById(employeeId);
-    if (!this.employee) {
-      this.error = 'Profesional no encontrado';
-      this.loading = false;
-      return;
-    }
+      const employee = await this.userService.getById(employeeId);
+      if (!employee) {
+        this.error.set('Profesional no encontrado');
+        this.loading.set(false);
+        return;
+      }
+      this.employee.set(employee);
 
-    this.services = await this.serviceService.getByEmployee(employeeId);
-    this.loading = false;
+      const services = await this.serviceService.getByEmployee(employeeId);
+      this.services.set(services);
+    } catch (err) {
+      this.error.set('Error al cargar los datos');
+    } finally {
+      this.loading.set(false);
+    }
   }
 
-  async onDateSelect(arg: any) {
-    this.selectedDate = arg.startStr.split('T')[0];
+  async handleDateSelect(arg: any) {
+    this.selectedDate.set(arg.startStr.split('T')[0]);
+    this.selectedTime.set('');
     await this.loadAvailableSlots();
   }
 
   async loadAvailableSlots() {
-    if (!this.selectedDate || !this.selectedService || !this.employee || !this.company) return;
+    const service = this.selectedService();
+    const date = this.selectedDate();
+    const emp = this.employee();
+    const comp = this.company();
 
-    this.availableSlots = await this.appointmentService.getAvailableSlots(
-      this.company.id,
-      this.employee.id,
-      this.selectedDate,
-      this.selectedService.duration_minutes
+    if (!date || !service || !emp || !comp) return;
+
+    const slots = await this.appointmentService.getAvailableSlots(
+      comp.id,
+      emp.id,
+      date,
+      service.duration_minutes
     );
+    this.availableSlots.set(slots);
   }
 
   async onServiceChange(service: Service) {
-    this.selectedService = service;
-    if (this.selectedDate) {
+    this.selectedService.set(service);
+    this.selectedTime.set('');
+    if (this.selectedDate()) {
       await this.loadAvailableSlots();
     }
   }
 
   selectTime(time: string) {
-    this.selectedTime = time;
+    this.selectedTime.set(time);
   }
 
   proceedToBooking() {
-    if (!this.selectedDate || !this.selectedTime || !this.selectedService || !this.company || !this.employee) {
+    const comp = this.company();
+    const emp = this.employee();
+    const service = this.selectedService();
+    const date = this.selectedDate();
+    const time = this.selectedTime();
+
+    if (!comp || !emp || !service || !date || !time) {
       return;
     }
 
-    this.router.navigate(['/c', this.company.slug, 'e', this.employee.id, 'book'], {
+    this.router.navigate(['/c', comp.slug, 'e', emp.id, 'book'], {
       queryParams: {
-        date: this.selectedDate,
-        time: this.selectedTime,
-        serviceId: this.selectedService.id
+        date: date,
+        time: time,
+        serviceId: service.id
       }
     });
   }
 
-  handleDateSelect(arg: any) {
-    this.selectedDate = arg.startStr.split('T')[0];
-    this.loadAvailableSlots();
+  formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('es-ES', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long'
+    });
   }
 }

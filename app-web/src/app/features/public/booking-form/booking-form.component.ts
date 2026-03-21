@@ -1,11 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Button } from 'primeng/button';
-import { InputText } from 'primeng/inputtext';
-import { Card } from 'primeng/card';
-import { Message } from 'primeng/message';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
@@ -21,13 +19,11 @@ import { Service } from '../../../core/models/service.model';
     CommonModule, 
     ReactiveFormsModule, 
     RouterLink,
-    Button,
-    InputText,
-    Card,
-    Message
+    ButtonModule,
+    InputTextModule
   ],
   templateUrl: './booking-form.component.html',
-  styleUrls: ['./booking-form.component.scss']
+  styleUrl: './booking-form.component.scss'
 })
 export class BookingFormComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -38,14 +34,16 @@ export class BookingFormComponent implements OnInit {
   private serviceService = inject(ServiceService);
   private appointmentService = inject(AppointmentService);
 
-  company: Company | null = null;
-  employee: User | null = null;
-  service: Service | null = null;
+  company = signal<Company | null>(null);
+  employee = signal<User | null>(null);
+  service = signal<Service | null>(null);
   selectedDate = '';
   selectedTime = '';
-  loading = false;
-  error = '';
-  success = false;
+  loading = signal(false);
+  error = signal('');
+  success = signal(false);
+  currentStep = signal(1);
+  submitError = signal('');
 
   bookingForm = this.fb.group({
     client_name: ['', [Validators.required, Validators.minLength(2)]],
@@ -63,32 +61,74 @@ export class BookingFormComponent implements OnInit {
     this.selectedTime = this.route.snapshot.queryParamMap.get('time') || '';
 
     if (!slug || !employeeId || !this.selectedDate || !serviceId || !this.selectedTime) {
-      this.error = 'Parámetros incompletos';
+      this.error.set('Parámetros incompletos');
       return;
     }
 
-    this.company = await this.companyService.getBySlug(slug);
-    this.employee = await this.userService.getById(employeeId);
-    this.service = await this.serviceService.getById(serviceId);
+    try {
+      const company = await this.companyService.getBySlug(slug);
+      const employee = await this.userService.getById(employeeId);
+      const service = await this.serviceService.getById(serviceId);
 
-    if (!this.company || !this.employee || !this.service) {
-      this.error = 'Datos no encontrados';
+      if (!company || !employee || !service) {
+        this.error.set('Datos no encontrados');
+        return;
+      }
+
+      this.company.set(company);
+      this.employee.set(employee);
+      this.service.set(service);
+    } catch (err) {
+      this.error.set('Error al cargar los datos');
     }
   }
 
+  nextStep() {
+    this.currentStep.set(2);
+  }
+
+  prevStep() {
+    this.currentStep.set(1);
+  }
+
+  getError(field: string): string {
+    const control = this.bookingForm.get(field);
+    if (control?.hasError('required') && control?.touched) {
+      return 'Este campo es requerido';
+    }
+    if (control?.hasError('minlength') && control?.touched) {
+      return 'El valor es muy corto';
+    }
+    if (control?.hasError('email') && control?.touched) {
+      return 'El email no es válido';
+    }
+    return '';
+  }
+
   async onSubmit() {
-    if (this.bookingForm.invalid || !this.company || !this.employee || !this.service) {
+    if (this.bookingForm.invalid) {
+      Object.values(this.bookingForm.controls).forEach(control => {
+        control.markAsTouched();
+      });
       return;
     }
 
-    this.loading = true;
-    this.error = '';
+    const comp = this.company();
+    const emp = this.employee();
+    const serv = this.service();
+
+    if (!comp || !emp || !serv) {
+      return;
+    }
+
+    this.loading.set(true);
+    this.submitError.set('');
 
     try {
       await this.appointmentService.create({
-        company_id: this.company.id,
-        employee_id: this.employee.id,
-        service_id: this.service.id,
+        company_id: comp.id,
+        employee_id: emp.id,
+        service_id: serv.id,
         client_name: this.bookingForm.value.client_name!,
         client_phone: this.bookingForm.value.client_phone!,
         client_email: this.bookingForm.value.client_email || undefined,
@@ -97,11 +137,22 @@ export class BookingFormComponent implements OnInit {
         notes: this.bookingForm.value.notes || undefined
       });
 
-      this.success = true;
+      this.currentStep.set(3);
+      this.success.set(true);
     } catch (err: any) {
-      this.error = err.message || 'Error al crear la reserva';
+      this.submitError.set(err.message || 'Error al crear la reserva');
     } finally {
-      this.loading = false;
+      this.loading.set(false);
     }
+  }
+
+  formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('es-ES', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
   }
 }

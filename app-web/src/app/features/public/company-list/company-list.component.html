@@ -1,81 +1,130 @@
-<div class="company-container">
-  @if (company) {
-    <div class="company-header mb-6">
-      <p-card styleClass="text-center">
-        <ng-template pTemplate="content">
-          @if (company.logo_url) {
-          <p-avatar
-            [image]="company.logo_url"
-            styleClass="mb-4"
-            size="xlarge"
-            shape="circle"
-          ></p-avatar>
-          }
-          <h1 class="text-3xl font-bold text-primary m-0 mb-2">{{ company.name }}</h1>
-          @if (company.address) {
-            <p class="text-surface-600 mb-1">
-              <i class="pi pi-map-marker mr-2"></i>{{ company.address }}
-            </p>
-          }
-          @if (company.phone) {
-            <p class="text-surface-600 m-0">
-              <i class="pi pi-phone mr-2"></i>{{ company.phone }}
-            </p>
-          }
-        </ng-template>
-      </p-card>
+<div class="company-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
     </div>
-  }
-
-  @if (loading) {
-    <div class="flex flex-col items-center justify-center py-12">
-      <p-progressSpinner></p-progressSpinner>
-      <p class="text-surface-500 mt-4">Cargando...</p>
-    </div>
-  }
-
-  @if (error) {
-    <p-message severity="error" [text]="error"></p-message>
-  }
-
-  @if (!loading && !error) {
-    <p-card>
-      <ng-template pTemplate="title">
-        <h2 class="text-xl font-bold m-0">Selecciona un profesional</h2>
-      </ng-template>
+    
+    <div class="hero-content">
+      <!-- Logo -->
+      <div class="hero-logo">
+        <svg width="180" height="50" viewBox="0 0 185 50" fill="none">
+          <text x="0" y="35" font-family="'Fraunces', Georgia, serif" font-size="26" font-weight="600" letter-spacing="-0.5">
+            <tspan fill="#9DC183">CITASYA</tspan><tspan fill="#5D6D7E">.APP</tspan>
+          </text>
+        </svg>
+      </div>
       
-      <ng-template pTemplate="content">
-        <div class="employees-list space-y-4">
-          @for (employee of employees; track employee.id) {
-            <div class="employee-card flex items-center gap-4 p-4 border border-surface-200 rounded-lg hover:shadow-md transition-shadow">
-              <p-avatar
-                [image]="employee.photo_url || '/assets/images/default-avatar.png'"
-                styleClass="border-2 border-surface-200"
-                size="large"
-                shape="circle"
-              ></p-avatar>
-              
-              <div class="flex-1">
-                <h3 class="font-semibold text-surface-800 m-0">{{ employee.full_name }}</h3>
-              </div>
-              
-              <p-button 
-                label="Ver disponibilidad"
-                icon="pi pi-calendar"
-                styleClass="p-button-primary"
-                [routerLink]="['/c', company?.slug, 'e', employee.id]"
-              />
-            </div>
+      <h1 class="hero-title">{{ company?.name }}</h1>
+      <p class="hero-subtitle">Agenda tu cita de forma rápida y sencilla</p>
+      
+      @if (company?.address || company?.phone) {
+        <div class="company-meta">
+          @if (company?.address) {
+            <span class="meta-item">
+              <i class="pi pi-map-marker"></i>
+              {{ company.address }}
+            </span>
           }
-
-          @if (employees.length === 0) {
-            <div class="text-center py-8">
-              <i class="pi pi-users text-4xl text-surface-400 mb-4"></i>
-              <p class="text-surface-600">No hay profesionales disponibles</p>
-            </div>
+          @if (company?.phone) {
+            <span class="meta-item">
+              <i class="pi pi-phone"></i>
+              {{ company.phone }}
+            </span>
           }
         </div>
-      </ng-template>
-    </p-card>
+      }
+    </div>
+  </section>
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando empleados...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error) {
+    <div class="error-state">
+      <div class="error-illustration">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="40" fill="#FEE2E2"/>
+          <circle cx="40" cy="30" r="12" stroke="#EF4444" stroke-width="2.5"/>
+          <path d="M32 50C32 43.373 36.373 39 43 39H47C53.627 39 58 43.373 58 50" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M38 56V60M52 56V60" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>Empresa no encontrada</h3>
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  <!-- Employees Section -->
+  @if (!loading && !error && employees.length > 0) {
+    <section class="employees-section">
+      <div class="section-header">
+        <h2>Selecciona un profesional</h2>
+        <p>Elige al especialista que atenderá tu cita</p>
+      </div>
+      
+      <div class="employees-grid">
+        @for (employee of employees; track employee.id; let i = $index) {
+          <div class="employee-card" [style.animation-delay]="(i * 100) + 'ms'">
+            <div class="card-decoration">
+              <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                <circle cx="80" cy="20" r="50" fill="currentColor"/>
+              </svg>
+            </div>
+            
+            <div class="card-content">
+              <div class="employee-avatar">
+                @if (employee.photo_url) {
+                  <img [src]="employee.photo_url" [alt]="employee.full_name">
+                } @else {
+                  <div class="avatar-placeholder">
+                    {{ employee.full_name.charAt(0) }}
+                  </div>
+                }
+              </div>
+              
+              <div class="employee-info">
+                <h3 class="employee-name">{{ employee.full_name }}</h3>
+                @if (employee.phone) {
+                  <span class="employee-contact">
+                    <i class="pi pi-phone"></i>
+                    {{ employee.phone }}
+                  </span>
+                }
+              </div>
+              
+              <a 
+                [routerLink]="['/c', company?.slug, 'e', employee.id]"
+                class="book-btn">
+                <span>Ver disponibilidad</span>
+                <i class="pi pi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Empty State -->
+  @if (!loading && !error && employees.length === 0) {
+    <div class="empty-state">
+      <div class="empty-illustration">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="50" fill="#F5F2ED"/>
+          <circle cx="50" cy="38" r="16" stroke="#B8D4A3" stroke-width="2.5"/>
+          <path d="M26 78C26 62.536 36.058 50 50 50C63.942 50 74 62.536 74 78" stroke="#B8D4A3" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>No hay profesionales disponibles</h3>
+      <p>Lo sentimos, actualmente no hay empleados registrados en este negocio.</p>
+    </div>
   }
 </div>

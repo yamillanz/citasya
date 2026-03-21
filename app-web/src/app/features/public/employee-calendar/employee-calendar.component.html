@@ -1,136 +1,183 @@
-<div class="calendar-container">
-  <div class="back-link mb-4">
-    <p-button 
-      label="Volver" 
-      icon="pi pi-arrow-left"
-      styleClass="p-button-text p-button-sm"
-      [routerLink]="['/c', company?.slug]"
-    />
-  </div>
+<div class="calendar-page">
+  <!-- Header -->
+  <header class="page-header">
+    <a [routerLink]="['/c', company?.slug]" class="back-link">
+      <i class="pi pi-arrow-left"></i>
+      <span>Volver</span>
+    </a>
+    
+    @if (company) {
+      <div class="company-badge">
+        <svg width="140" height="36" viewBox="0 0 145 38" fill="none">
+          <text x="0" y="28" font-family="'Fraunces', Georgia, serif" font-size="20" font-weight="600" letter-spacing="-0.5">
+            <tspan fill="#9DC183">CITASYA</tspan><tspan fill="#5D6D7E">.APP</tspan>
+          </text>
+        </svg>
+      </div>
+    }
+  </header>
 
-  @if (employee) {
-    <div class="employee-header mb-6">
-      <p-card styleClass="text-center">
-        <ng-template pTemplate="content">
-          <p-avatar
-            [image]="employee.photo_url || '/assets/images/default-avatar.png'"
-            styleClass="mb-4 border-4 border-primary"
-            size="xlarge"
-            shape="circle"
-          ></p-avatar>
-          <h1 class="text-2xl font-bold text-primary m-0">{{ employee.full_name }}</h1>
-        </ng-template>
-      </p-card>
-    </div>
-  }
-
+  <!-- Loading State -->
   @if (loading) {
-    <div class="flex flex-col items-center justify-center py-12">
-      <p-progressSpinner></p-progressSpinner>
-      <p class="text-surface-500 mt-4">Cargando...</p>
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando disponibilidad...</p>
     </div>
   }
 
+  <!-- Error State -->
   @if (error) {
-    <p-message severity="error" [text]="error"></p-message>
+    <div class="error-state">
+      <div class="error-illustration">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="40" fill="#FEE2E2"/>
+          <circle cx="40" cy="30" r="12" stroke="#EF4444" stroke-width="2.5"/>
+          <path d="M32 50C32 43.373 36.373 39 43 39H47C53.627 39 58 43.373 58 50" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>{{ error }}</h3>
+    </div>
   }
 
   @if (!loading && !error) {
-    <div class="booking-section space-y-6">
-      <!-- Service Selection -->
-      <p-card>
-        <ng-template pTemplate="title">
-          <h2 class="text-xl font-bold m-0">Selecciona un servicio</h2>
-        </ng-template>
+    <!-- Employee Header -->
+    <section class="employee-section">
+      <div class="employee-card">
+        <div class="card-decoration"></div>
         
-        <ng-template pTemplate="content">
-          <div class="services-grid grid gap-3">
-            @for (service of services; track service.id) {
-              <div 
-                class="service-item p-4 border-2 rounded-lg cursor-pointer transition-all"
-                [class.border-primary]="selectedService?.id === service.id"
-                [class.bg-primary-50]="selectedService?.id === service.id"
-                [class.border-surface-200]="selectedService?.id !== service.id"
-                [class.hover:border-primary-300]="selectedService?.id !== service.id"
-                (click)="onServiceChange(service)"
-              >
-                <div class="flex justify-between items-start">
-                  <span class="font-semibold text-surface-800">{{ service.name }}</span>
-                  @if (service.price) {
-                    <span class="font-bold text-primary">${{ service.price }}</span>
-                  }
-                </div>
-                <span class="text-sm text-surface-500">{{ service.duration_minutes }} min</span>
-              </div>
-            }
-          </div>
-          
-          @if (services.length === 0) {
-            <p class="text-surface-600 text-center py-4">No hay servicios disponibles</p>
+        <div class="employee-avatar">
+          @if (employee?.photo_url) {
+            <img [src]="employee.photo_url" [alt]="employee?.full_name">
+          } @else {
+            <div class="avatar-placeholder">
+              {{ employee?.full_name?.charAt(0) }}
+            </div>
           }
-        </ng-template>
-      </p-card>
+        </div>
+        
+        <div class="employee-info">
+          <h1 class="employee-name">{{ employee?.full_name }}</h1>
+          <p class="employee-role">Profesional</p>
+        </div>
+      </div>
+    </section>
 
-      <!-- Calendar -->
-      @if (selectedService) {
-        <p-card>
-          <ng-template pTemplate="title">
-            <h2 class="text-xl font-bold m-0">Selecciona fecha</h2>
-          </ng-template>
-          
-          <ng-template pTemplate="content">
-            <full-calendar [options]="calendarOptions"></full-calendar>
-          </ng-template>
-        </p-card>
-      }
-
-      <!-- Time Slots -->
-      @if (selectedDate && selectedService) {
-        <p-card>
-          <ng-template pTemplate="title">
-            <h2 class="text-xl font-bold m-0">Horarios disponibles</h2>
-          </ng-template>
-          
-          <ng-template pTemplate="subtitle">
-            <p class="text-surface-600 m-0">{{ selectedDate | date:'fullDate' }}</p>
-          </ng-template>
-          
-          <ng-template pTemplate="content">
-            @if (availableSlots.length > 0) {
-              <div class="slots-grid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                @for (slot of availableSlots; track slot) {
-                  <p-button 
-                    [label]="slot"
-                    styleClass="w-full"
-                    [styleClass]="selectedTime === slot ? 'p-button-primary' : 'p-button-outlined p-button-secondary'"
-                    (onClick)="selectTime(slot)"
-                  />
-                }
+    <!-- Services Selection -->
+    <section class="services-section">
+      <div class="section-header">
+        <h2>Paso 1: Selecciona un servicio</h2>
+      </div>
+      
+      <div class="services-grid">
+        @for (service of services; track service.id) {
+          <button 
+            class="service-card"
+            [class.selected]="selectedService?.id === service.id"
+            (click)="onServiceChange(service)">
+            <div class="service-content">
+              <div class="service-icon">
+                <i class="pi pi-tag"></i>
+              </div>
+              <div class="service-info">
+                <span class="service-name">{{ service.name }}</span>
+                <span class="service-duration">
+                  <i class="pi pi-clock"></i>
+                  {{ service.duration_minutes }} min
+                </span>
+              </div>
+              @if (service.price) {
+                <div class="service-price">
+                  ${{ service.price | number:'1.2-2' }}
+                </div>
+              }
+            </div>
+            @if (selectedService?.id === service.id) {
+              <div class="selected-check">
+                <i class="pi pi-check"></i>
               </div>
             }
-            
-            @if (availableSlots.length === 0) {
-              <div class="text-center py-8">
-                <i class="pi pi-calendar-times text-4xl text-surface-400 mb-4"></i>
-                <p class="text-surface-600">No hay horarios disponibles para esta fecha</p>
-              </div>
-            }
-          </ng-template>
-        </p-card>
-      }
-
-      <!-- Continue Button -->
-      @if (selectedDate && selectedTime && selectedService) {
-        <div class="booking-action">
-          <p-button 
-            label="Continuar con la reserva"
-            icon="pi pi-arrow-right"
-            iconPos="right"
-            styleClass="w-full p-button-lg p-button-primary"
-            (onClick)="proceedToBooking()"
-          />
+          </button>
+        }
+      </div>
+      
+      @if (services.length === 0) {
+        <div class="empty-services">
+          <p>No hay servicios disponibles</p>
         </div>
       }
-    </div>
+    </section>
+
+    <!-- Date Selection -->
+    @if (selectedService) {
+      <section class="date-section">
+        <div class="section-header">
+          <h2>Paso 2: Selecciona fecha y hora</h2>
+        </div>
+        
+        <div class="calendar-wrapper">
+          <div class="calendar-card">
+            <full-calendar [options]="calendarOptions"></full-calendar>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- Time Slots -->
+    @if (selectedDate && selectedService) {
+      <section class="slots-section">
+        <div class="slots-header">
+          <div class="selected-datetime">
+            <i class="pi pi-calendar"></i>
+            <span>{{ formatDate(selectedDate) }}</span>
+          </div>
+        </div>
+        
+        @if (availableSlots.length > 0) {
+          <div class="slots-grid">
+            @for (slot of availableSlots; track slot) {
+              <button 
+                class="time-slot"
+                [class.selected]="selectedTime === slot"
+                (click)="selectTime(slot)">
+                {{ slot }}
+              </button>
+            }
+          </div>
+        } @else {
+          <div class="no-slots">
+            <div class="no-slots-icon">
+              <i class="pi pi-calendar-times"></i>
+            </div>
+            <p>No hay horarios disponibles para esta fecha</p>
+            <span>Por favor selecciona otra fecha</span>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- Continue Button -->
+    @if (selectedDate && selectedTime && selectedService) {
+      <section class="action-section">
+        <div class="booking-summary">
+          <div class="summary-item">
+            <i class="pi pi-tag"></i>
+            <span>{{ selectedService.name }}</span>
+          </div>
+          <div class="summary-item">
+            <i class="pi pi-calendar"></i>
+            <span>{{ formatDate(selectedDate) }}</span>
+          </div>
+          <div class="summary-item highlight">
+            <i class="pi pi-clock"></i>
+            <span>{{ selectedTime }}</span>
+          </div>
+        </div>
+        
+        <button class="continue-btn" (click)="proceedToBooking()">
+          <span>Continuar con la reserva</span>
+          <i class="pi pi-arrow-right"></i>
+        </button>
+      </section>
+    }
   }
 </div>

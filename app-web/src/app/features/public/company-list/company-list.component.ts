@@ -1,14 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Button } from 'primeng/button';
-import { Card } from 'primeng/card';
-import { Avatar } from 'primeng/avatar';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Message } from 'primeng/message';
+import { ButtonModule } from 'primeng/button';
+import { AvatarModule } from 'primeng/avatar';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { CompanyService } from '../../../core/services/company.service';
-import { Company } from '../../../core/models/company.model';
 import { UserService } from '../../../core/services/user.service';
+import { Company } from '../../../core/models/company.model';
 import { User } from '../../../core/models/user.model';
 
 @Component({
@@ -17,41 +15,46 @@ import { User } from '../../../core/models/user.model';
   imports: [
     CommonModule,
     RouterLink,
-    Button,
-    Card,
-    Avatar,
-    ProgressSpinner,
-    Message
+    ButtonModule,
+    AvatarModule,
+    ProgressSpinnerModule
   ],
   templateUrl: './company-list.component.html',
-  styleUrls: ['./company-list.component.scss']
+  styleUrl: './company-list.component.scss'
 })
 export class CompanyListComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private companyService = inject(CompanyService);
   private userService = inject(UserService);
 
-  company: Company | null = null;
-  employees: User[] = [];
-  loading = true;
-  error = '';
+  company = signal<Company | null>(null);
+  employees = signal<User[]>([]);
+  loading = signal(true);
+  error = signal('');
 
   async ngOnInit() {
-    const slug = this.route.snapshot.paramMap.get('companySlug');
+    const slug = this.route.snapshot.paramMap.get('companySlug') || '';
     if (!slug) {
-      this.error = 'Empresa no encontrada';
-      this.loading = false;
+      this.error.set('Empresa no encontrada');
+      this.loading.set(false);
       return;
     }
 
-    this.company = await this.companyService.getBySlug(slug);
-    if (!this.company) {
-      this.error = 'Empresa no encontrada';
-      this.loading = false;
-      return;
-    }
+    try {
+      const company = await this.companyService.getBySlug(slug);
+      if (!company) {
+        this.error.set('Empresa no encontrada');
+        this.loading.set(false);
+        return;
+      }
 
-    this.employees = await this.userService.getEmployeesByCompany(this.company.id);
-    this.loading = false;
+      this.company.set(company);
+      const employees = await this.userService.getEmployeesByCompany(company.id);
+      this.employees.set(employees);
+    } catch (err) {
+      this.error.set('Error al cargar los datos');
+    } finally {
+      this.loading.set(false);
+    }
   }
 }
