@@ -16,21 +16,21 @@
         </svg>
       </div>
       
-      <h1 class="hero-title">{{ company?.name }}</h1>
+      <h1 class="hero-title">{{ company()?.name }}</h1>
       <p class="hero-subtitle">Agenda tu cita de forma rápida y sencilla</p>
       
-      @if (company?.address || company?.phone) {
+      @if (company()?.address || company()?.phone) {
         <div class="company-meta">
-          @if (company?.address) {
+          @if (company()?.address) {
             <span class="meta-item">
               <i class="pi pi-map-marker"></i>
-              {{ company.address }}
+              {{ company()?.address }}
             </span>
           }
-          @if (company?.phone) {
+          @if (company()?.phone) {
             <span class="meta-item">
               <i class="pi pi-phone"></i>
-              {{ company.phone }}
+              {{ company()?.phone }}
             </span>
           }
         </div>
@@ -39,7 +39,7 @@
   </section>
 
   <!-- Loading State -->
-  @if (loading) {
+  @if (loading()) {
     <div class="loading-state">
       <div class="loading-spinner"></div>
       <p>Cargando empleados...</p>
@@ -47,7 +47,7 @@
   }
 
   <!-- Error State -->
-  @if (error) {
+  @if (error()) {
     <div class="error-state">
       <div class="error-illustration">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -58,12 +58,12 @@
         </svg>
       </div>
       <h3>Empresa no encontrada</h3>
-      <p>{{ error }}</p>
+      <p>{{ error() }}</p>
     </div>
   }
 
   <!-- Employees Section -->
-  @if (!loading && !error && employees.length > 0) {
+  @if (!loading() && !error() && employees().length > 0) {
     <section class="employees-section">
       <div class="section-header">
         <h2>Selecciona un profesional</h2>
@@ -71,7 +71,7 @@
       </div>
       
       <div class="employees-grid">
-        @for (employee of employees; track employee.id; let i = $index) {
+        @for (employee of employees(); track employee.id; let i = $index) {
           <div class="employee-card" [style.animation-delay]="(i * 100) + 'ms'">
             <div class="card-decoration">
               <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
@@ -101,7 +101,7 @@
               </div>
               
               <a 
-                [routerLink]="['/c', company?.slug, 'e', employee.id]"
+                [routerLink]="['/c', company()?.slug, 'e', employee.id]"
                 class="book-btn">
                 <span>Ver disponibilidad</span>
                 <i class="pi pi-arrow-right"></i>
@@ -114,7 +114,7 @@
   }
 
   <!-- Empty State -->
-  @if (!loading && !error && employees.length === 0) {
+  @if (!loading() && !error() && employees().length === 0) {
     <div class="empty-state">
       <div class="empty-illustration">
         <svg width="100" height="100" viewBox="0 0 100 100" fill="none">

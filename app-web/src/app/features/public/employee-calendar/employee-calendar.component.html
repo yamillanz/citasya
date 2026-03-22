@@ -1,12 +1,12 @@
 <div class="calendar-page">
   <!-- Header -->
   <header class="page-header">
-    <a [routerLink]="['/c', company?.slug]" class="back-link">
+    <a [routerLink]="['/c', company()?.slug]" class="back-link">
       <i class="pi pi-arrow-left"></i>
       <span>Volver</span>
     </a>
     
-    @if (company) {
+    @if (company()) {
       <div class="company-badge">
         <svg width="140" height="36" viewBox="0 0 145 38" fill="none">
           <text x="0" y="28" font-family="'Fraunces', Georgia, serif" font-size="20" font-weight="600" letter-spacing="-0.5">
@@ -18,7 +18,7 @@
   </header>
 
   <!-- Loading State -->
-  @if (loading) {
+  @if (loading()) {
     <div class="loading-state">
       <div class="loading-spinner"></div>
       <p>Cargando disponibilidad...</p>
@@ -26,7 +26,7 @@
   }
 
   <!-- Error State -->
-  @if (error) {
+  @if (error()) {
     <div class="error-state">
       <div class="error-illustration">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -35,28 +35,28 @@
           <path d="M32 50C32 43.373 36.373 39 43 39H47C53.627 39 58 43.373 58 50" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <h3>{{ error }}</h3>
+      <h3>{{ error() }}</h3>
     </div>
   }
 
-  @if (!loading && !error) {
+  @if (!loading() && !error()) {
     <!-- Employee Header -->
     <section class="employee-section">
       <div class="employee-card">
         <div class="card-decoration"></div>
         
         <div class="employee-avatar">
-          @if (employee?.photo_url) {
-            <img [src]="employee.photo_url" [alt]="employee?.full_name">
+          @if (employee()?.photo_url) {
+            <img [src]="employee()?.photo_url" [alt]="employee()?.full_name">
           } @else {
             <div class="avatar-placeholder">
-              {{ employee?.full_name?.charAt(0) }}
+              {{ employee()?.full_name?.charAt(0) }}
             </div>
           }
         </div>
         
         <div class="employee-info">
-          <h1 class="employee-name">{{ employee?.full_name }}</h1>
+          <h1 class="employee-name">{{ employee()?.full_name }}</h1>
           <p class="employee-role">Profesional</p>
         </div>
       </div>
@@ -69,10 +69,10 @@
       </div>
       
       <div class="services-grid">
-        @for (service of services; track service.id) {
+        @for (service of services(); track service.id) {
           <button 
             class="service-card"
-            [class.selected]="selectedService?.id === service.id"
+            [class.selected]="selectedService()?.id === service.id"
             (click)="onServiceChange(service)">
             <div class="service-content">
               <div class="service-icon">
@@ -91,7 +91,7 @@
                 </div>
               }
             </div>
-            @if (selectedService?.id === service.id) {
+            @if (selectedService()?.id === service.id) {
               <div class="selected-check">
                 <i class="pi pi-check"></i>
               </div>
@@ -108,7 +108,7 @@
     </section>
 
     <!-- Date Selection -->
-    @if (selectedService) {
+    @if (selectedService()) {
       <section class="date-section">
         <div class="section-header">
           <h2>Paso 2: Selecciona fecha y hora</h2>
@@ -123,21 +123,21 @@
     }
 
     <!-- Time Slots -->
-    @if (selectedDate && selectedService) {
+    @if (selectedDate() && selectedService()) {
       <section class="slots-section">
         <div class="slots-header">
           <div class="selected-datetime">
             <i class="pi pi-calendar"></i>
-            <span>{{ formatDate(selectedDate) }}</span>
+            <span>{{ formatDate(selectedDate()) }}</span>
           </div>
         </div>
         
-        @if (availableSlots.length > 0) {
+          @if (availableSlots().length > 0) {
           <div class="slots-grid">
-            @for (slot of availableSlots; track slot) {
+            @for (slot of availableSlots(); track slot) {
               <button 
                 class="time-slot"
-                [class.selected]="selectedTime === slot"
+                [class.selected]="selectedTime() === slot"
                 (click)="selectTime(slot)">
                 {{ slot }}
               </button>
@@ -156,20 +156,20 @@
     }
 
     <!-- Continue Button -->
-    @if (selectedDate && selectedTime && selectedService) {
+    @if (selectedDate() && selectedTime() && selectedService()) {
       <section class="action-section">
         <div class="booking-summary">
           <div class="summary-item">
             <i class="pi pi-tag"></i>
-            <span>{{ selectedService.name }}</span>
+            <span>{{ selectedService()?.name }}</span>
           </div>
           <div class="summary-item">
             <i class="pi pi-calendar"></i>
-            <span>{{ formatDate(selectedDate) }}</span>
+            <span>{{ formatDate(selectedDate()) }}</span>
           </div>
           <div class="summary-item highlight">
             <i class="pi pi-clock"></i>
-            <span>{{ selectedTime }}</span>
+            <span>{{ selectedTime() }}</span>
           </div>
         </div>
         

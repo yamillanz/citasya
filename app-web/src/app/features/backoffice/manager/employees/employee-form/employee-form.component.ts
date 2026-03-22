@@ -7,7 +7,6 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ToastModule } from 'primeng/toast';
-import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { UserService } from '../../../../../core/services/user.service';

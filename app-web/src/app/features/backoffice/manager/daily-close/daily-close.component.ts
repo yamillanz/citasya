@@ -164,7 +164,7 @@ export class DailyCloseComponent implements OnInit {
   getEmployeeInitials(empId: string): string {
     const appointments = this.appointmentsByEmployee()[empId];
     if (appointments && appointments.length > 0) {
-      const name = this.$any(appointments[0]).employee?.full_name || '';
+      const name = (appointments[0] as any).employee?.full_name || '';
       return name.charAt(0).toUpperCase();
     }
     return '?';

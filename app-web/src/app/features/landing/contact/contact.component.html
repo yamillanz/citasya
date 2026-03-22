@@ -107,8 +107,8 @@
             }
           </div>
 
-          <button type="submit" class="submit-btn" [class.loading]="loading" [disabled]="contactForm.invalid || loading">
-            @if (loading) {
+          <button type="submit" class="submit-btn" [class.loading]="loading()" [disabled]="contactForm.invalid || loading()">
+            @if (loading()) {
               <div class="spinner"></div>
               <span>Enviando...</span>
             } @else {

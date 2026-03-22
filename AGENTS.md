@@ -1,5 +1,7 @@
 # CitasYa - Reglas Específicas del Proyecto
 
+**IMPORTANT** the folder of the project ins ./app-web
+
 ## UI Framework (PrimeNG) - SOLO PARA ESTE PROYECTO
 
 - **Use PrimeNG components exclusively** for all UI elements
