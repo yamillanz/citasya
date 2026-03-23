@@ -53,17 +53,110 @@
 
 ### Componentes
 - Siempre standalone components
-- ChangeDetection: OnPush
+- ChangeDetection: `ChangeDetectionStrategy.OnPush`
 - Usar `inject()` en lugar de constructor
 - Separar template y styles si >25 líneas / >6 líneas respectivamente
+- Usar `input()` y `output()` (no decoradores) para Angular 17.2+
+
+### Signals (Estado Reactivo)
+- Usar `signal()` para estado local
+- Usar `computed()` para estado derivado
+- **CRÍTICO**: En templates, SIEMPRE invocar signals con `()` - ej: `{{ mySignal() }}`, `@if (mySignal())`
+- Para acceder al valor en TypeScript: `mySignal()` (invocar para leer)
+- Para modificar: `mySignal.set(value)` o `mySignal.update(v => newValue)`
+
+### Control Flow Nativo (Angular 17+)
+- Usar `@if`, `@else`, `@for`, `@switch` en lugar de `*ngIf`, `*ngFor`, `*ngSwitch`
+- En `@for`, usar `track item.id` para mejor rendimiento
+- Variables de contexto: `$index`, `$first`, `$last`, `$even`, `$odd`
+
+### Formularios
+- Usar Reactive Forms con `FormBuilder`
+- Validaciones con `Validators.required`, `Validators.email`, `Validators.minLength`, etc.
+- Acceder a valores: `form.value.fieldName` o `form.get('fieldName')?.value`
+- Verificar touched/dirty: `control?.touched`, `control?.dirty`
 
 ### Servicios
 - `providedIn: 'root'` por defecto
 - Nombres descriptivos terminados en `Service`
+- Inyectar con `inject(NombreService)` en el constructor o como campo privado
 
 ### Modelos
 - Interfaces en `src/app/core/models/`
 - Nomenclatura: `nombre.model.ts`
+- Usar tipos exportados: `export type UserRole = 'superadmin' | 'manager' | 'employee'`
+
+### Nomenclatura de Archivos
+| Tipo | Patrón | Ejemplo |
+|------|--------|---------|
+| Páginas | `nombre.page.ts` | `dashboard.page.ts` |
+| Componentes | `nombre.component.ts` | `employee-card.component.ts` |
+| Servicios | `nombre.service.ts` | `appointment.service.ts` |
+| Modelos | `nombre.model.ts` | `user.model.ts` |
+| Feature pages | `features/[area]/[nombre]/` | `features/backoffice/manager/dashboard/` |
+
+### Templates HTML
+- Props de PrimeNG: usar PascalCase o kebab-case según el componente
+- Eventos: `(eventName)` para outputs nativos, `(onEventName)` para PrimeNG
+- Bindings: `[property]="value"` para inputs, `{{ expression }}` para texto
+- **Señales en templates**: Siempre invocar con paréntesis `{{ mySignal() }}`, `@if (mySignal())`
+- **Null safety**: Usar `?.` optional chaining para propiedades de objects nullable
+
+### Importaciones en Componentes
+```typescript
+// Estructura típica de imports
+import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+// PrimeNG modules según se usen
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+
+@Component({
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ButtonModule, CardModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  // ...
+})
+```
+
+### Ejemplos de Código
+
+**Estado local con signals:**
+```typescript
+loading = signal(false);
+error = signal('');
+data = signal<Data[]>([]);
+
+// Leer valor
+if (this.data().length > 0) { ... }
+
+// Modificar
+this.loading.set(true);
+this.data.update(current => [...current, newItem]);
+```
+
+**Computed:**
+```typescript
+filteredItems = computed(() => {
+  const query = this.searchQuery().toLowerCase();
+  return this.items().filter(item => item.name.toLowerCase().includes(query));
+});
+```
+
+**Template con signals:**
+```html
+@if (loading()) {
+  <p>Cargando...</p>
+}
+
+@for (item of items(); track item.id) {
+  <p>{{ item.name }}</p>
+}
+
+<span>{{ filteredItems().length }} resultados</span>
+```
 
 ---
 
