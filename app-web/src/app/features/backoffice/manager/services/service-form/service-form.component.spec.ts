@@ -12,7 +12,7 @@ describe('ServiceFormComponent - Behavior Driven Tests', () => {
   let fixture: ComponentFixture<ServiceFormComponent>;
   let authServiceMock: jest.Mocked<AuthService>;
   let serviceServiceMock: jest.Mocked<ServiceService>;
-  let routerMock: jest.Mocked<Router>;
+  let router: Router;
 
   const mockUser = {
     id: 'user-1',
@@ -46,10 +46,6 @@ describe('ServiceFormComponent - Behavior Driven Tests', () => {
       create: jest.fn().mockResolvedValue({ ...mockService, id: 'new-srv' }),
       update: jest.fn().mockResolvedValue(mockService)
     } as any;
-
-    routerMock = {
-      navigate: jest.fn().mockResolvedValue(true)
-    } as any;
   }));
 
   describe('when creating a new service', () => {
@@ -68,11 +64,13 @@ describe('ServiceFormComponent - Behavior Driven Tests', () => {
           { provide: AuthService, useValue: authServiceMock },
           { provide: ServiceService, useValue: serviceServiceMock },
           { provide: ActivatedRoute, useValue: activatedRouteMock },
-          { provide: Router, useValue: routerMock },
           MessageService
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
+
+      router = TestBed.inject(Router);
+      jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
       fixture = TestBed.createComponent(ServiceFormComponent);
       component = fixture.componentInstance;
@@ -157,7 +155,7 @@ describe('ServiceFormComponent - Behavior Driven Tests', () => {
 
       await component.onSubmit();
 
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/bo/services']);
+      expect(router.navigate).toHaveBeenCalledWith(['/bo/services']);
     });
 
     it('should associate service with manager company', async () => {
@@ -192,11 +190,13 @@ describe('ServiceFormComponent - Behavior Driven Tests', () => {
           { provide: AuthService, useValue: authServiceMock },
           { provide: ServiceService, useValue: serviceServiceMock },
           { provide: ActivatedRoute, useValue: activatedRouteMock },
-          { provide: Router, useValue: routerMock },
           MessageService
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
+
+      router = TestBed.inject(Router);
+      jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
       fixture = TestBed.createComponent(ServiceFormComponent);
       component = fixture.componentInstance;
@@ -234,7 +234,7 @@ describe('ServiceFormComponent - Behavior Driven Tests', () => {
 
       await component.onSubmit();
 
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/bo/services']);
+      expect(router.navigate).toHaveBeenCalledWith(['/bo/services']);
     });
 
     it('should navigate to list when service not found', async () => {
@@ -242,7 +242,7 @@ describe('ServiceFormComponent - Behavior Driven Tests', () => {
       
       await component.ngOnInit();
 
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/bo/services']);
+      expect(router.navigate).toHaveBeenCalledWith(['/bo/services']);
     });
   });
 });

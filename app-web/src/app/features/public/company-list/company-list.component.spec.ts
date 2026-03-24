@@ -67,7 +67,7 @@ describe('CompanyListComponent', () => {
 
   it('debe tener estado de carga inicial como true antes de ngOnInit', () => {
     // Before detectChanges, loading should be true
-    expect(component.loading).toBe(true);
+    expect(component.loading()).toBe(true);
   });
 
   describe('después de inicializar', () => {
@@ -85,35 +85,35 @@ describe('CompanyListComponent', () => {
     });
 
     it('debe almacenar la empresa en el componente', () => {
-      expect(component.company).toEqual(mockCompany);
+      expect(component.company()).toEqual(mockCompany);
     });
 
     it('debe almacenar los empleados en el componente', () => {
-      expect(component.employees.length).toBe(2);
-      expect(component.employees[0].full_name).toBe('Juan Pérez');
+      expect(component.employees().length).toBe(2);
+      expect(component.employees()[0].full_name).toBe('Juan Pérez');
     });
 
     it('debe finalizar carga después de obtener datos', () => {
-      expect(component.loading).toBe(false);
+      expect(component.loading()).toBe(false);
     });
 
     it('debe manejar estado sin empleados', async () => {
       userServiceMock.getEmployeesByCompany.mockResolvedValueOnce([]);
-      component.employees = [];
+      component.employees.set([]);
       fixture.detectChanges();
 
-      expect(component.employees.length).toBe(0);
+      expect(component.employees().length).toBe(0);
     });
 
     it('debe manejar error cuando empresa no existe', async () => {
       companyServiceMock.getBySlug.mockResolvedValueOnce(null);
-      component.company = null;
-      component.error = 'Empresa no encontrada';
-      component.loading = false;
+      component.company.set(null);
+      component.error.set('Empresa no encontrada');
+      component.loading.set(false);
       fixture.detectChanges();
 
-      expect(component.error).toBe('Empresa no encontrada');
-      expect(component.company).toBeNull();
+      expect(component.error()).toBe('Empresa no encontrada');
+      expect(component.company()).toBeNull();
     });
   });
 });

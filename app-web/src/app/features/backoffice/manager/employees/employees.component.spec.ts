@@ -84,7 +84,8 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
 
     it('should display page title', () => {
       const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('Gestión de Empleados');
+      expect(compiled.textContent).toContain('Recursos Humanos');
+      expect(compiled.textContent).toContain('Empleados');
     });
 
     it('should show add employee button', () => {

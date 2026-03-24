@@ -14,7 +14,7 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
   let authServiceMock: jest.Mocked<AuthService>;
   let userServiceMock: jest.Mocked<UserService>;
   let serviceServiceMock: jest.Mocked<ServiceService>;
-  let routerMock: jest.Mocked<Router>;
+  let router: Router;
 
   const mockUser = {
     id: 'user-1',
@@ -71,10 +71,6 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
     serviceServiceMock = {
       getByCompany: jest.fn().mockResolvedValue(mockServices)
     } as any;
-
-    routerMock = {
-      navigate: jest.fn().mockResolvedValue(true)
-    } as any;
   }));
 
   describe('when creating a new employee', () => {
@@ -94,11 +90,13 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
           { provide: UserService, useValue: userServiceMock },
           { provide: ServiceService, useValue: serviceServiceMock },
           { provide: ActivatedRoute, useValue: activatedRouteMock },
-          { provide: Router, useValue: routerMock },
           MessageService
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
+
+      router = TestBed.inject(Router);
+      jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
       fixture = TestBed.createComponent(EmployeeFormComponent);
       component = fixture.componentInstance;
@@ -179,7 +177,7 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
 
       await component.onSubmit();
 
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/bo/employees']);
+      expect(router.navigate).toHaveBeenCalledWith(['/bo/employees']);
     });
   });
 
@@ -202,11 +200,13 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
           { provide: UserService, useValue: userServiceMock },
           { provide: ServiceService, useValue: serviceServiceMock },
           { provide: ActivatedRoute, useValue: activatedRouteMock },
-          { provide: Router, useValue: routerMock },
           MessageService
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
+
+      router = TestBed.inject(Router);
+      jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
       fixture = TestBed.createComponent(EmployeeFormComponent);
       component = fixture.componentInstance;
@@ -239,7 +239,7 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
 
       await component.onSubmit();
 
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/bo/employees']);
+      expect(router.navigate).toHaveBeenCalledWith(['/bo/employees']);
     });
 
     it('should navigate to list when employee not found', async () => {
@@ -247,7 +247,7 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
       
       await component.ngOnInit();
 
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/bo/employees']);
+      expect(router.navigate).toHaveBeenCalledWith(['/bo/employees']);
     });
   });
 });

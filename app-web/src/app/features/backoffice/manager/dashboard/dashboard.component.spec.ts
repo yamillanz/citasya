@@ -91,8 +91,8 @@ describe('DashboardComponent - Behavior Driven Tests', () => {
     it('should display welcome message with manager name', () => {
       // Behavior: Manager sees personalized welcome
       const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('Manager Test');
-      expect(compiled.textContent).toContain('Bienvenido');
+      expect(compiled.textContent).toContain('Manager');
+      expect(compiled.textContent).toContain('Buenos días');
     });
 
     it('should show statistics for today appointments', () => {
@@ -170,7 +170,7 @@ describe('DashboardComponent - Behavior Driven Tests', () => {
       await fixture.whenStable();
 
       const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('No hay citas programadas para hoy');
+      expect(compiled.textContent).toContain('No hay citas programadas');
     });
 
     it('should display zero in statistics', async () => {

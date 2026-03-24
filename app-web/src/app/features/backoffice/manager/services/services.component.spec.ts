@@ -92,7 +92,8 @@ describe('ServicesComponent - Behavior Driven Tests', () => {
 
     it('should display page title', () => {
       const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('Gestión de Servicios');
+      expect(compiled.textContent).toContain('Catálogo');
+      expect(compiled.textContent).toContain('Servicios');
     });
 
     it('should show new service button', () => {
