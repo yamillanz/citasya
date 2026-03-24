@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -9,11 +9,14 @@ import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { UserService } from '../../../../core/services/user.service';
 import { CompanyService } from '../../../../core/services/company.service';
 import { User, CreateUserDto, UserRole } from '../../../../core/models/user.model';
 import { Company } from '../../../../core/models/company.model';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
 
 interface UserWithCompany extends User {
   companies?: { id: string; name: string } | null;
@@ -32,11 +35,15 @@ interface UserWithCompany extends User {
     DialogModule,
     SelectModule,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    SkeletonModule,
+    EmptyStateComponent,
+    LoadingSkeletonComponent
   ],
   templateUrl: './superadmin-users.component.html',
   styleUrl: './superadmin-users.component.scss',
-  providers: [MessageService, ConfirmationService]
+  providers: [MessageService, ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SuperadminUsersComponent implements OnInit {
   private userService = inject(UserService);
@@ -47,6 +54,7 @@ export class SuperadminUsersComponent implements OnInit {
   users = signal<UserWithCompany[]>([]);
   companies = signal<Company[]>([]);
   loading = signal(true);
+  saving = signal(false);
   searchTerm = signal('');
   companyFilter = signal<string | null>(null);
   dialogVisible = signal(false);
@@ -143,6 +151,7 @@ export class SuperadminUsersComponent implements OnInit {
       return;
     }
 
+    this.saving.set(true);
     try {
       if (this.editingUser()) {
         await this.userService.update(this.editingUser()!.id, data);
@@ -176,6 +185,8 @@ export class SuperadminUsersComponent implements OnInit {
           detail: 'No se pudo guardar el usuario'
         });
       }
+    } finally {
+      this.saving.set(false);
     }
   }
 

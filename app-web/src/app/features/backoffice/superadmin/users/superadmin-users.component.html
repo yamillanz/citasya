@@ -109,14 +109,39 @@
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="7" class="text-center">
-          @if (loading()) {
-            <p>Cargando...</p>
+        <td colspan="7">
+          @if (searchTerm() || companyFilter()) {
+            <app-empty-state
+              icon="pi pi-search"
+              title="No se encontraron resultados"
+              [description]="'No hay usuarios que coincidan con los filtros aplicados'"
+              actionLabel="Limpiar filtros"
+              (actionClick)="searchTerm.set(''); companyFilter.set(null)"
+            />
           } @else {
-            <p>No se encontraron usuarios</p>
+            <app-empty-state
+              icon="pi pi-users"
+              title="No hay usuarios registrados"
+              description="Comienza agregando tu primer usuario a la plataforma"
+              actionLabel="Crear Usuario"
+              (actionClick)="openCreateDialog()"
+            />
           }
         </td>
       </tr>
+    </ng-template>
+    <ng-template pTemplate="loadingbody">
+      @for (row of [1,2,3,4,5]; track row) {
+        <tr>
+          <td><p-skeleton height="2rem" /></td>
+          <td><p-skeleton height="2rem" /></td>
+          <td><p-skeleton height="2rem" /></td>
+          <td><p-skeleton height="2rem" /></td>
+          <td><p-skeleton height="2rem" /></td>
+          <td><p-skeleton height="2rem" /></td>
+          <td><p-skeleton height="2rem" /></td>
+        </tr>
+      }
     </ng-template>
   </p-table>
 </div>
@@ -193,10 +218,12 @@
       label="Cancelar" 
       styleClass="p-button-text" 
       (onClick)="dialogVisible.set(false)"
+      [disabled]="saving()"
     />
     <p-button 
       label="Guardar" 
       (onClick)="saveUser()"
+      [loading]="saving()"
     />
   </ng-template>
 </p-dialog>

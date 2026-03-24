@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -9,9 +9,12 @@ import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { PlanService } from '../../../../core/services/plan.service';
 import { Plan, CreatePlanDto } from '../../../../core/models/plan.model';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
 
 @Component({
   selector: 'app-superadmin-plans',
@@ -26,11 +29,15 @@ import { Plan, CreatePlanDto } from '../../../../core/models/plan.model';
     TagModule,
     DialogModule,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    SkeletonModule,
+    EmptyStateComponent,
+    LoadingSkeletonComponent
   ],
   templateUrl: './superadmin-plans.component.html',
   styleUrl: './superadmin-plans.component.scss',
-  providers: [MessageService, ConfirmationService]
+  providers: [MessageService, ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SuperadminPlansComponent implements OnInit {
   private planService = inject(PlanService);
@@ -39,6 +46,7 @@ export class SuperadminPlansComponent implements OnInit {
 
   plans = signal<Plan[]>([]);
   loading = signal(true);
+  saving = signal(false);
   searchTerm = signal('');
   dialogVisible = signal(false);
   editingPlan = signal<Plan | null>(null);
@@ -104,6 +112,7 @@ export class SuperadminPlansComponent implements OnInit {
       return;
     }
 
+    this.saving.set(true);
     try {
       if (this.editingPlan()) {
         await this.planService.update(this.editingPlan()!.id, data);
@@ -128,6 +137,8 @@ export class SuperadminPlansComponent implements OnInit {
         summary: 'Error',
         detail: error.message || 'No se pudo guardar el plan'
       });
+    } finally {
+      this.saving.set(false);
     }
   }
 

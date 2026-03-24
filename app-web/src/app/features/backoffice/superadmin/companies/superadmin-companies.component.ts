@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -9,11 +9,14 @@ import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { CompanyService } from '../../../../core/services/company.service';
 import { PlanService } from '../../../../core/services/plan.service';
 import { Company, CreateCompanyDto } from '../../../../core/models/company.model';
 import { Plan } from '../../../../core/models/plan.model';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
 
 interface CompanyWithPlan extends Company {
   plans?: { id: string; name: string } | null;
@@ -32,11 +35,15 @@ interface CompanyWithPlan extends Company {
     DialogModule,
     SelectModule,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    SkeletonModule,
+    EmptyStateComponent,
+    LoadingSkeletonComponent
   ],
   templateUrl: './superadmin-companies.component.html',
   styleUrl: './superadmin-companies.component.scss',
-  providers: [MessageService, ConfirmationService]
+  providers: [MessageService, ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SuperadminCompaniesComponent implements OnInit {
   private companyService = inject(CompanyService);
@@ -47,6 +54,7 @@ export class SuperadminCompaniesComponent implements OnInit {
   companies = signal<CompanyWithPlan[]>([]);
   plans = signal<Plan[]>([]);
   loading = signal(true);
+  saving = signal(false);
   searchTerm = signal('');
   dialogVisible = signal(false);
   editingCompany = signal<CompanyWithPlan | null>(null);
@@ -129,6 +137,7 @@ export class SuperadminCompaniesComponent implements OnInit {
       return;
     }
 
+    this.saving.set(true);
     try {
       if (this.editingCompany()) {
         await this.companyService.update(this.editingCompany()!.id, data);
@@ -162,6 +171,8 @@ export class SuperadminCompaniesComponent implements OnInit {
           detail: 'No se pudo guardar la empresa'
         });
       }
+    } finally {
+      this.saving.set(false);
     }
   }
 

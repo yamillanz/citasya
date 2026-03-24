@@ -51,6 +51,11 @@ export const routes: Routes = [
       .then(m => m.UnauthorizedComponent)
   },
   {
+    path: 'not-found',
+    loadComponent: () => import('./features/not-found/not-found.component')
+      .then(m => m.NotFoundComponent)
+  },
+  {
     path: 'c/:companySlug',
     loadComponent: () => import('./features/public/company-list/company-list.component')
       .then(m => m.CompanyListComponent)
@@ -94,6 +99,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'dashboard'
+    redirectTo: 'not-found'
   }
 ];

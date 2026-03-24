@@ -1,1 +1,6 @@
+@if (loading()) {
+  <div class="route-loading-bar">
+    <p-progressBar mode="indeterminate" [style]="{ height: '4px' }" />
+  </div>
+}
 <router-outlet />

@@ -1,0 +1,16 @@
+.route-loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+}
+
+:host ::ng-deep .route-loading-bar .p-progressbar {
+  border-radius: 0;
+  height: 4px;
+  
+  .p-progressbar-value {
+    background: #9DC183;
+  }
+}
