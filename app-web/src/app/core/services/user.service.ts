@@ -30,6 +30,27 @@ export class UserService {
     return data || [];
   }
 
+  async getAll(): Promise<User[]> {
+    const { data, error } = await this.supabase
+      .from('users')
+      .select('*, companies:company_id(id, name)')
+      .order('full_name');
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  async getAllByCompany(companyId: string): Promise<User[]> {
+    const { data, error } = await this.supabase
+      .from('users')
+      .select('*')
+      .eq('company_id', companyId)
+      .order('full_name');
+    
+    if (error) throw error;
+    return data || [];
+  }
+
   async getById(id: string): Promise<User | null> {
     const { data, error } = await this.supabase
       .from('users')
@@ -71,5 +92,29 @@ export class UserService {
       .eq('id', id);
     
     if (error) throw error;
+  }
+
+  async deactivate(id: string): Promise<User> {
+    const { data, error } = await this.supabase
+      .from('users')
+      .update({ is_active: false, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  async activate(id: string): Promise<User> {
+    const { data, error } = await this.supabase
+      .from('users')
+      .update({ is_active: true, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
   }
 }

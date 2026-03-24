@@ -31,7 +31,7 @@ export class CompanyService {
   async getAll(): Promise<Company[]> {
     const { data, error } = await this.supabase
       .from('companies')
-      .select('*')
+      .select('*, plans:plan_id(id, name)')
       .order('name');
     
     if (error) throw error;
@@ -53,6 +53,30 @@ export class CompanyService {
     const { data, error } = await this.supabase
       .from('companies')
       .update({ ...company, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  async deactivate(id: string): Promise<Company> {
+    const { data, error } = await this.supabase
+      .from('companies')
+      .update({ is_active: false, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  async activate(id: string): Promise<Company> {
+    const { data, error } = await this.supabase
+      .from('companies')
+      .update({ is_active: true, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
       .single();

@@ -1,0 +1,188 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1>Empresas</h1>
+      <p>Gestiona todas las empresas de la plataforma</p>
+    </div>
+    <p-button 
+      label="Nueva Empresa" 
+      icon="pi pi-plus" 
+      (onClick)="openCreateDialog()"
+    />
+  </div>
+
+  <div class="filters-bar">
+    <span class="p-input-icon-left search-input">
+      <i class="pi pi-search"></i>
+      <input 
+        pInputText 
+        type="text" 
+        placeholder="Buscar por nombre o slug..." 
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+      />
+    </span>
+  </div>
+
+  <p-table 
+    [value]="filteredCompanies()" 
+    [loading]="loading()"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-sm"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nombre</th>
+        <th>Slug</th>
+        <th>Plan</th>
+        <th>Estado</th>
+        <th>Creado</th>
+        <th style="width: 120px">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-company>
+      <tr>
+        <td>
+          <div class="company-name">{{ company.name }}</div>
+        </td>
+        <td>
+          <code class="slug-code">{{ company.slug }}</code>
+        </td>
+        <td>
+          <span class="plan-badge">{{ getPlanName(company) }}</span>
+        </td>
+        <td>
+          @if (company.is_active) {
+            <p-tag value="Activo" severity="success" />
+          } @else {
+            <p-tag value="Inactivo" severity="secondary" />
+          }
+        </td>
+        <td>
+          {{ company.created_at | date:'dd/MM/yyyy' }}
+        </td>
+        <td>
+          <div class="action-buttons">
+            <p-button 
+              icon="pi pi-pencil" 
+              styleClass="p-button-rounded p-button-text p-button-sm"
+              (onClick)="openEditDialog(company)"
+              pTooltip="Editar"
+            />
+            @if (company.is_active) {
+              <p-button 
+                icon="pi pi-ban" 
+                styleClass="p-button-rounded p-button-text p-button-sm p-button-danger"
+                (onClick)="confirmDeactivate(company)"
+                pTooltip="Desactivar"
+              />
+            } @else {
+              <p-button 
+                icon="pi pi-check" 
+                styleClass="p-button-rounded p-button-text p-button-sm p-button-success"
+                (onClick)="confirmActivate(company)"
+                pTooltip="Reactivar"
+              />
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center">
+          @if (loading()) {
+            <p>Cargando...</p>
+          } @else {
+            <p>No se encontraron empresas</p>
+          }
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog 
+  [header]="editingCompany() ? 'Editar Empresa' : 'Nueva Empresa'" 
+  [(visible)]="dialogVisible" 
+  [modal]="true" 
+  [style]="{ width: '450px' }"
+  [draggable]="false"
+>
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="name">Nombre *</label>
+      <input 
+        pInputText 
+        id="name" 
+        [(ngModel)]="formData().name"
+        (blur)="generateSlug()"
+        placeholder="Nombre de la empresa"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="slug">Slug *</label>
+      <div class="input-with-button">
+        <input 
+          pInputText 
+          id="slug" 
+          [(ngModel)]="formData().slug"
+          placeholder="url-slug"
+        />
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="address">Dirección</label>
+      <input 
+        pInputText 
+        id="address" 
+        [(ngModel)]="formData().address"
+        placeholder="Dirección física"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="phone">Teléfono</label>
+      <input 
+        pInputText 
+        id="phone" 
+        [(ngModel)]="formData().phone"
+        placeholder="+57 300 123 4567"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="plan">Plan</label>
+      <p-select 
+        id="plan"
+        [options]="planOptions()" 
+        [(ngModel)]="formData().plan_id"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sin plan"
+        [showClear]="true"
+        [style]="{ width: '100%' }"
+      />
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Cancelar" 
+      styleClass="p-button-text" 
+      (onClick)="dialogVisible.set(false)"
+    />
+    <p-button 
+      label="Guardar" 
+      (onClick)="saveCompany()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog />
+<p-toast />

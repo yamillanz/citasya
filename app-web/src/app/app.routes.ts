@@ -83,6 +83,15 @@ export const routes: Routes = [
     loadChildren: () => import('./features/backoffice/employee/employee.routes')
       .then(m => m.EMPLOYEE_ROUTES)
   },
+  // Back Office Superadmin routes
+  {
+    path: 'sa',
+    loadComponent: () => import('./features/backoffice/superadmin/superadmin-layout.component')
+      .then(m => m.SuperadminLayoutComponent),
+    canActivate: [authGuard, superadminGuard],
+    loadChildren: () => import('./features/backoffice/superadmin/superadmin.routes')
+      .then(m => m.SUPERADMIN_ROUTES)
+  },
   {
     path: '**',
     redirectTo: 'dashboard'
