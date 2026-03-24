@@ -10,7 +10,7 @@
 | Phase 2: Public Booking | ✅ Completada | Portal público de reservas |
 | Phase 3: Back Office Manager | ✅ Completada | Dashboard, CRUD empleados, servicios, citas |
 | Phase 4: Back Office Employee | ✅ Completada | Mi calendario, historial |
-| Phase 5: Superadmin | ⏳ Pendiente | Gestión de empresas, usuarios, planes |
+| Phase 5: Superadmin | ✅ Completada | Gestión de empresas, usuarios, planes |
 | Phase 6: Polish | ⏳ Pendiente | UI/UX, testing, deploy |
 
 ---
@@ -124,13 +124,61 @@
 
 ---
 
+## Phase 5: Superadmin Backoffice - Completada ✅
+
+### Componentes Implementados
+
+| Componente | Ubicación | Descripción |
+|------------|-----------|-------------|
+| Superadmin Layout | `backoffice/superadmin/` | Layout con sidebar y badge púrpura |
+| Companies | `backoffice/superadmin/companies/` | CRUD de empresas, búsqueda, paginación |
+| Users | `backoffice/superadmin/users/` | CRUD de usuarios, filtro por empresa |
+| Plans | `backoffice/superadmin/plans/` | CRUD de planes de suscripción |
+
+### Servicios Creados/Actualizados
+
+- ✅ `company.service.ts` - Métodos: `getAll()` con plan info, `deactivate()`, `activate()`
+- ✅ `user.service.ts` - Métodos: `getAll()`, `getAllByCompany()`, `deactivate()`, `activate()`
+- ✅ `plan.service.ts` (NUEVO) - CRUD completo con `getAllActive()`, `deactivate()`, `activate()`
+
+### Modelos Actualizados
+
+- ✅ `company.model.ts` - Añadido `is_active: boolean`
+- ✅ `plan.model.ts` - Añadido `is_active: boolean`, `CreatePlanDto`
+
+### Migración de Base de Datos
+
+- ✅ `supabase/migrations/add_is_active_to_companies_and_plans.sql`
+
+### Rutas Configuradas
+
+- `/sa/companies` - Gestión de empresas
+- `/sa/users` - Gestión de usuarios
+- `/sa/plans` - Gestión de planes
+
+### Características Implementadas
+
+- ✅ Búsqueda en tiempo real por nombre/slug/email
+- ✅ Paginación (10 por página)
+- ✅ Badges de estado (verde=activo, gris=inactivo)
+- ✅ Badges de rol (azul=manager, verde=empleado, púrpura=superadmin)
+- ✅ Activar/desactivar con confirmación
+- ✅ Planes inactivos deshabilitados en dropdown
+- ✅ Asignación de planes a empresas
+- ✅ Filtro de usuarios por empresa
+- ✅ Validación de duplicados (slug/email)
+
+---
+
 ## Estado de OpenSpec
 
-**Change activo:** `phase-4-back-office-employee` (implementado, listo para verificar/archivar)
 **Change archivado:** 
 - `2026-03-17-phase-2-public-booking`
 - `2026-03-18-phase-3-back-office-manager`
-**Specs actualizadas:** appointment-booking, company-directory, employee-calendar, slot-availability, manager-dashboard, services-crud, employees-crud, appointments-management, daily-close, employee-calendar, employee-history
+- `2026-03-23-phase-4-back-office-employee`
+- `2026-03-24-phase-5-superadmin-backoffice`
+
+**Specs sincronizadas:** appointment-booking, company-directory, employee-calendar, slot-availability, manager-dashboard, services-crud, employees-crud, appointments-management, daily-close, employee-calendar, employee-history, superadmin-companies, superadmin-users, superadmin-plans, superadmin-assignments
 
 ### Artefactos Creados para Phase 4
 
@@ -144,6 +192,21 @@
 **Specs creadas:**
 - `employee-calendar.md` - Calendario del empleado
 - `employee-history.md` - Historial de citas
+
+### Artefactos Creados para Phase 5
+
+| Artefacto | Estado | Archivo |
+|-----------|--------|---------|
+| Proposal | ✅ | `openspec/changes/phase-5-superadmin-backoffice/proposal.md` |
+| Specs | ✅ | `openspec/changes/phase-5-superadmin-backoffice/specs/*.md` |
+| Design | ✅ | `openspec/changes/phase-5-superadmin-backoffice/design.md` |
+| Tasks | ✅ | `openspec/changes/phase-5-superadmin-backoffice/tasks.md` |
+
+**Specs creadas:**
+- `superadmin-companies.md` - CRUD de empresas
+- `superadmin-users.md` - CRUD de usuarios
+- `superadmin-plans.md` - CRUD de planes
+- `superadmin-assignments.md` - Asignación planes-empresas
 
 ### Artefactos Creados para Phase 3
 
@@ -173,6 +236,7 @@
 - ✅ `schedule.service.ts`
 - ✅ `appointment.service.ts`
 - ✅ `daily-close.service.ts`
+- ✅ `plan.service.ts`
 
 ### Features Públicas Implementadas
 - ✅ Company List (`/c/:slug`)

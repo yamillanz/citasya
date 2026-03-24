@@ -162,11 +162,20 @@ export class SuperadminUsersComponent implements OnInit {
       this.dialogVisible.set(false);
       await this.loadData();
     } catch (error: any) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'No se pudo guardar el usuario'
-      });
+      const errorMessage = error?.message?.toLowerCase() || '';
+      if (errorMessage.includes('duplicate') || errorMessage.includes('unique') || errorMessage.includes('email')) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Validación',
+          detail: 'El email ya existe'
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo guardar el usuario'
+        });
+      }
     }
   }
 

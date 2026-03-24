@@ -148,11 +148,20 @@ export class SuperadminCompaniesComponent implements OnInit {
       this.dialogVisible.set(false);
       await this.loadData();
     } catch (error: any) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'No se pudo guardar la empresa'
-      });
+      const errorMessage = error?.message?.toLowerCase() || '';
+      if (errorMessage.includes('duplicate') || errorMessage.includes('unique') || errorMessage.includes('slug')) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Validación',
+          detail: 'El slug ya existe'
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo guardar la empresa'
+        });
+      }
     }
   }
 
