@@ -1,0 +1,139 @@
+<div class="employee-history">
+  <div class="history-header">
+    <div class="header-content">
+      <h1>Mi Historial</h1>
+      <p class="subtitle">Citas atendidas anteriormente</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Cargando historial...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <!-- Filters -->
+    <p-card styleClass="filters-card">
+      <div class="filters-row">
+        <div class="filter-group">
+          <label for="fromDate">Desde</label>
+          <p-datepicker 
+            id="fromDate"
+            [(ngModel)]="filterFromDate"
+            [showIcon]="true"
+            dateFormat="yy-mm-dd"
+            placeholder="Fecha inicial"
+            (onSelect)="applyFilters()">
+          </p-datepicker>
+        </div>
+        
+        <div class="filter-group">
+          <label for="toDate">Hasta</label>
+          <p-datepicker 
+            id="toDate"
+            [(ngModel)]="filterToDate"
+            [showIcon]="true"
+            dateFormat="yy-mm-dd"
+            placeholder="Fecha final"
+            (onSelect)="applyFilters()">
+          </p-datepicker>
+        </div>
+        
+        <div class="filter-actions">
+          <p-button 
+            label="Aplicar"
+            icon="pi pi-search"
+            severity="success"
+            (onClick)="applyFilters()">
+          </p-button>
+          <p-button 
+            label="Limpiar"
+            icon="pi pi-times"
+            severity="secondary"
+            [text]="true"
+            (onClick)="clearFilters()">
+          </p-button>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Results -->
+    <p-card styleClass="results-card">
+      @if (filteredAppointments().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-inbox"></i>
+          <h3>No hay citas en el historial</h3>
+          <p>{{ filterFromDate() || filterToDate() ? 'No hay citas que coincidan con los filtros seleccionados.' : 'Aún no has atendido ninguna cita.' }}</p>
+        </div>
+      } @else {
+        <p-table 
+          [value]="paginatedAppointments()" 
+          [paginator]="false"
+          [rows]="pageSize()"
+          [totalRecords]="totalRecords()"
+          styleClass="p-datatable-sm">
+          
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Cliente</th>
+              <th>Servicio</th>
+              <th>Monto</th>
+              <th>Estado</th>
+            </tr>
+          </ng-template>
+          
+          <ng-template pTemplate="body" let-apt>
+            <tr>
+              <td>{{ formatDate(apt.appointment_date) }}</td>
+              <td>{{ formatTime(apt.appointment_time) }}</td>
+              <td>
+                <div class="client-info">
+                  <span class="client-name">{{ apt.client_name }}</span>
+                  <span class="client-phone">{{ apt.client_phone }}</span>
+                </div>
+              </td>
+              <td>{{ apt.service?.name || 'N/A' }}</td>
+              <td>
+                @if (apt.amount_collected) {
+                  <span class="amount">${{ apt.amount_collected }}</span>
+                } @else {
+                  <span class="no-amount">-</span>
+                }
+              </td>
+              <td>
+                <p-tag 
+                  [value]="getStatusLabel(apt.status)" 
+                  [severity]="getStatusSeverity(apt.status)">
+                </p-tag>
+              </td>
+            </tr>
+          </ng-template>
+          
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6" class="empty-message">
+                No se encontraron citas
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <p-paginator
+          [rows]="pageSize()"
+          [totalRecords]="totalRecords()"
+          [first]="currentPage() * pageSize()"
+          (onPageChange)="onPageChange($event)"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          styleClass="paginator">
+        </p-paginator>
+      }
+    </p-card>
+  }
+</div>

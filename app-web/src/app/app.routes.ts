@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
-import { managerGuard } from './core/guards/role.guard';
+import { managerGuard, employeeGuard } from './core/guards/role.guard';
 import { superadminGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
@@ -73,6 +73,15 @@ export const routes: Routes = [
     canActivate: [authGuard, managerGuard],
     loadChildren: () => import('./features/backoffice/manager/manager.routes')
       .then(m => m.MANAGER_ROUTES)
+  },
+  // Back Office Employee routes
+  {
+    path: 'emp',
+    loadComponent: () => import('./features/backoffice/employee/employee-layout.component')
+      .then(m => m.EmployeeLayoutComponent),
+    canActivate: [authGuard, employeeGuard],
+    loadChildren: () => import('./features/backoffice/employee/employee.routes')
+      .then(m => m.EMPLOYEE_ROUTES)
   },
   {
     path: '**',

@@ -1,0 +1,232 @@
+.employee-history {
+  padding: var(--space-xl);
+  
+  @media (max-width: 768px) {
+    padding: var(--space-md);
+  }
+}
+
+.history-header {
+  margin-bottom: var(--space-xl);
+  
+  .header-content {
+    h1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-xs) 0;
+    }
+    
+    .subtitle {
+      color: var(--color-text-secondary);
+      font-size: 0.9375rem;
+      margin: 0;
+    }
+  }
+}
+
+// Filters Card
+:host ::ng-deep {
+  .filters-card {
+    margin-bottom: var(--space-lg);
+    
+    .p-card-body {
+      padding: var(--space-lg);
+    }
+    
+    .p-card-content {
+      padding: 0;
+    }
+  }
+}
+
+.filters-row {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: flex-end;
+  flex-wrap: wrap;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 160px;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+  
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+  }
+  
+  :host ::ng-deep {
+    .p-datepicker {
+      width: 100%;
+    }
+    
+    .p-inputtext {
+      width: 100%;
+    }
+  }
+}
+
+.filter-actions {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+// Results Card
+:host ::ng-deep {
+  .results-card {
+    .p-card-body {
+      padding: 0;
+    }
+    
+    .p-card-content {
+      padding: 0;
+    }
+  }
+}
+
+// Table Styles
+:host ::ng-deep {
+  .p-datatable {
+    .p-datatable-header {
+      background: transparent;
+      border: none;
+      padding: var(--space-lg) var(--space-lg) 0;
+    }
+    
+    .p-datatable-thead > tr > th {
+      background: var(--color-linen);
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      font-size: 0.8125rem;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+      padding: var(--space-md) var(--space-lg);
+      border-color: var(--color-border);
+    }
+    
+    .p-datatable-tbody > tr {
+      transition: background var(--duration-fast) ease;
+      
+      > td {
+        padding: var(--space-md) var(--space-lg);
+        border-color: var(--color-border);
+        color: var(--color-text-primary);
+      }
+      
+      &:hover {
+        background: var(--color-sage-pale);
+      }
+    }
+  }
+  
+  .client-info {
+    display: flex;
+    flex-direction: column;
+    
+    .client-name {
+      font-weight: 500;
+    }
+    
+    .client-phone {
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+    }
+  }
+  
+  .amount {
+    font-weight: 600;
+    color: var(--color-sage-dark);
+  }
+  
+  .no-amount {
+    color: var(--color-text-muted);
+  }
+  
+  .paginator {
+    padding: var(--space-lg);
+    justify-content: center;
+  }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+  text-align: center;
+  
+  i {
+    font-size: 3rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-md);
+  }
+  
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xs) 0;
+  }
+  
+  p {
+    color: var(--color-text-secondary);
+    margin: 0;
+    max-width: 300px;
+  }
+}
+
+// Loading and Error States
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+  text-align: center;
+  
+  i {
+    font-size: 2rem;
+    margin-bottom: var(--space-md);
+  }
+}
+
+.loading-state {
+  color: var(--color-text-secondary);
+  
+  i {
+    color: var(--color-sage);
+  }
+}
+
+.error-state {
+  color: var(--color-error);
+}
+
+.empty-message {
+  text-align: center;
+  padding: var(--space-xl) !important;
+  color: var(--color-text-muted);
+}

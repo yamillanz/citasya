@@ -20,6 +20,37 @@ export class AppointmentService {
     return data || [];
   }
 
+  async getByEmployeeAll(employeeId: string): Promise<Appointment[]> {
+    const { data, error } = await this.supabase
+      .from('appointments')
+      .select(`
+        *,
+        service:service_id (name)
+      `)
+      .eq('employee_id', employeeId)
+      .order('appointment_date', { ascending: true })
+      .order('appointment_time', { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  async getCompletedByEmployee(employeeId: string): Promise<Appointment[]> {
+    const { data, error } = await this.supabase
+      .from('appointments')
+      .select(`
+        *,
+        service:service_id (name)
+      `)
+      .eq('employee_id', employeeId)
+      .eq('status', 'completed')
+      .order('appointment_date', { ascending: false })
+      .order('appointment_time', { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
   async getAvailableSlots(companyId: string, employeeId: string, date: string, durationMinutes: number): Promise<string[]> {
     const dayOfWeek = new Date(date).getDay();
     

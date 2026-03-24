@@ -1,0 +1,127 @@
+<div class="backoffice-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a routerLink="/" class="sidebar-logo">
+        <svg width="140" height="38" viewBox="0 0 148 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="0" y="30" font-family="'Fraunces', Georgia, serif" font-size="22" font-weight="600" letter-spacing="-0.5">
+            <tspan fill="#9DC183">CITASYA</tspan><tspan fill="#5D6D7E">.APP</tspan>
+          </text>
+        </svg>
+      </a>
+      <span class="sidebar-badge">Empleado</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.routerLink) {
+        <a 
+          [routerLink]="item.routerLink" 
+          routerLinkActive="active"
+          class="nav-item">
+          <i [class]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      @if (user()) {
+        <div class="user-card">
+          <div class="user-avatar">
+            {{ user()?.full_name?.charAt(0) || 'U' }}
+          </div>
+          <div class="user-details">
+            <span class="user-name">{{ user()?.full_name }}</span>
+            <span class="user-email">{{ user()?.email }}</span>
+          </div>
+        </div>
+      }
+      <p-button 
+        label="Cerrar Sesión"
+        icon="pi pi-sign-out"
+        styleClass="logout-btn"
+        [text]="true"
+        (onClick)="logout()">
+      </p-button>
+    </div>
+  </aside>
+
+  <!-- Mobile Header -->
+  <header class="mobile-header">
+    <a routerLink="/" class="mobile-logo">
+      <svg width="120" height="34" viewBox="0 0 128 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="28" font-family="'Fraunces', Georgia, serif" font-size="20" font-weight="600" letter-spacing="-0.5">
+          <tspan fill="#9DC183">CITASYA</tspan><tspan fill="#5D6D7E">.APP</tspan>
+        </text>
+      </svg>
+    </a>
+    <p-button 
+      icon="pi pi-bars" 
+      styleClass="p-button-rounded p-button-text mobile-menu-btn"
+      (onClick)="sidebarVisible.set(true)"
+    />
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Mobile Sidebar -->
+  <p-drawer 
+    [visible]="sidebarVisible()" 
+    (visibleChange)="sidebarVisible.set($event)"
+    [style]="{ width: '280px' }"
+    [showCloseIcon]="false"
+    styleClass="mobile-sidebar-drawer"
+    position="left"
+  >
+    <ng-template pTemplate="header">
+      <div class="drawer-header">
+        <svg width="120" height="34" viewBox="0 0 128 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="0" y="28" font-family="'Fraunces', Georgia, serif" font-size="20" font-weight="600" letter-spacing="-0.5">
+            <tspan fill="#9DC183">CITASYA</tspan><tspan fill="#5D6D7E">.APP</tspan>
+          </text>
+        </svg>
+      </div>
+    </ng-template>
+    
+    <div class="drawer-content">
+      <nav class="drawer-nav">
+        @for (item of menuItems; track item.routerLink) {
+          <a 
+            [routerLink]="item.routerLink" 
+            routerLinkActive="active"
+            class="drawer-nav-item"
+            (click)="sidebarVisible.set(false)">
+            <i [class]="item.icon"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+      
+      <div class="drawer-footer">
+        @if (user()) {
+          <div class="drawer-user">
+            <div class="user-avatar small">
+              {{ user()?.full_name?.charAt(0) || 'U' }}
+            </div>
+            <div class="user-info">
+              <span class="user-name">{{ user()?.full_name }}</span>
+              <span class="user-email">{{ user()?.email }}</span>
+            </div>
+          </div>
+        }
+        <p-button 
+          label="Cerrar Sesión"
+          icon="pi pi-sign-out"
+          styleClass="logout-btn-mobile"
+          [text]="true"
+          (onClick)="logout()"
+        />
+      </div>
+    </div>
+  </p-drawer>
+</div>
+
+<p-toast />

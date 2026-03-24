@@ -9,7 +9,7 @@
 | Phase 1: Foundation | ✅ Completada | Setup, Auth, Database, **Landing Page** ✅ |
 | Phase 2: Public Booking | ✅ Completada | Portal público de reservas |
 | Phase 3: Back Office Manager | ✅ Completada | Dashboard, CRUD empleados, servicios, citas |
-| Phase 4: Back Office Employee | ⏳ Pendiente | Mi calendario, historial |
+| Phase 4: Back Office Employee | ✅ Completada | Mi calendario, historial |
 | Phase 5: Superadmin | ⏳ Pendiente | Gestión de empresas, usuarios, planes |
 | Phase 6: Polish | ⏳ Pendiente | UI/UX, testing, deploy |
 
@@ -103,13 +103,47 @@
 
 ---
 
+## Phase 4: Back Office Employee - Completada ✅
+
+### Componentes Implementados
+
+| Componente | Ubicación | Descripción |
+|------------|-----------|-------------|
+| Employee Layout | `backoffice/employee/` | Layout con sidebar de navegación |
+| Employee Calendar | `backoffice/employee/calendar/` | Calendario con citas del empleado |
+| Employee History | `backoffice/employee/history/` | Historial de citas completadas |
+
+### Servicios Actualizados
+
+- ✅ `appointment.service.ts` - Nuevos métodos: `getByEmployeeAll()`, `getCompletedByEmployee()`
+
+### Rutas Configuradas
+
+- `/emp/calendar` - Mi calendario de citas
+- `/emp/history` - Mi historial de citas
+
+---
+
 ## Estado de OpenSpec
 
-**Change activo:** Ninguno (Phase 3 completada - listo para archivar)
+**Change activo:** `phase-4-back-office-employee` (implementado, listo para verificar/archivar)
 **Change archivado:** 
 - `2026-03-17-phase-2-public-booking`
-- `2026-03-18-phase-3-back-office-manager` (listo)
-**Specs actualizadas:** appointment-booking, company-directory, employee-calendar, slot-availability, manager-dashboard, services-crud, employees-crud, appointments-management, daily-close
+- `2026-03-18-phase-3-back-office-manager`
+**Specs actualizadas:** appointment-booking, company-directory, employee-calendar, slot-availability, manager-dashboard, services-crud, employees-crud, appointments-management, daily-close, employee-calendar, employee-history
+
+### Artefactos Creados para Phase 4
+
+| Artefacto | Estado | Archivo |
+|-----------|--------|---------|
+| Proposal | ✅ | `openspec/changes/phase-4-back-office-employee/proposal.md` |
+| Specs | ✅ | `openspec/changes/phase-4-back-office-employee/specs/*.md` |
+| Design | ✅ | `openspec/changes/phase-4-back-office-employee/design.md` |
+| Tasks | ✅ | `openspec/changes/phase-4-back-office-employee/tasks.md` |
+
+**Specs creadas:**
+- `employee-calendar.md` - Calendario del empleado
+- `employee-history.md` - Historial de citas
 
 ### Artefactos Creados para Phase 3
 
@@ -192,5 +226,5 @@ npm run test:coverage # Con coverage
 ---
 
 ## Última Actualización
-- Fecha: 2026-03-18
-- Fase activa: Phase 3 completada
+- Fecha: 2026-03-23
+- Fase activa: Phase 4 implementada (listo para archivar)

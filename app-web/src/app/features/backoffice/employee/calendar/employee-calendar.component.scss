@@ -1,0 +1,171 @@
+.employee-calendar {
+  padding: var(--space-xl);
+  
+  @media (max-width: 768px) {
+    padding: var(--space-md);
+  }
+}
+
+.calendar-header {
+  margin-bottom: var(--space-xl);
+  
+  .header-content {
+    h1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-xs) 0;
+    }
+    
+    .subtitle {
+      color: var(--color-text-secondary);
+      font-size: 0.9375rem;
+      margin: 0;
+    }
+  }
+}
+
+:host ::ng-deep {
+  .calendar-card {
+    .p-card-body {
+      padding: var(--space-lg);
+    }
+    
+    .p-card-content {
+      padding: 0;
+    }
+  }
+  
+  .fc {
+    font-family: inherit;
+    
+    .fc-toolbar-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    
+    .fc-button {
+      background: var(--color-sage) !important;
+      border-color: var(--color-sage) !important;
+      font-weight: 500;
+      
+      &:hover {
+        background: var(--color-sage-dark) !important;
+        border-color: var(--color-sage-dark) !important;
+      }
+      
+      &:focus {
+        box-shadow: 0 0 0 2px var(--color-sage-pale) !important;
+      }
+    }
+    
+    .fc-daygrid-day-number {
+      color: var(--color-text-primary);
+      font-weight: 500;
+    }
+    
+    .fc-daygrid-day.fc-day-today {
+      background: var(--color-sage-pale) !important;
+    }
+    
+    .fc-event {
+      border-radius: var(--radius-sm);
+      padding: 2px 4px;
+      font-size: 0.8125rem;
+      cursor: pointer;
+      
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+    
+    .fc-col-header-cell-cushion {
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+  }
+}
+
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+  text-align: center;
+  
+  i {
+    font-size: 2rem;
+    margin-bottom: var(--space-md);
+  }
+}
+
+.loading-state {
+  color: var(--color-text-secondary);
+  
+  i {
+    color: var(--color-sage);
+  }
+}
+
+.error-state {
+  color: var(--color-error);
+}
+
+// Dialog styles
+.appointment-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border);
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    &.notes {
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    
+    .label {
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+    }
+    
+    .value {
+      color: var(--color-text-primary);
+      font-size: 0.9375rem;
+      text-align: right;
+    }
+  }
+}
+
+:host ::ng-deep {
+  .appointment-dialog {
+    .p-dialog-header {
+      background: var(--color-linen);
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    .p-dialog-content {
+      padding: var(--space-lg);
+    }
+    
+    .p-dialog-footer {
+      border-top: 1px solid var(--color-border);
+    }
+  }
+}

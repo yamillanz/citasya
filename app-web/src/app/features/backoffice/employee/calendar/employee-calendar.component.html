@@ -1,0 +1,94 @@
+<div class="employee-calendar">
+  <div class="calendar-header">
+    <div class="header-content">
+      <h1>Mi Calendario</h1>
+      <p class="subtitle">Consulta tus citas programadas</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Cargando calendario...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <p-card styleClass="calendar-card">
+      <full-calendar [options]="calendarOptions" />
+    </p-card>
+  }
+</div>
+
+<!-- Appointment Details Dialog -->
+<p-dialog 
+  [(visible)]="showDetailsDialog" 
+  header="Detalles de la Cita" 
+  [modal]="true"
+  [style]="{ width: '400px' }"
+  styleClass="appointment-dialog">
+  
+  @if (selectedAppointment()) {
+    <div class="appointment-details">
+      <div class="detail-row">
+        <span class="label">Fecha:</span>
+        <span class="value">{{ formatDate(selectedAppointment()!.appointment_date) }}</span>
+      </div>
+      
+      <div class="detail-row">
+        <span class="label">Hora:</span>
+        <span class="value">{{ formatTime(selectedAppointment()!.appointment_time) }}</span>
+      </div>
+      
+      <div class="detail-row">
+        <span class="label">Cliente:</span>
+        <span class="value">{{ selectedAppointment()!.client_name }}</span>
+      </div>
+      
+      <div class="detail-row">
+        <span class="label">Teléfono:</span>
+        <span class="value">{{ selectedAppointment()!.client_phone }}</span>
+      </div>
+      
+      @if (selectedAppointment()!.client_email) {
+        <div class="detail-row">
+          <span class="label">Email:</span>
+          <span class="value">{{ selectedAppointment()!.client_email }}</span>
+        </div>
+      }
+      
+      <div class="detail-row">
+        <span class="label">Estado:</span>
+        <p-tag 
+          [value]="getStatusLabel(selectedAppointment()!.status)" 
+          [severity]="getStatusSeverity(selectedAppointment()!.status)">
+        </p-tag>
+      </div>
+      
+      @if (selectedAppointment()!.amount_collected) {
+        <div class="detail-row">
+          <span class="label">Monto:</span>
+          <span class="value">${{ selectedAppointment()!.amount_collected }}</span>
+        </div>
+      }
+      
+      @if (selectedAppointment()!.notes) {
+        <div class="detail-row notes">
+          <span class="label">Notas:</span>
+          <span class="value">{{ selectedAppointment()!.notes }}</span>
+        </div>
+      }
+    </div>
+  }
+  
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Cerrar" 
+      severity="secondary" 
+      (onClick)="showDetailsDialog.set(false)">
+    </p-button>
+  </ng-template>
+</p-dialog>
