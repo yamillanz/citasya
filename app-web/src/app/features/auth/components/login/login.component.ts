@@ -76,7 +76,7 @@ export class LoginComponent {
         this.router.navigate(['/bo/dashboard']);
         break;
       case 'employee':
-        this.router.navigate(['/bo/appointments']);
+        this.router.navigate(['/emp/calendar']);
         break;
       default:
         this.router.navigate(['/bo/dashboard']);
