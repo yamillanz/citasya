@@ -55,6 +55,7 @@ export class LoginComponent {
         this.loginForm.get('password')!.value!
       );
       
+      this.loginForm.reset();
       this.redirectByRole(user.role);
     } catch (err: any) {
       this.error.set(err.message || 'Error al iniciar sesión');
@@ -70,7 +71,7 @@ export class LoginComponent {
   private redirectByRole(role: string) {
     switch (role) {
       case 'superadmin':
-        this.router.navigate(['/admin']);
+        this.router.navigate(['/sa']);
         break;
       case 'manager':
         this.router.navigate(['/bo/dashboard']);

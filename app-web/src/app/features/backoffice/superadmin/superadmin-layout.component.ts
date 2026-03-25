@@ -34,7 +34,8 @@ export class SuperadminLayoutComponent implements OnInit {
   menuItems = [
     { label: 'Empresas', icon: 'pi pi-building', routerLink: '/sa/companies' },
     { label: 'Usuarios', icon: 'pi pi-users', routerLink: '/sa/users' },
-    { label: 'Planes', icon: 'pi pi-credit-card', routerLink: '/sa/plans' }
+    { label: 'Planes', icon: 'pi pi-credit-card', routerLink: '/sa/plans' },
+    { label: 'Transacciones', icon: 'pi pi-dollar', routerLink: '/sa/transactions' }
   ];
 
   async ngOnInit() {

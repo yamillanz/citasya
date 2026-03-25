@@ -17,5 +17,9 @@ export const SUPERADMIN_ROUTES: Routes = [
   {
     path: 'plans',
     loadComponent: () => import('./plans/superadmin-plans.component').then(m => m.SuperadminPlansComponent)
+  },
+  {
+    path: 'transactions',
+    loadComponent: () => import('./transactions/superadmin-transactions.component').then(m => m.SuperadminTransactionsComponent)
   }
 ];

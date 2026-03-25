@@ -1,0 +1,10 @@
+{
+  "name": "add-superadmin-sidebar-menu",
+  "title": "Add sidebar menu to superadmin dashboard",
+  "description": "Agregar panel de menú lateral al dashboard de superadmin con las opciones Companies, Users, Plans y Transactions.",
+  "type": "feature",
+  "priority": "medium",
+  "status": "completed",
+  "created_at": "2026-03-25T19:30:00.000Z",
+  "created_by": "agent"
+}
