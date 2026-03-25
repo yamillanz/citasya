@@ -8,7 +8,7 @@ export class UserService {
 
   async getEmployeesByCompany(companyId: string): Promise<User[]> {
     const { data, error } = await this.supabase
-      .from('users')
+      .from('profiles')
       .select('*')
       .eq('company_id', companyId)
       .eq('role', 'employee')
@@ -21,7 +21,7 @@ export class UserService {
 
   async getByCompany(companyId: string): Promise<User[]> {
     const { data, error } = await this.supabase
-      .from('users')
+      .from('profiles')
       .select('*')
       .eq('company_id', companyId)
       .order('full_name');
@@ -32,7 +32,7 @@ export class UserService {
 
   async getAll(): Promise<User[]> {
     const { data, error } = await this.supabase
-      .from('users')
+      .from('profiles')
       .select('*, companies:company_id(id, name)')
       .order('full_name');
     
@@ -42,7 +42,7 @@ export class UserService {
 
   async getAllByCompany(companyId: string): Promise<User[]> {
     const { data, error } = await this.supabase
-      .from('users')
+      .from('profiles')
       .select('*')
       .eq('company_id', companyId)
       .order('full_name');
@@ -53,7 +53,7 @@ export class UserService {
 
   async getById(id: string): Promise<User | null> {
     const { data, error } = await this.supabase
-      .from('users')
+      .from('profiles')
       .select('*')
       .eq('id', id)
       .single();
@@ -64,7 +64,7 @@ export class UserService {
 
   async create(user: CreateUserDto): Promise<User> {
     const { data, error } = await this.supabase
-      .from('users')
+      .from('profiles')
       .insert(user)
       .select()
       .single();
@@ -75,7 +75,7 @@ export class UserService {
 
   async update(id: string, user: Partial<User>): Promise<User> {
     const { data, error } = await this.supabase
-      .from('users')
+      .from('profiles')
       .update({ ...user, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
@@ -87,7 +87,7 @@ export class UserService {
 
   async delete(id: string): Promise<void> {
     const { error } = await this.supabase
-      .from('users')
+      .from('profiles')
       .delete()
       .eq('id', id);
     
@@ -96,7 +96,7 @@ export class UserService {
 
   async deactivate(id: string): Promise<User> {
     const { data, error } = await this.supabase
-      .from('users')
+      .from('profiles')
       .update({ is_active: false, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
@@ -108,7 +108,7 @@ export class UserService {
 
   async activate(id: string): Promise<User> {
     const { data, error } = await this.supabase
-      .from('users')
+      .from('profiles')
       .update({ is_active: true, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()

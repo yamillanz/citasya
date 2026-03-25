@@ -70,16 +70,14 @@ CREATE POLICY "profiles_select_own" ON profiles
     FOR SELECT USING (auth.uid() = id);
 
 -- Managers pueden ver todos los usuarios de su empresa
+-- NOTA: Usa get_current_user_company_id() para evitar recursion infinita
 CREATE POLICY "profiles_select_company" ON profiles
-    FOR SELECT USING (
-        company_id = (SELECT company_id FROM profiles WHERE id = auth.uid())
-    );
+    FOR SELECT USING (company_id = get_current_user_company_id());
 
 -- Superadmin puede ver todos
+-- NOTA: Usa get_current_user_role() para evitar recursion infinita
 CREATE POLICY "profiles_select_superadmin" ON profiles
-    FOR SELECT USING (
-        auth.uid() IN (SELECT id FROM profiles WHERE role = 'superadmin')
-    );
+    FOR SELECT USING (get_current_user_role() = 'superadmin');
 
 -- Solo superadmin puede crear usuarios
 CREATE POLICY "profiles_insert" ON profiles
@@ -90,9 +88,10 @@ CREATE POLICY "profiles_update_own" ON profiles
     FOR UPDATE USING (auth.uid() = id);
 
 -- Managers pueden actualizar empleados de su empresa
+-- NOTA: Usa get_current_user_company_id() para evitar recursion infinita
 CREATE POLICY "profiles_update_company" ON profiles
     FOR UPDATE USING (
-        company_id = (SELECT company_id FROM profiles WHERE id = auth.uid())
+        company_id = get_current_user_company_id()
         AND role = 'employee'
     );
 
@@ -245,17 +244,19 @@ CREATE POLICY "appointments_update" ON appointments
 -- ============================================================================
 
 -- Solo managers pueden ver cierres de su empresa
+-- NOTA: Usa funciones SECURITY DEFINER para evitar recursion infinita
 CREATE POLICY "daily_closes_select" ON daily_closes
     FOR SELECT USING (
-        company_id = (SELECT company_id FROM profiles WHERE id = auth.uid())
-        AND (SELECT role FROM profiles WHERE id = auth.uid()) = 'manager'
+        company_id = get_current_user_company_id()
+        AND get_current_user_role() = 'manager'
     );
 
 -- Solo managers pueden generar cierres
+-- NOTA: Usa funciones SECURITY DEFINER para evitar recursion infinita
 CREATE POLICY "daily_closes_insert" ON daily_closes
     FOR INSERT WITH CHECK (
-        company_id = (SELECT company_id FROM profiles WHERE id = auth.uid())
-        AND (SELECT role FROM profiles WHERE id = auth.uid()) = 'manager'
+        company_id = get_current_user_company_id()
+        AND get_current_user_role() = 'manager'
     );
 
 -- ============================================================================

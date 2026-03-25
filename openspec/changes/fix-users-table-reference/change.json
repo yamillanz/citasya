@@ -1,0 +1,10 @@
+{
+  "name": "fix-users-table-reference",
+  "title": "Fix: Rename users table reference to profiles",
+  "description": "La tabla en la base de datos se llama 'profiles' pero el código Angular consulta 'users'. Esto causa error PGRST205 en Supabase.",
+  "type": "bugfix",
+  "priority": "high",
+  "status": "completed",
+  "created_at": "2026-03-25T18:30:00.000Z",
+  "created_by": "agent"
+}

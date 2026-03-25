@@ -16,7 +16,6 @@ import { CompanyService } from '../../../../core/services/company.service';
 import { User, CreateUserDto, UserRole } from '../../../../core/models/user.model';
 import { Company } from '../../../../core/models/company.model';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
-import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
 
 interface UserWithCompany extends User {
   companies?: { id: string; name: string } | null;
@@ -37,8 +36,7 @@ interface UserWithCompany extends User {
     ConfirmDialogModule,
     ToastModule,
     SkeletonModule,
-    EmptyStateComponent,
-    LoadingSkeletonComponent
+    EmptyStateComponent
   ],
   templateUrl: './superadmin-users.component.html',
   styleUrl: './superadmin-users.component.scss',

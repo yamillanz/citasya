@@ -41,7 +41,7 @@ export class AuthService {
   
   private async getUserData(userId: string): Promise<User> {
     const { data, error } = await this.supabase
-      .from('users')
+      .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
@@ -56,7 +56,7 @@ export class AuthService {
       switchMap(user => {
         if (!user) return of(null);
         return from(
-          this.supabase.from('users').select('role, company_id').eq('id', user.id).single()
+          this.supabase.from('profiles').select('role, company_id').eq('id', user.id).single()
         ).pipe(
           map(response => response.data?.role || null)
         );

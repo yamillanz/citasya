@@ -14,7 +14,6 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { PlanService } from '../../../../core/services/plan.service';
 import { Plan, CreatePlanDto } from '../../../../core/models/plan.model';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
-import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
 
 @Component({
   selector: 'app-superadmin-plans',
@@ -31,8 +30,7 @@ import { LoadingSkeletonComponent } from '../../../../shared/components/loading-
     ConfirmDialogModule,
     ToastModule,
     SkeletonModule,
-    EmptyStateComponent,
-    LoadingSkeletonComponent
+    EmptyStateComponent
   ],
   templateUrl: './superadmin-plans.component.html',
   styleUrl: './superadmin-plans.component.scss',

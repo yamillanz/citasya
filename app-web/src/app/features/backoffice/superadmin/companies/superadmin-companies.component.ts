@@ -16,7 +16,6 @@ import { PlanService } from '../../../../core/services/plan.service';
 import { Company, CreateCompanyDto } from '../../../../core/models/company.model';
 import { Plan } from '../../../../core/models/plan.model';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
-import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
 
 interface CompanyWithPlan extends Company {
   plans?: { id: string; name: string } | null;
@@ -37,8 +36,7 @@ interface CompanyWithPlan extends Company {
     ConfirmDialogModule,
     ToastModule,
     SkeletonModule,
-    EmptyStateComponent,
-    LoadingSkeletonComponent
+    EmptyStateComponent
   ],
   templateUrl: './superadmin-companies.component.html',
   styleUrl: './superadmin-companies.component.scss',
