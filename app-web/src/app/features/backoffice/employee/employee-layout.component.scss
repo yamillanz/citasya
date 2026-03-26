@@ -212,6 +212,7 @@
    ================================ */
 .mobile-header {
   display: none;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   padding: var(--space-md) var(--space-lg);
