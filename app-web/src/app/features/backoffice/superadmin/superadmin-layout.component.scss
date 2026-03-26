@@ -32,6 +32,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-sm);
   min-height: 72px;
 }
 
@@ -201,11 +202,13 @@
 .main-content {
   flex: 1;
   margin-left: 260px;
+  padding-right: var(--space-lg);
   min-height: 100vh;
   overflow-x: hidden;
 
   @media (max-width: 1024px) {
     margin-left: 0;
+    padding-right: 0;
   }
 }
 
