@@ -249,8 +249,12 @@
   .mobile-sidebar-drawer {
     z-index: 1100 !important;
 
-    .p-drawer {
+    &.p-drawer {
       z-index: 1101 !important;
+      position: fixed !important;
+      left: 0 !important;
+      top: 0 !important;
+      height: 100vh !important;
     }
 
     .p-drawer-header {
