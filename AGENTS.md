@@ -2,6 +2,36 @@
 
 **IMPORTANT** the folder of the project ins ./app-web
 
+---
+
+## OpenSpec - FLUJO OBLIGATORIO PARA TODOS LOS CAMBIOS
+
+**⚠️ IMPORTANTE: TODO cambio debe seguir el flujo OpenSpec sin excepción.**
+
+### Comandos disponibles:
+- `/opsx:new` - Iniciar nueva tarea/cambio
+- `/opsx:ff` - Fast-forward para crear todos los artifacts de un cambio
+- `/opsx:apply` - Aplicar tareas desde el change
+- `/opsx:verify` - Verificar que la implementación coincide con los artifacts
+- `/opsx:archive` - Archivar cambio completado
+
+### Cuándo usar:
+- ✅ Cualquier bug fix
+- ✅ Cualquier nueva feature
+- ✅ Cualquier refactorización
+- ✅ Cualquier cambio en UI/estilos
+- ✅ Cambios en un solo archivo
+
+### Excepciones:
+- Solo para cambios menores de documentación (fix typos, comments) se puede hacer commit directo
+- Para cualquier duda sobre si usar OpenSpec, SIEMPRE usar OpenSpec
+
+### Referencia:
+- Comandos completos en `app-web/README.md`
+- Documentation en `.agents/skills/openspec*/SKILL.md`
+
+---
+
 ## UI Framework (PrimeNG) - SOLO PARA ESTE PROYECTO
 
 - **Use PrimeNG components exclusively** for all UI elements
@@ -15,7 +45,6 @@
 2. Query Context7 MCP for PrimeNG components
 3. Select appropriate components (p-inputText, p-button, p-card)
 4. Implement using PrimeNG - NEVER custom HTML/CSS when PrimeNG alternative exists
-5. This project uses **OpenSpec** for phased development. See commands in `app-web/README.md` or use `/opsx:` in the chat
 ```
 
 ### Componentes disponibles en PrimeNG (memorizar):
