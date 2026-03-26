@@ -14,6 +14,6 @@
 
 ## 3. Z-Index Fallback (si necesario)
 
-- [ ] 3.1 Agregar z-index en `backoffice.component.scss`
-- [ ] 3.2 Agregar z-index en `superadmin-layout.component.scss`
-- [ ] 3.3 Agregar z-index en `employee-layout.component.scss`
+- [x] 3.1 Agregar z-index en `backoffice.component.scss`
+- [x] 3.2 Agregar z-index en `superadmin-layout.component.scss`
+- [x] 3.3 Agregar z-index en `employee-layout.component.scss`

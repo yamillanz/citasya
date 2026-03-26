@@ -247,6 +247,12 @@
    ================================ */
 :host ::ng-deep {
   .mobile-sidebar-drawer {
+    z-index: 1100 !important;
+
+    .p-drawer {
+      z-index: 1101 !important;
+    }
+
     .p-drawer-header {
       padding: var(--space-lg);
       border-bottom: 1px solid var(--color-sand);
