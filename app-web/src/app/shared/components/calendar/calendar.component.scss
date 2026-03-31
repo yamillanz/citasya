@@ -4,13 +4,32 @@
   gap: var(--space-lg);
   width: 100%;
   box-sizing: border-box;
+  max-width: 100%;
 }
+
+:host ::ng-deep {
+  .calendar-card {
+    width: 100%;
+    .p-card-body {
+      padding: var(--space-lg);
+    }
+
+    .p-card-content {
+      padding: 0;
+      width: 100%;
+    }
+
+    .p-card {
+      width: 100%;
+    }
+  }
 
 :host {
   display: block;
   width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
+  max-width: 100vw;
 }
 
 :host ::ng-deep {
