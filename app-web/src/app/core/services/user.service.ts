@@ -1,10 +1,11 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { User, CreateUserDto } from '../models/user.model';
+import { supabase } from '../supabase';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private supabase = inject(SupabaseClient);
+  private supabase: SupabaseClient = supabase;
 
   async getEmployeesByCompany(companyId: string): Promise<User[]> {
     const { data, error } = await this.supabase

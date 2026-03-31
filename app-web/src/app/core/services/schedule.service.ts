@@ -1,5 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { supabase } from '../supabase';
 
 export interface Schedule {
   id: string;
@@ -12,7 +13,7 @@ export interface Schedule {
 
 @Injectable({ providedIn: 'root' })
 export class ScheduleService {
-  private supabase = inject(SupabaseClient);
+  private supabase: SupabaseClient = supabase;
 
   async getByCompany(companyId: string): Promise<Schedule[]> {
     const { data, error } = await this.supabase

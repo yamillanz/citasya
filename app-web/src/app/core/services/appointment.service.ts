@@ -2,10 +2,11 @@ import { Injectable, inject } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Appointment, AppointmentStatus, CreateAppointmentDto } from '../models/appointment.model';
 import { ScheduleService } from './schedule.service';
+import { supabase } from '../supabase';
 
 @Injectable({ providedIn: 'root' })
 export class AppointmentService {
-  private supabase = inject(SupabaseClient);
+  private supabase: SupabaseClient = supabase;
   private scheduleService = inject(ScheduleService);
 
   async getByEmployee(employeeId: string, date: string): Promise<Appointment[]> {

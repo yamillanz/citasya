@@ -1,11 +1,12 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { jsPDF } from 'jspdf';
 import { Appointment } from '../models/appointment.model';
+import { supabase } from '../supabase';
 
 @Injectable({ providedIn: 'root' })
 export class DailyCloseService {
-  private supabase = inject(SupabaseClient);
+  private supabase: SupabaseClient = supabase;
 
   async generateDailyClose(
     companyId: string, 

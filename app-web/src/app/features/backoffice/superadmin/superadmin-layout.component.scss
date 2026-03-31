@@ -209,15 +209,20 @@
   grid-column: 1 / -1;
   grid-row: 2;
   width: 100%;
-  padding-left: var(--space-lg);
-  padding-right: var(--space-lg);
   min-height: 100vh;
   overflow-x: hidden;
   box-sizing: border-box;
 
+  @media (min-width: 1025px) {
+    margin-left: 260px;
+    padding-right: var(--space-xl);
+    padding-left: 1rem;
+  }
+
   @media (max-width: 1024px) {
     margin-left: 0;
-    padding-right: 0;
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
   }
 }
 

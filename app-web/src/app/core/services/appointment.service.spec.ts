@@ -1,13 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { AppointmentService } from './appointment.service';
 import { ScheduleService } from './schedule.service';
-import { SupabaseClient } from '@supabase/supabase-js';
+
+let mockFromFn: jest.Mock;
+
+jest.mock('../supabase', () => ({
+  supabase: {
+    from: (...args: any[]) => mockFromFn(...args)
+  }
+}));
 
 describe('AppointmentService', () => {
   let service: AppointmentService;
-  let mockSupabase: {
-    from: jest.Mock;
-  };
   let scheduleServiceMock: jest.Mocked<ScheduleService>;
 
   const mockAppointment = {
@@ -23,6 +27,8 @@ describe('AppointmentService', () => {
   };
 
   beforeEach(() => {
+    mockFromFn = jest.fn();
+
     const mockSelect = {
       select: jest.fn().mockReturnValue({
         eq: jest.fn().mockReturnValue({
@@ -44,22 +50,22 @@ describe('AppointmentService', () => {
       })
     };
 
-    mockSupabase = {
-      from: jest.fn().mockReturnValue({
-        ...mockSelect,
-        ...mockInsert,
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            select: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({ data: mockAppointment, error: null })
-            })
+    const mockSupabase = {
+      ...mockSelect,
+      ...mockInsert,
+      update: jest.fn().mockReturnValue({
+        eq: jest.fn().mockReturnValue({
+          select: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({ data: mockAppointment, error: null })
           })
-        }),
-        delete: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ error: null })
         })
+      }),
+      delete: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({ error: null })
       })
     };
+
+    mockFromFn.mockReturnValue(mockSupabase);
 
     scheduleServiceMock = {
       getByCompany: jest.fn().mockResolvedValue([
@@ -70,7 +76,6 @@ describe('AppointmentService', () => {
     TestBed.configureTestingModule({
       providers: [
         AppointmentService,
-        { provide: SupabaseClient, useValue: mockSupabase },
         { provide: ScheduleService, useValue: scheduleServiceMock }
       ]
     });
@@ -92,7 +97,7 @@ describe('AppointmentService', () => {
 
       const result = await service.create(appointmentData);
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
+      expect(mockFromFn).toHaveBeenCalledWith('appointments');
       expect(result.status).toBe('pending');
     });
 
@@ -109,8 +114,7 @@ describe('AppointmentService', () => {
 
       await service.create(appointmentData);
 
-      const fromMock = mockSupabase.from as jest.Mock;
-      const fromReturn = fromMock.mock.results[0].value;
+      const fromReturn = mockFromFn.mock.results[0].value;
       expect(fromReturn.insert).toHaveBeenCalledWith(
         expect.objectContaining({
           ...appointmentData,
@@ -155,7 +159,7 @@ describe('AppointmentService', () => {
     it('debe obtener citas por empleado y fecha', async () => {
       await service.getByEmployee('employee-1', '2026-03-20');
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('appointments');
+      expect(mockFromFn).toHaveBeenCalledWith('appointments');
     });
   });
 
@@ -163,8 +167,7 @@ describe('AppointmentService', () => {
     it('debe actualizar estado a cancelled', async () => {
       await service.cancel('apt-1');
 
-      const fromMock = mockSupabase.from as jest.Mock;
-      const fromReturn = fromMock.mock.results[0].value;
+      const fromReturn = mockFromFn.mock.results[0].value;
       expect(fromReturn.update).toHaveBeenCalled();
     });
   });
