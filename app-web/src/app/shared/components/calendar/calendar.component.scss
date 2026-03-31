@@ -1,0 +1,190 @@
+.shared-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+:host ::ng-deep {
+  .calendar-card {
+    .p-card-body {
+      padding: var(--space-lg);
+    }
+
+    .p-card-content {
+      padding: 0;
+    }
+  }
+
+  .fc {
+    font-family: inherit;
+
+    .fc-toolbar-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .fc-button {
+      background: var(--color-sage) !important;
+      border-color: var(--color-sage) !important;
+      font-weight: 500;
+
+      &:hover {
+        background: var(--color-sage-dark) !important;
+        border-color: var(--color-sage-dark) !important;
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px var(--color-sage-pale) !important;
+      }
+    }
+
+    .fc-daygrid-day-number {
+      color: var(--color-text-primary);
+      font-weight: 500;
+    }
+
+    .fc-daygrid-day.fc-day-today {
+      background: var(--color-sage-pale) !important;
+    }
+
+    .fc-event {
+      border-radius: var(--radius-sm);
+      padding: 2px 4px;
+      font-size: 0.8125rem;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+
+    .fc-col-header-cell-cushion {
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+  }
+}
+
+.calendar-header {
+  margin-bottom: var(--space-md);
+}
+
+.view-toggles {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+
+  button {
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: white;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all var(--duration-fast) ease;
+
+    &:hover {
+      background: var(--color-sage-pale);
+    }
+
+    &.active {
+      background: var(--color-sage);
+      color: white;
+      border-color: var(--color-sage);
+    }
+  }
+}
+
+.appointments-list {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.list-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.no-appointments {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  color: var(--color-text-secondary);
+  text-align: center;
+
+  i {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+    color: var(--color-text-muted);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+}
+
+.appointment-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-linen);
+  border-radius: var(--radius-md);
+  border-left: 4px solid;
+  margin-bottom: var(--space-sm);
+  cursor: pointer;
+  transition: transform var(--duration-fast) ease;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    transform: translateX(4px);
+  }
+
+  &.status-completed { border-left-color: #9DC183; }
+  &.status-pending { border-left-color: #F4D03F; }
+  &.status-cancelled { border-left-color: #E74C3C; }
+  &.status-no_show { border-left-color: #95A5A6; }
+}
+
+.apt-time {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  min-width: 50px;
+}
+
+.apt-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.client-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.service-name {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+:host ::ng-deep .apt-status {
+  font-size: 0.75rem;
+}

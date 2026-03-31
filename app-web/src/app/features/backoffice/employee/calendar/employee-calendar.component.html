@@ -17,9 +17,11 @@
       <p>{{ error() }}</p>
     </div>
   } @else {
-    <p-card styleClass="calendar-card">
-      <full-calendar [options]="calendarOptions" />
-    </p-card>
+    <app-shared-calendar
+      [appointments]="appointments()"
+      [initialView]="'dayGridMonth'"
+      (appointmentClicked)="onAppointmentClick($event)"
+    />
   }
 </div>
 
