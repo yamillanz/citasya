@@ -73,6 +73,10 @@
     mask-composite: exclude;
     pointer-events: none;
   }
+  
+  @media (max-width: 768px) {
+    min-height: 420px;
+  }
 }
 
 .appointments-card {
