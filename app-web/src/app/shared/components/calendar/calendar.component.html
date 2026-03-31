@@ -1,57 +1,84 @@
-<div class="shared-calendar">
-  <p-card styleClass="calendar-card">
-    <div class="calendar-header">
-      <div class="view-toggles">
-        <button
-          type="button"
-          [class.active]="currentView() === 'dayGridMonth'"
-          (click)="currentView.set('dayGridMonth')">
-          Mes
-        </button>
-        <button
-          type="button"
-          [class.active]="currentView() === 'timeGridWeek'"
-          (click)="currentView.set('timeGridWeek')">
-          Semana
-        </button>
+<div class="calendar-wrapper">
+  <!-- Calendar Card -->
+  <div class="calendar-card">
+    <div class="card-header">
+      <div class="card-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <span class="card-title">Mi Calendario</span>
+    </div>
+    
+    <div class="card-content">
+      <div class="calendar-header">
+        <div class="view-toggles">
+          <button
+            type="button"
+            [class.active]="currentView() === 'dayGridMonth'"
+            (click)="currentView.set('dayGridMonth')">
+            Mes
+          </button>
+          <button
+            type="button"
+            [class.active]="currentView() === 'timeGridWeek'"
+            (click)="currentView.set('timeGridWeek')">
+            Semana
+          </button>
+        </div>
       </div>
 
       <full-calendar [options]="calendarOptions()" />
     </div>
-  </p-card>
+  </div>
 
-  <div class="appointments-list">
-    <h3 class="list-title">
-      @if (selectedDate()) {
-        Citas del {{ formatDate(selectedDate()!) }}
-      } @else {
-        Selecciona un día para ver sus citas
-      }
-    </h3>
-
-    @if (selectedDayAppointments().length === 0 && selectedDate()) {
-      <div class="no-appointments">
-        <i class="pi pi-calendar-times"></i>
-        <p>No hay citas para este día</p>
+  <!-- Appointments List Card -->
+  <div class="appointments-card">
+    <div class="card-header">
+      <div class="card-dots">
+        <span></span><span></span><span></span>
       </div>
-    }
-
-    @for (apt of selectedDayAppointments(); track apt.id) {
-      <div
-        class="appointment-card"
-        [class]="'status-' + apt.status"
-        (click)="appointmentClicked.emit(apt)">
-        <div class="apt-time">{{ formatTime(apt.appointment_time) }}</div>
-        <div class="apt-info">
-          <span class="client-name">{{ apt.client_name }}</span>
-          <span class="service-name">{{ apt.service?.name || 'Servicio' }}</span>
+      <span class="card-title">
+        @if (selectedDate()) {
+          Citas del {{ formatDate(selectedDate()!) }}
+        } @else {
+          Selecciona un día
+        }
+      </span>
+    </div>
+    
+    <div class="card-content">
+      @if (selectedDayAppointments().length === 0 && selectedDate()) {
+        <div class="no-appointments">
+          <i class="pi pi-calendar-times"></i>
+          <p>No hay citas para este día</p>
         </div>
-        <p-tag
-          [value]="getStatusLabel(apt.status)"
-          [severity]="getStatusSeverity(apt.status)"
-          styleClass="apt-status">
-        </p-tag>
+      }
+
+      @if (selectedDayAppointments().length === 0 && !selectedDate()) {
+        <div class="no-appointments">
+          <i class="pi pi-hand-pointer"></i>
+          <p>Selecciona un día en el calendario para ver tus citas</p>
+        </div>
+      }
+
+      <div class="appointments-list">
+        @for (apt of selectedDayAppointments(); track apt.id) {
+          <div
+            class="appointment-card"
+            [class]="'status-' + apt.status"
+            (click)="appointmentClicked.emit(apt)">
+            <div class="apt-time">{{ formatTime(apt.appointment_time) }}</div>
+            <div class="apt-info">
+              <span class="client-name">{{ apt.client_name }}</span>
+              <span class="service-name">{{ apt.service?.name || 'Servicio' }}</span>
+            </div>
+            <p-tag
+              [value]="getStatusLabel(apt.status)"
+              [severity]="getStatusSeverity(apt.status)"
+              styleClass="apt-status">
+            </p-tag>
+          </div>
+        }
       </div>
-    }
+    </div>
   </div>
 </div>
