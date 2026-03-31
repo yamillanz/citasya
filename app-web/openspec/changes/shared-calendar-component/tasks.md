@@ -6,7 +6,7 @@
 - [x] Create `calendar.component.ts` with inputs/outputs
 - [x] Create `calendar.component.html` with template
 - [x] Create `calendar.component.scss` with styles
-- [x] Build verification passed (FullCalendar tests require complex mocking, skipped)
+- [x] Create `calendar.component.spec.ts` with unit tests (25 tests passing)
 
 ## Refactor EmployeeCalendarComponent
 
@@ -18,6 +18,7 @@
 ## Verification
 
 - [x] Build compiles without errors
+- [x] All 172 tests passing (25 new calendar tests + 147 existing)
 - [ ] Test in browser: http://localhost:4200/emp/calendar
 - [ ] Verify both views (month/week) work correctly
 - [ ] Verify appointment details dialog still works

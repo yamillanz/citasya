@@ -52,7 +52,12 @@ module.exports = {
     '^primeng/toast$': '<rootDir>/node_modules/primeng/fesm2022/primeng-toast.mjs',
     '^primeng/([^/]+)$': '<rootDir>/node_modules/primeng/fesm2022/primeng-$1.mjs',
     '^primeng/types/([^/]+)$': '<rootDir>/node_modules/primeng/fesm2022/primeng-types-$1.mjs',
-    '^primeng/icons/([^/]+)$': '<rootDir>/node_modules/primeng/fesm2022/primeng-icons-$1.mjs'
+    '^primeng/icons/([^/]+)$': '<rootDir>/node_modules/primeng/fesm2022/primeng-icons-$1.mjs',
+    '^@fullcalendar/angular$': '<rootDir>/src/__mocks__/fullcalendar-angular.mock.ts',
+    '^@fullcalendar/core$': '<rootDir>/src/__mocks__/fullcalendar-core.mock.ts',
+    '^@fullcalendar/daygrid$': '<rootDir>/src/__mocks__/fullcalendar-plugin.mock.ts',
+    '^@fullcalendar/timegrid$': '<rootDir>/src/__mocks__/fullcalendar-plugin.mock.ts',
+    '^@fullcalendar/interaction$': '<rootDir>/src/__mocks__/fullcalendar-plugin.mock.ts'
   },
   moduleFileExtensions: ['ts', 'js', 'html', 'mjs'],
   globals: {
