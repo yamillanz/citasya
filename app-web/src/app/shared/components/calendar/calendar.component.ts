@@ -5,6 +5,7 @@ import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import esLocale from '@fullcalendar/core/locales/es';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 
@@ -63,6 +64,7 @@ export class SharedCalendarComponent {
   calendarOptions = computed<CalendarOptions>(() => ({
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
     initialView: this.currentView(),
+    locale: esLocale,
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
