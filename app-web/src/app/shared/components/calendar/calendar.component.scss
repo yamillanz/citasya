@@ -5,7 +5,7 @@
   width: 100%;
   box-sizing: border-box;
   overflow: hidden;
-  max-height: calc(100vh - 180px);
+  max-height: calc(100vh - 200px);
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
@@ -70,7 +70,7 @@
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 180px);
   
   &::before {
     content: '';
@@ -89,7 +89,7 @@
   .card-content {
     flex: 1;
     overflow: visible;
-    max-height: calc(100vh - 280px);
+    max-height: calc(100vh - 260px);
   }
 
   @media (max-width: 768px) {
@@ -139,13 +139,13 @@
   .fc.fc-media-screen {
     overflow: hidden !important;
     height: 100% !important;
-    max-height: calc(100vh - 280px) !important;
+    max-height: calc(100vh - 260px) !important;
   }
 
   .fc {
     font-family: inherit;
     height: 100% !important;
-    max-height: calc(100vh - 280px) !important;
+    max-height: calc(100vh - 260px) !important;
 
     .fc-toolbar {
       flex-wrap: wrap;
@@ -190,8 +190,8 @@
     .fc-daygrid-day-number {
       color: var(--color-text-primary);
       font-weight: 500;
-      font-size: 0.75rem;
-      padding: var(--space-xs);
+      font-size: 0.6875rem;
+      padding: 2px 4px;
     }
 
     .fc-daygrid-day.fc-day-today {
@@ -201,8 +201,8 @@
         background: var(--color-sage);
         color: white;
         border-radius: var(--radius-sm);
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -215,8 +215,8 @@
 
     .fc-event {
       border-radius: var(--radius-sm);
-      padding: 1px 4px;
-      font-size: 0.6875rem;
+      padding: 1px 3px;
+      font-size: 0.625rem;
       cursor: pointer;
       border: none !important;
       background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
@@ -231,13 +231,14 @@
       color: var(--color-text-secondary);
       font-weight: 600;
       text-transform: uppercase;
-      font-size: 0.6875rem;
-      padding: var(--space-xs) 0;
+      font-size: 0.625rem;
+      padding: 2px 0;
     }
 
     .fc-scrollgrid {
       border-radius: var(--radius-lg);
-      border: 1px solid var(--color-sand);
+      border: none !important;
+      outline: none !important;
     }
 
     .fc-scrollgrid-section-header td {
@@ -246,6 +247,26 @@
 
     tbody, .fc-scrollgrid-sync-table, .fc-daygrid-body, .fc-timegrid-body {
       overflow: visible !important;
+    }
+
+    .fc-scrollgrid-section-body td {
+      border-right: 1px solid var(--color-sand) !important;
+      border-bottom: 1px solid var(--color-sand) !important;
+    }
+
+    .fc-scrollgrid-section-header td {
+      border-right: 1px solid var(--color-sand) !important;
+      border-bottom: 1px solid var(--color-sand) !important;
+    }
+
+    .fc-daygrid-day {
+      border-right: 1px solid var(--color-sand) !important;
+      border-bottom: 1px solid var(--color-sand) !important;
+    }
+
+    .fc-col-header-cell {
+      border-right: 1px solid var(--color-sand) !important;
+      border-bottom: 1px solid var(--color-sand) !important;
     }
   }
 }
