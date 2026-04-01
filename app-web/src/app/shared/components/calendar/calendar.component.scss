@@ -11,6 +11,10 @@
     grid-template-columns: 1fr;
     max-height: none;
   }
+
+  @media (max-width: 768px) {
+    max-height: calc(100vh - 140px);
+  }
 }
 
 :host {
@@ -209,10 +213,6 @@
       }
     }
 
-    .fc-daygrid-day.has-apt {
-      background: var(--color-sage-pale) !important;
-    }
-
     .fc-event {
       border-radius: var(--radius-sm);
       padding: 1px 3px;
@@ -224,6 +224,40 @@
       &:hover {
         opacity: 0.9;
         transform: scale(1.02);
+      }
+    }
+
+    .fc-more-link {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .fc-daygrid-day.has-apt {
+        background: rgba(110, 140, 90, 0.45) !important;
+      }
+
+      .fc-daygrid-event {
+        display: none !important;
+      }
+
+      .fc-daygrid-event-harness {
+        display: none !important;
+      }
+
+      .fc-more-link {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .fc-daygrid-day.has-apt {
+        background: transparent !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .appointments-card {
+        display: none !important;
       }
     }
 

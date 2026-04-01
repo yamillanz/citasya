@@ -74,8 +74,10 @@ export class SharedCalendarComponent {
     slotMaxTime: '20:00:00',
     weekends: true,
     selectable: true,
-    dayMaxEvents: true,
+    dayMaxEvents: false,
     events: this.buildEvents(),
+    eventClassNames: () => ['calendar-event'],
+    dayCellClassNames: (arg) => this.getDayCellClassNames(arg),
     dateClick: this.handleDateClick.bind(this),
     eventClick: this.handleEventClick.bind(this)
   }));
@@ -111,6 +113,16 @@ export class SharedCalendarComponent {
     if (appointment) {
       this.appointmentClicked.emit(appointment);
     }
+  }
+
+  getDayCellClassNames(arg: any): string[] {
+    const classes: string[] = [];
+    const dateStr = this.formatDateISO(arg.date);
+    const hasAppointment = this.appointments().some(apt => apt.appointment_date === dateStr);
+    if (hasAppointment) {
+      classes.push('has-apt');
+    }
+    return classes;
   }
 
   formatDate(date: Date): string {

@@ -102,5 +102,9 @@
     .p-dialog-footer {
       border-top: 1px solid var(--color-border);
     }
+
+    @media (max-width: 768px) {
+      display: none !important;
+    }
   }
 }
