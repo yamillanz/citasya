@@ -9,23 +9,6 @@
     </div>
     
     <div class="card-content">
-      <div class="calendar-header">
-        <div class="view-toggles">
-          <button
-            type="button"
-            [class.active]="currentView() === 'dayGridMonth'"
-            (click)="currentView.set('dayGridMonth')">
-            Mes
-          </button>
-          <button
-            type="button"
-            [class.active]="currentView() === 'timeGridWeek'"
-            (click)="currentView.set('timeGridWeek')">
-            Semana
-          </button>
-        </div>
-      </div>
-
       <full-calendar [options]="calendarOptions()" />
     </div>
   </div>

@@ -63,7 +63,11 @@ export class SharedCalendarComponent {
   calendarOptions = computed<CalendarOptions>(() => ({
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
     initialView: this.currentView(),
-    headerToolbar: false,
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek'
+    },
     slotMinTime: '08:00:00',
     slotMaxTime: '20:00:00',
     weekends: true,
@@ -93,8 +97,10 @@ export class SharedCalendarComponent {
   }
 
   handleDateClick(arg: any) {
-    this.selectedDate.set(new Date(arg.dateStr));
-    this.dateClicked.emit(new Date(arg.dateStr));
+    const [year, month, day] = arg.dateStr.split('-').map(Number);
+    const localDate = new Date(year, month - 1, day);
+    this.selectedDate.set(localDate);
+    this.dateClicked.emit(localDate);
   }
 
   handleEventClick(arg: any) {
