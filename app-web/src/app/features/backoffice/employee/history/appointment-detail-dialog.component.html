@@ -1,0 +1,106 @@
+<p-dialog 
+  [visible]="visible()"
+  [modal]="true"
+  [style]="{'width': '600px'}"
+  [header]="'Detalle de Cita'"
+  [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
+  (onHide)="onClose.emit()">
+  
+  <ng-template pTemplate="content">
+    @if (appointment()) {
+      <div class="appointment-detail">
+        <p-card styleClass="detail-card">
+          <div class="detail-section">
+            <h4>Información del Cliente</h4>
+            <div class="detail-row">
+              <span class="label">Nombre:</span>
+              <span class="value">{{ appointment()!.client_name }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Teléfono:</span>
+              <span class="value">{{ appointment()!.client_phone }}</span>
+            </div>
+            @if (appointment()!.client_email) {
+              <div class="detail-row">
+                <span class="label">Email:</span>
+                <span class="value">{{ appointment()!.client_email }}</span>
+              </div>
+            }
+          </div>
+        </p-card>
+
+        <p-card styleClass="detail-card">
+          <div class="detail-section">
+            <h4>Información de la Cita</h4>
+            <div class="detail-row">
+              <span class="label">Fecha:</span>
+              <span class="value">{{ formatDate(appointment()!.appointment_date) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Hora:</span>
+              <span class="value">{{ formatTime(appointment()!.appointment_time) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Servicio:</span>
+              <span class="value">{{ appointment()!.service?.name || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Estado:</span>
+              <p-tag 
+                [value]="getStatusLabel(appointment()!.status)" 
+                [severity]="getStatusSeverity(appointment()!.status)">
+              </p-tag>
+            </div>
+            <div class="detail-row">
+              <span class="label">Monto:</span>
+              <span class="value amount">
+                @if (appointment()!.amount_collected) {
+                  ${{ appointment()!.amount_collected }}
+                } @else {
+                  -
+                }
+              </span>
+            </div>
+          </div>
+        </p-card>
+
+        @if (appointment()!.notes) {
+          <p-card styleClass="detail-card">
+            <div class="detail-section">
+              <h4>Notas</h4>
+              <p class="notes">{{ appointment()!.notes }}</p>
+            </div>
+          </p-card>
+        }
+      </div>
+    }
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <div class="navigation-buttons">
+        <p-button 
+          icon="pi pi-chevron-left"
+          [text]="true"
+          [disabled]="!hasPrevious()"
+          (onClick)="onPrevious.emit()">
+        </p-button>
+        <span class="navigation-info">
+          {{ currentIndex() + 1 }} de {{ totalCount() }}
+        </span>
+        <p-button 
+          icon="pi pi-chevron-right"
+          [text]="true"
+          [disabled]="!hasNext()"
+          (onClick)="onNext.emit()">
+        </p-button>
+      </div>
+      <p-button 
+        label="Cerrar"
+        icon="pi pi-times"
+        severity="secondary"
+        (onClick)="onClose.emit()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>

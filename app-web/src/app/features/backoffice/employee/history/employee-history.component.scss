@@ -41,6 +41,51 @@
   }
 }
 
+// Search Bar
+.search-bar {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .search-icon {
+    position: absolute;
+    left: var(--space-md);
+    color: var(--color-text-secondary);
+    z-index: 1;
+  }
+
+  .search-input {
+    width: 100%;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+
+  .clear-search {
+    position: absolute;
+    right: var(--space-xs);
+    padding: var(--space-xs);
+    height: auto;
+
+    &:focus {
+      outline: 2px solid var(--color-sage);
+      outline-offset: 2px;
+    }
+  }
+}
+
 .filters-row {
   display: flex;
   gap: var(--space-lg);
@@ -122,19 +167,26 @@
       letter-spacing: 0.025em;
       padding: var(--space-md) var(--space-lg);
       border-color: var(--color-border);
+      cursor: pointer;
+      user-select: none;
+      
+      &:hover {
+        background: var(--color-sage-pale);
+      }
     }
     
     .p-datatable-tbody > tr {
       transition: background var(--duration-fast) ease;
+      cursor: pointer;
+      
+      &.clickable-row:hover {
+        background: var(--color-sage-pale);
+      }
       
       > td {
         padding: var(--space-md) var(--space-lg);
         border-color: var(--color-border);
         color: var(--color-text-primary);
-      }
-      
-      &:hover {
-        background: var(--color-sage-pale);
       }
     }
   }

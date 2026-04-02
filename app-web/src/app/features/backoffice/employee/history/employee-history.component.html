@@ -1,4 +1,6 @@
 <div class="employee-history">
+  <p-toast position="top-right"></p-toast>
+  
   <div class="history-header">
     <div class="header-content">
       <h1>Mi Historial</h1>
@@ -19,6 +21,41 @@
   } @else {
     <!-- Filters -->
     <p-card styleClass="filters-card">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <div class="search-input-wrapper">
+          <i class="pi pi-search search-icon"></i>
+          <input 
+            pInputText 
+            type="text"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event); currentPage.set(0)"
+            placeholder="Buscar por cliente, servicio, teléfono o notas..."
+            class="search-input"
+            aria-label="Buscar en el historial" />
+          @if (searchQuery()) {
+            <button 
+              pButton 
+              type="button" 
+              icon="pi pi-times"
+              class="p-button-text p-button-rounded clear-search"
+              (click)="clearSearch()"
+              aria-label="Limpiar búsqueda">
+            </button>
+          }
+        </div>
+        <p-button 
+          label="Exportar CSV"
+          icon="pi pi-download"
+          severity="success"
+          [loading]="exporting()"
+          [disabled]="filteredAppointments().length === 0"
+          (onClick)="exportToCsv()"
+          aria-label="Exportar historial a CSV">
+        </p-button>
+      </div>
+
+      <!-- Date Filters -->
       <div class="filters-row">
         <div class="filter-group">
           <label for="fromDate">Desde</label>
@@ -76,21 +113,42 @@
           [paginator]="false"
           [rows]="pageSize()"
           [totalRecords]="totalRecords()"
-          styleClass="p-datatable-sm">
+          styleClass="p-datatable-sm"
+          [sortField]="sortField()"
+          [sortOrder]="sortOrder()">
           
           <ng-template pTemplate="header">
             <tr>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Cliente</th>
-              <th>Servicio</th>
-              <th>Monto</th>
-              <th>Estado</th>
+              <th pSortableColumn="appointment_date">
+                Fecha
+                <p-sortIcon field="appointment_date"></p-sortIcon>
+              </th>
+              <th pSortableColumn="appointment_time">
+                Hora
+                <p-sortIcon field="appointment_time"></p-sortIcon>
+              </th>
+              <th pSortableColumn="client_name">
+                Cliente
+                <p-sortIcon field="client_name"></p-sortIcon>
+              </th>
+              <th pSortableColumn="service.name">
+                Servicio
+                <p-sortIcon field="service.name"></p-sortIcon>
+              </th>
+              <th pSortableColumn="amount_collected">
+                Monto
+                <p-sortIcon field="amount_collected"></p-sortIcon>
+              </th>
+              <th pSortableColumn="status">
+                Estado
+                <p-sortIcon field="status"></p-sortIcon>
+              </th>
+              <th>Acciones</th>
             </tr>
           </ng-template>
           
           <ng-template pTemplate="body" let-apt>
-            <tr>
+            <tr (click)="openDetailDialog(apt)" class="clickable-row">
               <td>{{ formatDate(apt.appointment_date) }}</td>
               <td>{{ formatTime(apt.appointment_time) }}</td>
               <td>
@@ -112,6 +170,14 @@
                   [value]="getStatusLabel(apt.status)" 
                   [severity]="getStatusSeverity(apt.status)">
                 </p-tag>
+              </td>
+              <td (click)="$event.stopPropagation()">
+                <p-button 
+                  icon="pi pi-eye"
+                  [text]="true"
+                  (onClick)="openDetailDialog(apt)"
+                  aria-label="Ver detalles">
+                </p-button>
               </td>
             </tr>
           </ng-template>
@@ -135,5 +201,18 @@
         </p-paginator>
       }
     </p-card>
+
+    <!-- Detail Dialog -->
+    <app-appointment-detail-dialog
+      [appointment]="selectedAppointment()"
+      [visible]="dialogVisible()"
+      [currentIndex]="selectedIndex()"
+      [totalCount]="filteredAppointments().length"
+      [hasPrevious]="selectedIndex() > 0"
+      [hasNext]="selectedIndex() < filteredAppointments().length - 1"
+      (onClose)="closeDialog()"
+      (onPrevious)="previousAppointment()"
+      (onNext)="nextAppointment()">
+    </app-appointment-detail-dialog>
   }
 </div>
