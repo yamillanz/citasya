@@ -19,6 +19,6 @@
 
 - [x] Build compiles without errors
 - [x] All 172 tests passing (25 new calendar tests + 147 existing)
-- [ ] Test in browser: http://localhost:4200/emp/calendar
-- [ ] Verify both views (month/week) work correctly
-- [ ] Verify appointment details dialog still works
+- [x] Test in browser: http://localhost:4200/emp/calendar
+- [x] Verify both views (month/week) work correctly
+- [x] Verify appointment details dialog still works
