@@ -31,14 +31,15 @@
             [ngModel]="searchQuery()"
             (ngModelChange)="searchQuery.set($event); currentPage.set(0)"
             placeholder="Buscar por cliente, servicio, teléfono o notas..."
-            class="search-input"
-            aria-label="Buscar en el historial" />
+            styleClass="search-input"
+            aria-label="Buscar en el historial"
+            class="search-input-field" />
           @if (searchQuery()) {
             <button 
               pButton 
               type="button" 
               icon="pi pi-times"
-              class="p-button-text p-button-rounded clear-search"
+              class="p-button-text p-button-rounded clear-search-btn"
               (click)="clearSearch()"
               aria-label="Limpiar búsqueda">
             </button>
@@ -47,7 +48,7 @@
         <p-button 
           label="Exportar CSV"
           icon="pi pi-download"
-          severity="success"
+          styleClass="export-button"
           [loading]="exporting()"
           [disabled]="filteredAppointments().length === 0"
           (onClick)="exportToCsv()"
@@ -63,7 +64,7 @@
             id="fromDate"
             [(ngModel)]="filterFromDate"
             [showIcon]="true"
-            dateFormat="yy-mm-dd"
+            dateFormat="dd/mm/yy"
             placeholder="Fecha inicial"
             (onSelect)="applyFilters()">
           </p-datepicker>
@@ -75,7 +76,7 @@
             id="toDate"
             [(ngModel)]="filterToDate"
             [showIcon]="true"
-            dateFormat="yy-mm-dd"
+            dateFormat="dd/mm/yy"
             placeholder="Fecha final"
             (onSelect)="applyFilters()">
           </p-datepicker>
@@ -175,6 +176,7 @@
                 <p-button 
                   icon="pi pi-eye"
                   [text]="true"
+                  styleClass="detail-button"
                   (onClick)="openDetailDialog(apt)"
                   aria-label="Ver detalles">
                 </p-button>
