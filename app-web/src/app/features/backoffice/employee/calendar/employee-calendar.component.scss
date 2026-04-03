@@ -43,6 +43,11 @@
     border-color: var(--color-sage) !important;
     color: white !important;
     font-weight: 500 !important;
+    padding: 0.5rem 1rem !important;
+    
+    .p-button-label {
+      padding-left: 0.5rem;
+    }
     
     &:hover:not(:disabled) {
       background: var(--color-sage-dark) !important;
