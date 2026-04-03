@@ -1,16 +1,18 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { BookingFormComponent } from './booking-form.component';
 import { AppointmentService } from '../../../core/services/appointment.service';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
 
 describe('BookingFormComponent', () => {
   let component: BookingFormComponent;
   let fixture: ComponentFixture<BookingFormComponent>;
   let appointmentServiceMock: jest.Mocked<AppointmentService>;
+  let companyServiceMock: jest.Mocked<CompanyService>;
+  let userServiceMock: jest.Mocked<UserService>;
+  let serviceServiceMock: jest.Mocked<ServiceService>;
 
   const mockCompany = {
     id: 'company-1',
@@ -35,17 +37,17 @@ describe('BookingFormComponent', () => {
       create: jest.fn().mockResolvedValue({})
     } as any;
 
-    const companyServiceMock = {
+    companyServiceMock = {
       getBySlug: jest.fn().mockResolvedValue(mockCompany)
-    };
+    } as any;
 
-    const userServiceMock = {
+    userServiceMock = {
       getById: jest.fn().mockResolvedValue(mockEmployee)
-    };
+    } as any;
 
-    const serviceServiceMock = {
+    serviceServiceMock = {
       getById: jest.fn().mockResolvedValue(mockService)
-    };
+    } as any;
 
     const routerMock = {
       navigate: jest.fn().mockReturnValue(Promise.resolve(true)),
@@ -89,30 +91,310 @@ describe('BookingFormComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('debe crear el componente', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('debe tener formulario con campos requeridos', () => {
-    expect(component.bookingForm.contains('client_name')).toBe(true);
-    expect(component.bookingForm.contains('client_phone')).toBe(true);
-  });
-
-  it('debe validar que nombre es requerido', () => {
-    component.bookingForm.patchValue({ client_name: '', client_phone: '12345678' });
-    expect(component.bookingForm.valid).toBe(false);
-  });
-
-  it('debe validar que teléfono es requerido', () => {
-    component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '' });
-    expect(component.bookingForm.valid).toBe(false);
-  });
-
-  it('debe ser válido con datos completos', () => {
-    component.bookingForm.patchValue({
-      client_name: 'Juan',
-      client_phone: '12345678'
+  describe('Inicialización', () => {
+    it('debe crear el componente', () => {
+      expect(component).toBeTruthy();
     });
-    expect(component.bookingForm.valid).toBe(true);
+
+    it('debe inicializar currentStep en 1', () => {
+      expect(component.currentStep()).toBe(1);
+    });
+
+    it('debe inicializar signals en sus valores por defecto', () => {
+      expect(component.loading()).toBe(false);
+      expect(component.success()).toBe(false);
+      expect(component.error()).toBe('');
+      expect(component.submitError()).toBe('');
+    });
+
+    it('debe cargar datos iniciales desde los servicios', async () => {
+      await component.ngOnInit();
+      expect(component.company()).toEqual(mockCompany);
+      expect(component.employee()).toEqual(mockEmployee);
+      expect(component.service()).toEqual(mockService);
+    });
+  });
+
+  describe('Formulario', () => {
+    it('debe tener todos los campos del formulario', () => {
+      expect(component.bookingForm.contains('client_name')).toBe(true);
+      expect(component.bookingForm.contains('client_phone')).toBe(true);
+      expect(component.bookingForm.contains('client_email')).toBe(true);
+      expect(component.bookingForm.contains('notes')).toBe(true);
+    });
+
+    it('debe validar que nombre es requerido', () => {
+      component.bookingForm.patchValue({ client_name: '', client_phone: '555-123-4567' });
+      expect(component.bookingForm.get('client_name')?.valid).toBe(false);
+      expect(component.bookingForm.get('client_name')?.hasError('required')).toBe(true);
+    });
+
+    it('debe validar nombre con mínimo 2 caracteres', () => {
+      component.bookingForm.patchValue({ client_name: 'A', client_phone: '555-123-4567' });
+      expect(component.bookingForm.get('client_name')?.hasError('minlength')).toBe(true);
+    });
+
+    it('debe validar que teléfono es requerido', () => {
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '' });
+      expect(component.bookingForm.get('client_phone')?.hasError('required')).toBe(true);
+    });
+
+    it('debe validar teléfono con mínimo 12 caracteres (formato XXX-XXX-XXXX)', () => {
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123' });
+      expect(component.bookingForm.get('client_phone')?.hasError('minlength')).toBe(true);
+    });
+
+    it('debe aceptar teléfono válido con formato XXX-XXX-XXXX', () => {
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-4567' });
+      expect(component.bookingForm.get('client_phone')?.valid).toBe(true);
+    });
+
+    it('debe validar email inválido', () => {
+      component.bookingForm.patchValue({ client_email: 'email-invalido' });
+      expect(component.bookingForm.get('client_email')?.hasError('email')).toBe(true);
+    });
+
+    it('debe aceptar email válido', () => {
+      component.bookingForm.patchValue({ client_email: 'test@example.com' });
+      expect(component.bookingForm.get('client_email')?.valid).toBe(true);
+    });
+
+    it('debe permitir email vacío (opcional)', () => {
+      component.bookingForm.patchValue({ client_email: '' });
+      expect(component.bookingForm.get('client_email')?.valid).toBe(true);
+    });
+
+    it('debe ser válido con datos completos', () => {
+      component.bookingForm.patchValue({
+        client_name: 'Juan Pérez',
+        client_phone: '555-123-4567',
+        client_email: 'juan@example.com',
+        notes: 'Nota de prueba'
+      });
+      expect(component.bookingForm.valid).toBe(true);
+    });
+  });
+
+  describe('formatPhone', () => {
+    it('debe formatear teléfono con 3 dígitos', () => {
+      expect(component.formatPhone('555')).toBe('555');
+    });
+
+    it('debe formatear teléfono con 6 dígitos', () => {
+      expect(component.formatPhone('555123')).toBe('555-123');
+    });
+
+    it('debe formatear teléfono con 10 dígitos (completo)', () => {
+      expect(component.formatPhone('5551234567')).toBe('555-123-4567');
+    });
+
+    it('debe ignorar caracteres no numéricos', () => {
+      expect(component.formatPhone('555-abc-1234')).toBe('555-123-4');
+    });
+
+    it('debe manejar números con más de 10 dígitos (truncar)', () => {
+      expect(component.formatPhone('555123456789')).toBe('555-123-4567');
+    });
+  });
+
+  describe('onPhoneInput', () => {
+    it('debe formatear el teléfono en tiempo real', () => {
+      const input = { target: { value: '5551234567' } } as any;
+      component.onPhoneInput(input);
+      expect(component.bookingForm.value.client_phone).toBe('555-123-4567');
+    });
+  });
+
+  describe('notesLength computed', () => {
+    it('debe retornar 0 cuando notes está vacío', () => {
+      component.bookingForm.get('notes')?.setValue('');
+      expect(component.notesLength()).toBe(0);
+    });
+
+    it('debe retornar la longitud correcta de las notas', () => {
+      component.bookingForm.get('notes')?.setValue('Nota de prueba');
+      expect(component.notesLength()).toBe(14);
+    });
+  });
+
+  describe('Navegación de pasos', () => {
+    it('debe iniciar en paso 1', () => {
+      expect(component.currentStep()).toBe(1);
+    });
+
+    it('debe avanzar al paso 2 con nextStep()', () => {
+      component.nextStep();
+      expect(component.currentStep()).toBe(2);
+    });
+
+    it('debe retroceder al paso 1 con prevStep() desde paso 2', () => {
+      component.currentStep.set(2);
+      component.prevStep();
+      expect(component.currentStep()).toBe(1);
+    });
+  });
+
+  describe('getError', () => {
+    it('debe retornar mensaje para campo requerido', () => {
+      const control = component.bookingForm.get('client_name');
+      control?.setValue('');
+      control?.markAsTouched();
+      expect(component.getError('client_name')).toBe('Este campo es requerido');
+    });
+
+    it('debe retornar mensaje para valor muy corto', () => {
+      const control = component.bookingForm.get('client_name');
+      control?.setValue('A');
+      control?.markAsTouched();
+      expect(component.getError('client_name')).toBe('El valor es muy corto');
+    });
+
+    it('debe retornar mensaje para email inválido', () => {
+      const control = component.bookingForm.get('client_email');
+      control?.setValue('email-invalido');
+      control?.markAsTouched();
+      expect(component.getError('client_email')).toBe('El email no es válido');
+    });
+
+    it('debe retornar string vacío para campo válido', () => {
+      const control = component.bookingForm.get('client_name');
+      control?.setValue('Juan');
+      control?.markAsTouched();
+      expect(component.getError('client_name')).toBe('');
+    });
+
+    it('debe retornar string vacío para campo no tocado', () => {
+      component.bookingForm.patchValue({ client_name: '' });
+      expect(component.getError('client_name')).toBe('');
+    });
+  });
+
+  describe('formatDate', () => {
+    it('debe formatear la fecha en español', () => {
+      const result = component.formatDate('2026-03-20');
+      expect(result).toContain('20');
+      expect(result).toContain('marzo');
+      expect(result).toContain('2026');
+    });
+  });
+
+  describe('onSubmit', () => {
+    beforeEach(async () => {
+      await component.ngOnInit();
+    });
+
+    it('no debe enviar si el formulario es inválido', async () => {
+      component.bookingForm.patchValue({ client_name: '', client_phone: '' });
+      await component.onSubmit();
+      expect(appointmentServiceMock.create).not.toHaveBeenCalled();
+    });
+
+    it('debe marcar todos los campos como tocados si es inválido', async () => {
+      component.bookingForm.patchValue({ client_name: '', client_phone: '' });
+      await component.onSubmit();
+      expect(component.bookingForm.get('client_name')?.touched).toBe(true);
+      expect(component.bookingForm.get('client_phone')?.touched).toBe(true);
+    });
+
+    it('debe llamar appointmentService.create con datos correctos', async () => {
+      component.bookingForm.patchValue({
+        client_name: 'Juan Pérez',
+        client_phone: '555-123-4567',
+        client_email: 'juan@example.com',
+        notes: 'Nota de prueba'
+      });
+
+      await component.onSubmit();
+
+      expect(appointmentServiceMock.create).toHaveBeenCalledWith({
+        company_id: 'company-1',
+        employee_id: 'employee-1',
+        service_id: 'service-1',
+        client_name: 'Juan Pérez',
+        client_phone: '555-123-4567',
+        client_email: 'juan@example.com',
+        appointment_date: '2026-03-20',
+        appointment_time: '10:00',
+        notes: 'Nota de prueba'
+      });
+    });
+
+    it('debe establecer success en true después de envío exitoso', async () => {
+      component.bookingForm.patchValue({
+        client_name: 'Juan',
+        client_phone: '555-123-4567'
+      });
+
+      await component.onSubmit();
+
+      expect(component.success()).toBe(true);
+      expect(component.currentStep()).toBe(3);
+    });
+
+    it('debe establecer loading durante el envío', async () => {
+      let resolvePromise: () => void;
+      appointmentServiceMock.create.mockImplementation(() => new Promise(resolve => {
+        resolvePromise = resolve;
+      }));
+      
+      component.bookingForm.patchValue({
+        client_name: 'Juan',
+        client_phone: '555-123-4567'
+      });
+
+      const promise = component.onSubmit();
+      expect(component.loading()).toBe(true);
+      
+      resolvePromise!();
+      await promise;
+      
+      expect(component.loading()).toBe(false);
+    });
+
+    it('debe manejar errores del servidor', async () => {
+      appointmentServiceMock.create.mockRejectedValue(new Error('Error del servidor'));
+      
+      component.bookingForm.patchValue({
+        client_name: 'Juan',
+        client_phone: '555-123-4567'
+      });
+
+      await component.onSubmit();
+
+      expect(component.submitError()).toBe('Error del servidor');
+      expect(component.success()).toBe(false);
+      expect(component.currentStep()).toBe(1);
+    });
+
+    it('debe limpiar submitError antes del envío', async () => {
+      component.submitError.set('Error previo');
+      
+      component.bookingForm.patchValue({
+        client_name: 'Juan',
+        client_phone: '555-123-4567'
+      });
+
+      await component.onSubmit();
+
+      expect(component.submitError()).toBe('');
+    });
+
+    it('debe enviar sin email ni notas (opcionales)', async () => {
+      component.bookingForm.patchValue({
+        client_name: 'Juan',
+        client_phone: '555-123-4567',
+        client_email: '',
+        notes: ''
+      });
+
+      await component.onSubmit();
+
+      expect(appointmentServiceMock.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          client_email: undefined,
+          notes: undefined
+        })
+      );
+    });
   });
 });

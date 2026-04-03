@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -11,6 +11,7 @@ import { AppointmentService } from '../../../core/services/appointment.service';
 import { Company } from '../../../core/models/company.model';
 import { User } from '../../../core/models/user.model';
 import { Service } from '../../../core/models/service.model';
+import { fadeInUp, stepComplete, fadeIn, shakeError } from './booking-form.animations';
 
 @Component({
   selector: 'app-booking-form',
@@ -23,7 +24,8 @@ import { Service } from '../../../core/models/service.model';
     InputTextModule
   ],
   templateUrl: './booking-form.component.html',
-  styleUrl: './booking-form.component.scss'
+  styleUrl: './booking-form.component.scss',
+  animations: [fadeInUp, stepComplete, fadeIn, shakeError]
 })
 export class BookingFormComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -44,11 +46,16 @@ export class BookingFormComponent implements OnInit {
   success = signal(false);
   currentStep = signal(1);
   submitError = signal('');
+  
+  notesLength = computed(() => {
+    const notes = this.bookingForm.get('notes')?.value;
+    return notes ? notes.length : 0;
+  });
 
   bookingForm = this.fb.group({
     client_name: ['', [Validators.required, Validators.minLength(2)]],
-    client_phone: ['', [Validators.required, Validators.minLength(8)]],
-    client_email: [''],
+    client_phone: ['', [Validators.required, Validators.minLength(12)]],
+    client_email: ['', [Validators.email]],
     notes: ['']
   });
 
@@ -154,5 +161,18 @@ export class BookingFormComponent implements OnInit {
       month: 'long',
       year: 'numeric'
     });
+  }
+
+  formatPhone(value: string): string {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 3) return cleaned;
+    if (cleaned.length <= 6) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = this.formatPhone(input.value);
+    this.bookingForm.patchValue({ client_phone: formatted });
   }
 }
