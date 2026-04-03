@@ -4,6 +4,15 @@
       <h1>Mi Calendario</h1>
       <p class="subtitle">Consulta tus citas programadas</p>
     </div>
+    <p-button
+      label="Reservar"
+      icon="pi pi-copy"
+      [loading]="copying()"
+      (onClick)="copyBookingLink()"
+      styleClass="booking-link-btn"
+      pTooltip="Copiar enlace de reserva"
+      tooltipPosition="left">
+    </p-button>
   </div>
 
   @if (loading()) {

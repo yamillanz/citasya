@@ -67,6 +67,16 @@
     <router-outlet></router-outlet>
   </main>
 
+  <!-- Mobile FAB (Floating Action Button) -->
+  <button
+    class="mobile-fab"
+    (click)="copyBookingLink()"
+    [disabled]="copying()"
+    pTooltip="Copiar enlace de reserva"
+    tooltipPosition="left">
+    <i class="pi" [ngClass]="copying() ? 'pi-spinner pi-spin' : 'pi-copy'"></i>
+  </button>
+
   <!-- Mobile Sidebar -->
   @if (sidebarVisible()) {
     <div class="mobile-menu-overlay" (click)="sidebarVisible.set(false)">

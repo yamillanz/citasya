@@ -390,3 +390,47 @@
     }
   }
 }
+
+/* ================================
+   Mobile FAB
+   ================================ */
+.mobile-fab {
+  display: none;
+  position: fixed;
+  bottom: var(--space-xl);
+  right: var(--space-lg);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(157, 193, 131, 0.4);
+  cursor: pointer;
+  z-index: 1000;
+  transition: all var(--duration-fast) ease;
+  align-items: center;
+  justify-content: center;
+  
+  i {
+    font-size: 1.25rem;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(157, 193, 131, 0.5);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  @media (max-width: 1024px) {
+    display: flex;
+  }
+}
