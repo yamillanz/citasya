@@ -153,6 +153,160 @@ describe('AppointmentService', () => {
       expect(slots[0]).toBe('09:00');
       expect(slots[1]).toBe('09:30');
     });
+
+    it('debe excluir slots con citas existentes', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([
+        {
+          id: 'apt-1',
+          appointment_time: '09:00',
+          appointment_date: '2026-03-20'
+        } as any
+      ]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 4, start_time: '09:00:00', end_time: '11:00:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 30);
+
+      expect(slots).not.toContain('09:00');
+      expect(slots).toContain('09:30');
+      expect(slots).toContain('10:00');
+    });
+
+    it('debe calcular slots correctamente con duración de 60 minutos', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 4, start_time: '09:00:00', end_time: '12:00:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 60);
+
+      expect(slots).toEqual(['09:00', '10:00', '11:00']);
+    });
+
+    it('debe calcular slots correctamente con duración de 15 minutos', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 4, start_time: '09:00:00', end_time: '10:00:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 15);
+
+      expect(slots).toEqual(['09:00', '09:15', '09:30', '09:45']);
+    });
+
+    it('debe manejar horarios con minutos específicos', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 4, start_time: '08:30:00', end_time: '10:30:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 30);
+
+      expect(slots[0]).toBe('08:30');
+      expect(slots[slots.length - 1]).toBe('10:00');
+    });
+
+    it('debe excluir slots que se superponen con citas existentes', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([
+        {
+          id: 'apt-1',
+          appointment_time: '09:30',
+          appointment_date: '2026-03-20'
+        } as any
+      ]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 4, start_time: '09:00:00', end_time: '11:00:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 30);
+
+      expect(slots).not.toContain('09:30');
+      expect(slots).toContain('09:00');
+      expect(slots).toContain('10:00');
+    });
+
+    it('debe manejar múltiples citas existentes', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([
+        {
+          id: 'apt-1',
+          appointment_time: '09:00',
+          appointment_date: '2026-03-20'
+        } as any,
+        {
+          id: 'apt-2',
+          appointment_time: '10:00',
+          appointment_date: '2026-03-20'
+        } as any
+      ]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 4, start_time: '09:00:00', end_time: '12:00:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 30);
+
+      expect(slots).not.toContain('09:00');
+      expect(slots).not.toContain('10:00');
+      expect(slots).toContain('09:30');
+      expect(slots).toContain('10:30');
+      expect(slots).toContain('11:00');
+    });
+
+    it('debe retornar array vacío si no hay schedule para ese día de la semana', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 0, start_time: '09:00:00', end_time: '18:00:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 30);
+
+      expect(slots).toEqual([]);
+    });
+
+    it('debe retornar array vacío si el servicio no cabe en el horario disponible', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 4, start_time: '09:00:00', end_time: '10:00:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 90);
+
+      expect(slots).toEqual([]);
+    });
+
+    it('debe incluir slot si el servicio cabe exactamente en el horario', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 4, start_time: '09:00:00', end_time: '10:30:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 90);
+
+      expect(slots).toEqual(['09:00']);
+    });
+
+    it('debe retornar array vacío si el horario es muy corto para el servicio', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 4, start_time: '09:00:00', end_time: '09:20:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 30);
+
+      expect(slots).toEqual([]);
+    });
+
+    it('debe formatear horas correctamente con padding de ceros', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 4, start_time: '09:05:00', end_time: '09:35:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 15);
+
+      expect(slots[0]).toBe('09:05');
+      expect(slots[1]).toBe('09:20');
+    });
   });
 
   describe('getByEmployee', () => {
