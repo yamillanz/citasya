@@ -121,14 +121,14 @@ export class EmployeeCalendarComponent implements OnInit {
         throw new Error('Company slug not found');
       }
 
-      const bookingUrl = `${window.location.origin}/c/${company.slug}/e/${user.id}/book`;
+      const bookingUrl = `${window.location.origin}/c/${company.slug}/e/${user.id}`;
       await navigator.clipboard.writeText(bookingUrl);
 
       this.messageService.add({
         severity: 'success',
         summary: 'Link copiado',
-        detail: 'Link copiado al portapapeles',
-        life: 3000
+        detail: 'El cliente podrá ver tu calendario y seleccionar servicio, fecha y hora',
+        life: 5000
       });
     } catch (error) {
       this.messageService.add({
