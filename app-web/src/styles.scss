@@ -21,6 +21,7 @@
   --color-warm-white: #FFFFFF;
   --color-linen: #F5F2ED;
   --color-sand: #E8E4DD;
+  --color-border: #E8E4DD;
   
   /* Text Colors */
   --color-text-primary: #2C3E50;
@@ -377,5 +378,61 @@ a {
     --space-xl: 24px;
     --space-2xl: 32px;
     --space-3xl: 48px;
+  }
+}
+
+/* ================================
+   PrimeNG Dialog Overrides
+   ================================ */
+.p-dialog-mask {
+  background: rgba(44, 62, 80, 0.5) !important;
+}
+
+.p-dialog {
+  background: var(--color-warm-white) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-xl) !important;
+  overflow: hidden !important;
+  border: none !important;
+}
+
+.p-dialog-header {
+  background: var(--color-linen) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  padding: var(--space-md) var(--space-lg) !important;
+}
+
+.p-dialog-header .p-dialog-title {
+  font-family: var(--font-display) !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: var(--color-text-primary) !important;
+}
+
+.p-dialog-header-icons {
+  color: var(--color-text-secondary) !important;
+}
+
+.p-dialog-header-icons button:hover {
+  color: var(--color-text-primary) !important;
+}
+
+.p-dialog-content {
+  padding: var(--space-lg) !important;
+}
+
+.p-dialog-footer {
+  border-top: 1px solid var(--color-border) !important;
+  padding: var(--space-md) var(--space-lg) !important;
+}
+
+/* Responsive mobile */
+@media (max-width: 640px) {
+  .p-dialog {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: auto !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
   }
 }
