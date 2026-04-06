@@ -6,6 +6,7 @@ import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import esLocale from '@fullcalendar/core/locales/es';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { CompanyService } from '../../../core/services/company.service';
@@ -64,7 +65,13 @@ export class EmployeeCalendarComponent implements OnInit {
     select: this.handleDateSelect.bind(this),
     dateClick: this.handleDateClick.bind(this),
     unselectAuto: false,
-    events: []
+    events: [],
+    locale: esLocale,
+    buttonText: {
+      today: 'Hoy',
+      month: 'Mes',
+      week: 'Semana'
+    }
   };
 
   async ngOnInit() {
