@@ -167,13 +167,13 @@ describe('EmployeeCalendarComponent', () => {
     it('debe copiar el link al portapapeles correctamente', async () => {
       await component.copyBookingLink();
 
-      const expectedUrl = `${window.location.origin}/c/${mockCompany.slug}/e/${mockUser.id}/book`;
+      const expectedUrl = `${window.location.origin}/c/${mockCompany.slug}/e/${mockUser.id}`;
       expect(clipboardWriteTextMock).toHaveBeenCalledWith(expectedUrl);
       expect(messageServiceMock.add).toHaveBeenCalledWith({
         severity: 'success',
         summary: 'Link copiado',
-        detail: 'Link copiado al portapapeles',
-        life: 3000
+        detail: 'El cliente podrá ver tu calendario y seleccionar servicio, fecha y hora',
+        life: 5000
       });
     });
 
