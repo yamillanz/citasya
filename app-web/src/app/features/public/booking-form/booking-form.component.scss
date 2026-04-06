@@ -779,3 +779,46 @@
     transform: translateY(0);
   }
 }
+
+/* ================================
+   Selection Form (Open Mode Step 0)
+   ================================ */
+.selection-content {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.group-error {
+  margin-top: var(--space-sm);
+  padding: var(--space-md);
+  background: rgba(239, 68, 68, 0.05);
+  border-radius: var(--radius-md);
+}
+
+.w-full {
+  width: 100%;
+  
+  :host ::ng-deep .p-dropdown,
+  :host ::ng-deep .p-calendar {
+    width: 100%;
+  }
+}
+
+.service-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  
+  .service-name {
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+  
+  .service-meta {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+  }
+}
