@@ -1,11 +1,9 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidationErrors, ValidatorFn, AbstractControl } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown';
-import { CalendarModule } from 'primeng/calendar';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
@@ -16,7 +14,8 @@ import { Service } from '../../../core/models/service.model';
 import { fadeInUp, stepComplete, fadeIn, shakeError } from './booking-form.animations';
 
 function atLeastOneContactValidator(): ValidatorFn {
-  return (group: FormGroup): ValidationErrors | null => {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const group = control as FormGroup;
     const phone = group.get('client_phone')?.value;
     const email = group.get('client_email')?.value;
     
@@ -42,9 +41,7 @@ function atLeastOneContactValidator(): ValidatorFn {
     ReactiveFormsModule, 
     RouterLink,
     ButtonModule,
-    InputTextModule,
-    DropdownModule,
-    CalendarModule
+    InputTextModule
   ],
   templateUrl: './booking-form.component.html',
   styleUrl: './booking-form.component.scss',
@@ -148,32 +145,33 @@ export class BookingFormComponent implements OnInit {
     }
   }
 
-  onServiceChange(event: any) {
-    const serviceId = event.value;
+  onServiceChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const serviceId = select.value;
     const service = this.services().find(s => s.id === serviceId);
     if (service) {
       this.service.set(service);
     }
   }
 
-  onDateSelect(event: any) {
-    const date = event;
-    if (date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      this.selectedDate = `${year}-${month}-${day}`;
+  onDateSelect(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.value) {
+      this.selectedDate = input.value;
       this.selectionForm.patchValue({ appointment_date: this.selectedDate });
     }
   }
 
-  onTimeSelect(event: any) {
-    this.selectedTime = event.value;
-    this.selectionForm.patchValue({ appointment_time: this.selectedTime });
+  onTimeSelect(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.value) {
+      this.selectedTime = input.value;
+      this.selectionForm.patchValue({ appointment_time: this.selectedTime });
+    }
   }
 
   canProceedFromStep0(): boolean {
-    return this.selectionForm.valid && this.selectedDate && this.selectedTime;
+    return !!(this.selectionForm.valid && this.selectedDate && this.selectedTime);
   }
 
   proceedFromStep0() {
@@ -248,14 +246,23 @@ export class BookingFormComponent implements OnInit {
     this.loading.set(true);
     this.submitError.set('');
 
+    const phone = this.bookingForm.value.client_phone?.replace(/\D/g, '') || '';
+    const email = this.bookingForm.value.client_email || undefined;
+
+    if (!email && phone.length < 10) {
+      this.submitError.set('El teléfono debe tener al menos 10 dígitos si no proporcionas email');
+      this.loading.set(false);
+      return;
+    }
+
     try {
       await this.appointmentService.create({
         company_id: comp.id,
         employee_id: emp.id,
         service_id: serv.id,
         client_name: this.bookingForm.value.client_name!,
-        client_phone: this.bookingForm.value.client_phone || undefined,
-        client_email: this.bookingForm.value.client_email || undefined,
+        client_phone: phone,
+        client_email: email,
         appointment_date: this.selectedDate,
         appointment_time: this.selectedTime,
         notes: this.bookingForm.value.notes || undefined

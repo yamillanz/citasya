@@ -116,30 +116,19 @@
                   <i class="pi pi-tag" aria-hidden="true"></i>
                   <span>Servicio *</span>
                 </label>
-                <p-dropdown 
+                <select 
+                  id="service_id"
                   formControlName="service_id"
                   [formGroup]="selectionForm"
-                  [options]="services()"
-                  optionLabel="name"
-                  optionValue="id"
-                  placeholder="Selecciona un servicio"
-                  (onChange)="onServiceChange($event)"
-                  styleClass="w-full">
-                  <ng-template pTemplate="selectedItem" let-selected>
-                    @if (selected) {
-                      <div class="service-option">
-                        <span class="service-name">{{ selected.name }}</span>
-                        <span class="service-meta">{{ selected.duration_minutes }} min</span>
-                      </div>
-                    }
-                  </ng-template>
-                  <ng-template pTemplate="item" let-service>
-                    <div class="service-option">
-                      <span class="service-name">{{ service.name }}</span>
-                      <span class="service-meta">{{ service.duration_minutes }} min</span>
-                    </div>
-                  </ng-template>
-                </p-dropdown>
+                  class="native-select"
+                  (change)="onServiceChange($event)">
+                  <option value="">Selecciona un servicio</option>
+                  @for (svc of services(); track svc.id) {
+                    <option [value]="svc.id">
+                      {{ svc.name }} ({{ svc.duration_minutes }} min)
+                    </option>
+                  }
+                </select>
                 @if (selectionForm.get('service_id')?.touched && selectionForm.get('service_id')?.invalid) {
                   <small class="field-error">
                     <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
@@ -154,15 +143,14 @@
                   <i class="pi pi-calendar" aria-hidden="true"></i>
                   <span>Fecha *</span>
                 </label>
-                <p-calendar 
+                <input 
+                  id="appointment_date" 
+                  type="date" 
                   formControlName="appointment_date"
                   [formGroup]="selectionForm"
-                  [minDate]="minDate"
-                  dateFormat="yy-mm-dd"
-                  placeholder="Selecciona una fecha"
-                  (onSelect)="onDateSelect($event)"
-                  styleClass="w-full">
-                </p-calendar>
+                  [min]="minDate | date:'yyyy-MM-dd'"
+                  class="native-input"
+                  (change)="onDateSelect($event)">
                 @if (selectionForm.get('appointment_date')?.touched && selectionForm.get('appointment_date')?.invalid) {
                   <small class="field-error">
                     <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
@@ -171,7 +159,7 @@
                 }
               </div>
 
-              <!-- Time Selection (Manual input for now) -->
+              <!-- Time Selection -->
               <div class="form-field">
                 <label for="appointment_time">
                   <i class="pi pi-clock" aria-hidden="true"></i>
@@ -180,11 +168,10 @@
                 <input 
                   id="appointment_time" 
                   type="time" 
-                  pInputText
                   formControlName="appointment_time"
                   [formGroup]="selectionForm"
-                  placeholder="Ej: 10:00"
-                  styleClass="w-full">
+                  class="native-input"
+                  (change)="onTimeSelect($event)">
                 @if (selectionForm.get('appointment_time')?.touched && selectionForm.get('appointment_time')?.invalid) {
                   <small class="field-error">
                     <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
