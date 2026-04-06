@@ -122,9 +122,17 @@
       </section>
     }
 
+    <!-- Debug info -->
+    <div style="background: yellow; padding: 10px; margin: 10px; border: 1px solid black;">
+      Debug: selectedDate = "{{ selectedDate() }}", selectedService = "{{ selectedService()?.name }}"<br>
+      selectedDate truthy: {{ !!selectedDate() }}<br>
+      selectedService truthy: {{ !!selectedService() }}<br>
+      Condition result: {{ !!(selectedDate() && selectedService()) }}
+    </div>
+
     <!-- Time Slots -->
     @if (selectedDate() && selectedService()) {
-      <section class="slots-section" style="border: 2px solid red;">
+      <section class="slots-section">
         <div class="slots-header">
           <div class="selected-datetime">
             <i class="pi pi-calendar"></i>

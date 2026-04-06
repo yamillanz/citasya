@@ -62,6 +62,8 @@ export class EmployeeCalendarComponent implements OnInit {
     selectMirror: true,
     dayMaxEvents: true,
     select: this.handleDateSelect.bind(this),
+    dateClick: this.handleDateClick.bind(this),
+    unselectAuto: false,
     events: []
   };
 
@@ -103,6 +105,15 @@ export class EmployeeCalendarComponent implements OnInit {
 
   async handleDateSelect(arg: any) {
     this.selectedDate.set(arg.startStr.split('T')[0]);
+    this.selectedTime.set('');
+    await this.loadAvailableSlots();
+  }
+
+  async handleDateClick(arg: any) {
+    // arg.dateStr is like "2026-04-06T00:00:00+00:00"
+    const dateStr = arg.dateStr;
+    const datePart = dateStr.split('T')[0];
+    this.selectedDate.set(datePart);
     this.selectedTime.set('');
     await this.loadAvailableSlots();
   }
