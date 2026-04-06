@@ -378,6 +378,10 @@
    ================================ */
 .slots-header {
   margin-bottom: var(--space-md);
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .selected-datetime {
