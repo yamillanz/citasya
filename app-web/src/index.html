@@ -7,6 +7,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="La solución perfecta para gestionar citas de salones de belleza, clínicas dentales y profesionales independientes.">
   
+  <!-- Suppress Supabase NavigatorLockAcquireTimeoutError and AuthApiError logs -->
+  <script>
+    // Override console.error as early as possible
+    (function() {
+      var originalError = console.error;
+      console.error = function (message) {
+        var fullMessage = Array.prototype.slice.call(arguments).map(function(p) {
+          return typeof p === 'string' ? p : (p && p.toString ? p.toString() : JSON.stringify(p));
+        }).join(' ');
+        
+        if (
+          fullMessage.includes('NavigatorLockAcquireTimeoutError') ||
+          fullMessage.includes('AuthApiError: Invalid Refresh Token') ||
+          fullMessage.includes('lock:sb-')
+        ) {
+          return;
+        }
+        originalError.apply(console, arguments);
+      };
+      
+      // Suppress unhandled promise rejections from Supabase
+      window.addEventListener('unhandledrejection', function(event) {
+        var reason = event.reason;
+        if (reason && typeof reason === 'object' && reason.message) {
+          if (
+            reason.message.includes('NavigatorLockAcquireTimeoutError') ||
+            reason.message.includes('AuthApiError: Invalid Refresh Token') ||
+            reason.message.includes('lock:sb-')
+          ) {
+            event.preventDefault();
+          }
+        }
+      });
+    })();
+  </script>
+  
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%239DC183' rx='20' width='100' height='100'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-family='system-ui'>C</text></svg>">
   
