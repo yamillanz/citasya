@@ -126,6 +126,11 @@
       "sourceType": "github",
       "computedHash": "f399cc2b67d0583110b785e37e31b5bef0ecf3d8cecb3d19cb2a11353209ea66"
     },
+    "supabase-postgres-best-practices": {
+      "source": "supabase/agent-skills",
+      "sourceType": "github",
+      "computedHash": "9c87c315aed143ee3b34bec8117100f5035e0df09e6b23e1ecc772cff434c9ad"
+    },
     "writing-plans": {
       "source": "obra/superpowers",
       "sourceType": "github",
