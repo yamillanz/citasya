@@ -15,12 +15,16 @@ export class DailyCloseService {
     companyName: string
   ): Promise<void> {
     // Check if already closed
-    const { data: existing } = await this.supabase
+    const { data: existing, error: checkError } = await this.supabase
       .from('daily_closes')
       .select('id')
       .eq('company_id', companyId)
       .eq('close_date', date)
-      .single();
+      .maybeSingle();
+
+    if (checkError) {
+      console.error('Error checking existing daily close:', checkError);
+    }
 
     if (existing) {
       throw new Error('Cierre ya generado para esta fecha');
@@ -129,7 +133,12 @@ export class DailyCloseService {
       .select('id')
       .eq('company_id', companyId)
       .eq('close_date', date)
-      .single();
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error checking daily close:', error);
+      return false;
+    }
 
     return !!data;
   }
