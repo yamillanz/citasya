@@ -74,7 +74,7 @@ export class DailyCloseFacade {
 
   readonly filteredAppointments = computed(() => {
     const empId = this._selectedEmployee()?.id;
-    if (!empId) return this._appointments();
+    if (!empId) return [];
     return this._appointments()
       .filter(apt => apt.employee_id === empId)
       .sort((a, b) => a.appointment_time.localeCompare(b.appointment_time));

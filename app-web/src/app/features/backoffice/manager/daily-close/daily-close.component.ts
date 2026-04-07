@@ -32,8 +32,7 @@ import { IConfirmationDialog } from '../../../../core/interfaces/confirmation-di
     ConfirmDialogModule
   ],
   providers: [
-    MessageService,
-    DailyCloseFacade
+    MessageService
   ],
   templateUrl: './daily-close.component.html',
   styleUrl: './daily-close.component.scss'
