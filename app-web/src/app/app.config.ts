@@ -2,10 +2,12 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChang
 import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import Aura from '@primeuix/themes/aura';
 
 import { routes } from './app.routes';
+import { CONFIRMATION_DIALOG } from './core/tokens/confirmation-dialog.token';
+import { PrimeNGConfirmationDialog } from './core/services/primeng-confirmation-dialog.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,6 +27,11 @@ export const appConfig: ApplicationConfig = {
             }
         }
     }),
-    MessageService
+    MessageService,
+    ConfirmationService,
+    {
+      provide: CONFIRMATION_DIALOG,
+      useClass: PrimeNGConfirmationDialog
+    }
   ]
 };
