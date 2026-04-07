@@ -1,11 +1,10 @@
 <div class="daily-close-page">
-  <!-- Header -->
   <header class="page-header">
     <div class="header-content">
       <div class="header-text">
-        <div class="header-badge">Reportes</div>
+        <div class="header-badge">Cierre Diario</div>
         <h1>Cierre Diario</h1>
-        <p>Resumen de operaciones y generación de reportes</p>
+        <p>Panel de control para gestionar y cerrar citas del día</p>
       </div>
     </div>
   </header>
@@ -16,205 +15,321 @@
       <p>Cargando datos...</p>
     </div>
   } @else {
-    <!-- Date Selector Card -->
-    <div class="date-card">
-      <div class="date-content">
-        <div class="date-info">
+    <div class="date-nav-card">
+      <div class="date-nav">
+        <p-button 
+          icon="pi pi-chevron-left"
+          (onClick)="navigateToPreviousDay()"
+          styleClass="nav-btn"
+          [outlined]="true"
+          tooltip="Día anterior">
+        </p-button>
+        
+        <div class="date-display">
           <div class="date-icon">
             <i class="pi pi-calendar"></i>
           </div>
-          <div class="date-text">
+          <div class="date-info">
             <span class="date-label">Fecha seleccionada</span>
             <span class="date-value">{{ formatDate(selectedDate()) }}</span>
           </div>
         </div>
+
+        <p-button 
+          icon="pi pi-chevron-right"
+          (onClick)="navigateToNextDay()"
+          [disabled]="!canNavigateNext()"
+          styleClass="nav-btn"
+          [outlined]="true"
+          tooltip="Día siguiente">
+        </p-button>
+        
         <p-datepicker 
           [(ngModel)]="selectedDate"
           (ngModelChange)="onDateChange()"
           [showIcon]="true"
           dateFormat="dd/mm/yy"
           [maxDate]="maxDateValue"
-          styleClass="date-picker">
+          styleClass="date-picker"
+          [showButtonBar]="true">
         </p-datepicker>
       </div>
     </div>
 
-    <!-- Already Closed Alert -->
     @if (alreadyClosed()) {
       <div class="closed-alert">
         <div class="alert-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-            <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <i class="pi pi-check-circle"></i>
         </div>
         <div class="alert-content">
           <span class="alert-title">Cierre ya generado</span>
-          <span class="alert-desc">El reporte de cierre para este día ya fue generado anteriormente.</span>
+          <span class="alert-desc">El reporte de cierre para este día ya fue generado.</span>
         </div>
       </div>
     }
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card stat-primary">
+    <div class="stats-summary">
+      <div class="stat-item stat-primary">
         <div class="stat-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-            <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
+          <i class="pi pi-dollar"></i>
         </div>
         <div class="stat-content">
-          <span class="stat-value">{{ appointments().length }}</span>
+          <span class="stat-value">${{ dayStats().totalAmount | number:'1.2-2' }}</span>
+          <span class="stat-label">Total Recaudado</span>
+        </div>
+      </div>
+      <div class="stat-item stat-info">
+        <div class="stat-icon">
+          <i class="pi pi-calendar"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ dayStats().totalAppointments }}</span>
           <span class="stat-label">Total Citas</span>
         </div>
-        <div class="stat-decoration"></div>
       </div>
-
-      <div class="stat-card stat-success">
+      <div class="stat-item stat-success">
         <div class="stat-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-            <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <i class="pi pi-check-circle"></i>
         </div>
         <div class="stat-content">
-          <span class="stat-value">{{ completedAppointments().length }}</span>
+          <span class="stat-value">{{ dayStats().completedCount }}</span>
           <span class="stat-label">Completadas</span>
         </div>
-        <div class="stat-decoration"></div>
       </div>
-
-      <div class="stat-card stat-info">
+      <div class="stat-item stat-warning">
         <div class="stat-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <i class="pi pi-clock"></i>
         </div>
         <div class="stat-content">
-          <span class="stat-value">${{ totalAmount() | number:'1.0-0' }}</span>
-          <span class="stat-label">Ingresos</span>
+          <span class="stat-value">{{ dayStats().pendingCount }}</span>
+          <span class="stat-label">Pendientes</span>
         </div>
-        <div class="stat-decoration"></div>
       </div>
     </div>
 
-    @if (appointments().length === 0) {
-      <!-- Empty State -->
-      <div class="empty-state">
-        <div class="empty-illustration">
-          <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-            <circle cx="50" cy="50" r="50" fill="#F5F2ED"/>
-            <rect x="25" y="28" width="50" height="44" rx="4" stroke="#B8D4A3" stroke-width="2.5"/>
-            <path d="M25 40H75" stroke="#B8D4A3" stroke-width="2.5"/>
-            <path d="M35 52H65M35 64H55" stroke="#B8D4A3" stroke-width="2" stroke-linecap="round"/>
-          </svg>
+    <div class="main-content">
+      <div class="left-panel">
+        <div class="panel-header">
+          <h3>Empleados</h3>
+          <div class="search-box">
+            <span class="p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input 
+                type="text" 
+                pInputText 
+                [value]="searchQuery()"
+                (input)="onSearchChange($any($event.target).value)"
+                placeholder="Buscar empleado..." />
+            </span>
+          </div>
         </div>
-        <h3>Sin citas para esta fecha</h3>
-        <p>No hay citas registradas para el {{ formatDate(selectedDate()) }}.</p>
-      </div>
-    } @else {
-      <!-- Appointments List -->
-      <div class="appointments-section">
-        <div class="section-header">
-          <h2>Citas del Día</h2>
-          <span class="count-badge">{{ appointments().length }}</span>
-        </div>
-        
-        <div class="appointments-list">
-          @for (apt of appointments(); track apt.id) {
-            <div class="appointment-item" [class]="'status-' + apt.status">
-              <div class="item-time">{{ apt.appointment_time }}</div>
-              <div class="item-info">
-                <span class="item-client">{{ apt.client_name }}</span>
-                <span class="item-meta">
-                  <i class="pi pi-tag"></i>
-                  {{ $any(apt).service?.name || 'N/A' }}
-                  <span class="separator">•</span>
-                  <i class="pi pi-user"></i>
-                  {{ $any(apt).employee?.full_name || 'N/A' }}
-                </span>
-              </div>
-              <div class="item-status">
-                <span class="status-badge" [class]="apt.status">
-                  {{ getStatusLabel(apt.status) }}
-                </span>
-              </div>
-              <div class="item-amount">
-                @if (apt.amount_collected) {
-                  ${{ apt.amount_collected | number:'1.2-2' }}
-                } @else {
-                  -
-                }
-              </div>
+
+        <div class="employee-list">
+          @if (filteredEmployees().length === 0) {
+            <div class="empty-state">
+              <i class="pi pi-users"></i>
+              <p>No se encontraron empleados</p>
             </div>
+          } @else {
+            @for (employee of filteredEmployees(); track employee.id) {
+              <div 
+                class="employee-card"
+                [class.selected]="selectedEmployee()?.id === employee.id"
+                (click)="selectEmployee(employee)">
+                <div class="employee-header">
+                  <div class="employee-avatar">
+                    {{ getInitials(employee.full_name) }}
+                  </div>
+                  <div class="employee-info">
+                    <span class="employee-name">{{ employee.full_name }}</span>
+                    <span class="employee-meta">
+                      {{ getEmployeeStats(employee.id).completedCount }}/{{ getEmployeeStats(employee.id).totalAppointments }} citas
+                    </span>
+                  </div>
+                </div>
+                <div class="employee-stats">
+                  <div class="stat">
+                    <span class="stat-value">${{ getEmployeeStats(employee.id).totalAmount | number:'1.2-2' }}</span>
+                    <span class="stat-label">Total</span>
+                  </div>
+                  @if (getEmployeeStats(employee.id).pendingCount > 0) {
+                    <div class="pending-badge">
+                      {{ getEmployeeStats(employee.id).pendingCount }} pendientes
+                    </div>
+                  }
+                </div>
+              </div>
+            }
           }
         </div>
       </div>
 
-      <!-- Employee Breakdown -->
-      @if (objectKeys(appointmentsByEmployee()).length > 0) {
-        <div class="breakdown-section">
-          <div class="section-header">
-            <h2>Resumen por Empleado</h2>
+      <div class="right-panel">
+        @if (!selectedEmployee()) {
+          <div class="empty-state large">
+            <i class="pi pi-hand-left"></i>
+            <h3>Selecciona un empleado</h3>
+            <p>Elige un empleado de la lista para ver sus citas del día</p>
           </div>
-          
-          <div class="breakdown-grid">
-            @for (empId of objectKeys(appointmentsByEmployee()); track empId) {
-              <div class="breakdown-card">
-                <div class="breakdown-header">
-                  <div class="employee-avatar">
-                    {{ getEmployeeInitials(empId) }}
-                  </div>
-                  <div class="employee-info">
-                    <span class="employee-name">{{ $any(appointmentsByEmployee()[empId][0]).employee?.full_name }}</span>
-                    <span class="employee-role">Empleado</span>
+        } @else if (appointmentsByEmployee().length === 0) {
+          <div class="empty-state large">
+            <i class="pi pi-calendar-times"></i>
+            <h3>Sin citas programadas</h3>
+            <p>{{ selectedEmployee()?.full_name }} no tiene citas para este día</p>
+          </div>
+        } @else {
+          <div class="appointments-header">
+            <div class="header-info">
+              <div class="employee-avatar large">
+                {{ getInitials(selectedEmployee()!.full_name) }}
+              </div>
+              <div class="header-text">
+                <h3>{{ selectedEmployee()?.full_name }}</h3>
+                <p>{{ appointmentsByEmployee().length }} citas • {{ getEmployeeStats(selectedEmployee()!.id).completedCount }} completadas</p>
+              </div>
+            </div>
+            <div class="header-total">
+              <span class="total-label">Total del empleado</span>
+              <span class="total-value">${{ getEmployeeStats(selectedEmployee()!.id).totalAmount | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="appointments-list">
+            @for (apt of appointmentsByEmployee(); track apt.id) {
+              <div class="appointment-card" [class]="'status-' + apt.status">
+                <div class="apt-time">
+                  {{ apt.appointment_time }}
+                </div>
+                <div class="apt-main">
+                  <div class="apt-client">{{ apt.client_name }}</div>
+                  <div class="apt-service">
+                    <i class="pi pi-tag"></i>
+                    {{ apt.service?.name || 'N/A' }}
                   </div>
                 </div>
-                <div class="breakdown-stats">
-                  <div class="breakdown-stat">
-                    <span class="stat-value">{{ appointmentsByEmployee()[empId].length }}</span>
-                    <span class="stat-label">Citas</span>
-                  </div>
-                  <div class="breakdown-stat highlight">
-                    <span class="stat-value">${{ getEmployeeTotal(appointmentsByEmployee()[empId]) | number:'1.2-2' }}</span>
-                    <span class="stat-label">Total</span>
-                  </div>
+                <div class="apt-status">
+                  <span class="status-badge" [class]="getStatusClass(apt.status)">
+                    {{ getStatusLabel(apt.status) }}
+                  </span>
                 </div>
+                @if (apt.amount_collected) {
+                  <div class="apt-amount">
+                    ${{ apt.amount_collected | number:'1.2-2' }}
+                  </div>
+                }
+                @if (apt.status === 'pending') {
+                  <div class="apt-actions">
+                    <p-button 
+                      icon="pi pi-check"
+                      (onClick)="openCompleteDrawer(apt)"
+                      styleClass="btn-complete"
+                      tooltip="Completar">
+                    </p-button>
+                    <p-button 
+                      icon="pi pi-user-minus"
+                      (onClick)="markAsNoShow(apt)"
+                      styleClass="btn-noshow"
+                      [outlined]="true"
+                      tooltip="No asistió">
+                    </p-button>
+                    <p-button 
+                      icon="pi pi-times"
+                      (onClick)="cancelAppointment(apt)"
+                      styleClass="btn-cancel"
+                      [outlined]="true"
+                      severity="danger"
+                      tooltip="Cancelar">
+                    </p-button>
+                  </div>
+                }
               </div>
             }
           </div>
-        </div>
-      }
+        }
+      </div>
+    </div>
 
-      <!-- Generate PDF Button -->
-      @if (!alreadyClosed() && completedAppointments().length > 0) {
-        <div class="generate-action">
-          <div class="generate-content">
-            <div class="generate-icon">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M14 2V8H20M8 13H16M8 17H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <div class="generate-text">
-              <span class="generate-title">Generar Reporte PDF</span>
-              <span class="generate-desc">Descarga el resumen completo del día {{ formatDateShort(selectedDate()) }}</span>
-            </div>
+    @if (!alreadyClosed() && completedAppointments().length > 0) {
+      <div class="generate-action">
+        <div class="generate-content">
+          <div class="generate-icon">
+            <i class="pi pi-file-pdf"></i>
           </div>
-          <p-button 
-            label="Generar y Descargar"
-            icon="pi pi-file-pdf"
-            size="large"
-            (onClick)="generateClose()"
-            [loading]="generating()"
-            [disabled]="generating()"
-            styleClass="btn-generate">
-          </p-button>
+          <div class="generate-text">
+            <span class="generate-title">Generar Reporte PDF</span>
+            <span class="generate-desc">Descarga el resumen completo del día {{ formatDateShort(selectedDate()) }}</span>
+          </div>
         </div>
-      }
+        <p-button 
+          label="Generar y Descargar"
+          icon="pi pi-download"
+          (onClick)="generateClose()"
+          [loading]="generating()"
+          [disabled]="generating()"
+          styleClass="btn-generate">
+        </p-button>
+      </div>
     }
   }
 </div>
 
+<p-drawer 
+  [(visible)]="amountDrawerVisible"
+  [modal]="true"
+  position="right"
+  styleClass="amount-drawer"
+  [showCloseIcon]="true"
+  header="Completar Cita">
+  
+  @if (selectedAppointment()) {
+    <div class="drawer-content">
+      <div class="appointment-summary">
+        <div class="summary-row">
+          <span class="summary-label">Cliente:</span>
+          <span class="summary-value">{{ selectedAppointment()?.client_name }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Servicio:</span>
+          <span class="summary-value">{{ selectedAppointment()?.service?.name || 'N/A' }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Hora:</span>
+          <span class="summary-value">{{ selectedAppointment()?.appointment_time }}</span>
+        </div>
+      </div>
+
+      <div class="amount-input-section">
+        <label for="amount">Monto cobrado *</label>
+        <p-inputNumber
+          inputId="amount"
+          [(ngModel)]="amountInput"
+          mode="currency"
+          currency="USD"
+          locale="es-MX"
+          [min]="0"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          placeholder="Ingresa el monto">
+        </p-inputNumber>
+      </div>
+
+      <div class="drawer-actions">
+        <p-button 
+          label="Cancelar"
+          (onClick)="closeDrawer()"
+          [outlined]="true"
+          styleClass="btn-cancel-drawer">
+        </p-button>
+        <p-button 
+          label="Confirmar"
+          icon="pi pi-check"
+          (onClick)="confirmCompletion()"
+          styleClass="btn-confirm">
+        </p-button>
+      </div>
+    </div>
+  }
+</p-drawer>
+
+<p-confirmDialog header="Confirmar acción" icon="pi pi-exclamation-triangle"></p-confirmDialog>
 <p-toast></p-toast>
