@@ -1,4 +1,4 @@
-import { IConfirmationDialog, ConfirmationDialogConfig } from '../../../../core/interfaces/confirmation-dialog.interface';
+import { IConfirmationDialog, ConfirmationDialogConfig } from '../../../../../core/interfaces/confirmation-dialog.interface';
 
 export class MockConfirmationDialog implements IConfirmationDialog {
   private _shouldConfirm = true;
