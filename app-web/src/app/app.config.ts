@@ -8,6 +8,7 @@ import Aura from '@primeuix/themes/aura';
 import { routes } from './app.routes';
 import { CONFIRMATION_DIALOG } from './core/tokens/confirmation-dialog.token';
 import { PrimeNGConfirmationDialog } from './core/services/primeng-confirmation-dialog.service';
+import { DailyCloseFacade } from './features/backoffice/manager/daily-close/daily-close.facade';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -29,6 +30,7 @@ export const appConfig: ApplicationConfig = {
     }),
     MessageService,
     ConfirmationService,
+    DailyCloseFacade,
     {
       provide: CONFIRMATION_DIALOG,
       useClass: PrimeNGConfirmationDialog
