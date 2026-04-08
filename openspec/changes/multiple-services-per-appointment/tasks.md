@@ -189,24 +189,24 @@
 
 ## 11. Database Migration Scripts
 
-- [ ] 11.1 Create script `scripts/migrate-appointment-services.ts` for manual migration
-- [ ] 11.2 Add environment variable checks for Supabase URL and service key
-- [ ] 11.3 Implement migration logic: fetch appointments, create appointment_services records
-- [ ] 11.4 Add verification count check in migration script
-- [ ] 11.5 Add rollback script `scripts/rollback-appointment-services.ts`
+- [x] 11.1 Create migration file `scripts/migrate-appointment-services.ts` for manual migration (used SQL migration instead)
+- [x] 11.2 Add environment variable checks for Supabase URL and service key (N/A - SQL migration)
+- [x] 11.3 Implement migration logic: fetch appointments, create appointment_services records (done in SQL)
+- [x] 11.4 Add verification count check in migration script (done in SQL)
+- [x] 11.5 Add rollback script `scripts/rollback-appointment-services.ts` (N/A - SQL migration)
 - [ ] 11.6 Test migration script in development environment
 - [ ] 11.7 Test rollback script in development environment
 - [ ] 11.8 Document migration process in README
 
 ## 12. Documentation
 
-- [ ] 12.1 Update README.md with multiple services feature description
-- [ ] 12.2 Document database schema changes in migration guide
-- [ ] 12.3 Document API changes for `POST /appointments` endpoint
-- [ ] 12.4 Document new `PATCH /appointments/:id/services` endpoint
-- [ ] 12.5 Document helper functions in `appointment.model.ts`
-- [ ] 12.6 Document `AppointmentService` methods for multiple services
-- [ ] 12.7 Add comments to complex logic in services and components
+- [x] 12.1 Update README.md with multiple services feature description
+- [x] 12.2 Document database schema changes in migration guide
+- [x] 12.3 Document API changes for `POST /appointments` endpoint
+- [x] 12.4 Document new `PATCH /appointments/:id/services` endpoint
+- [x] 12.5 Document helper functions in `appointment.model.ts`
+- [x] 12.6 Document `AppointmentService` methods for multiple services
+- [x] 12.7 Add comments to complex logic in services and components
 - [ ] 12.8 Create ADR (Architecture Decision Record) for N:N relationship design
 - [ ] 12.9 Update API documentation with new request/response formats
 - [ ] 12.10 Add examples for common use cases in documentation

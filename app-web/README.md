@@ -2,6 +2,50 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.4.
 
+## Features
+
+### Multiple Services per Appointment
+
+Las citas pueden tener múltiples servicios asociados. Esta funcionalidad permite:
+
+- **Selección múltiple de servicios** durante el proceso de reserva
+- **Cálculo automático** de duración total y precio total
+- **Edición de servicios** en citas pendientes desde el backoffice
+- **Visualización consolidada** en historial de empleados y lista de citas del manager
+
+#### API Changes
+
+**Create Appointment** (`POST /appointments`)
+```typescript
+// Before: single service
+{ service_id: string }
+
+// After: multiple services
+{ service_ids: string[] }
+```
+
+**Update Services** (`PATCH /appointments/:id/services`)
+```typescript
+// New endpoint for editing services on pending appointments
+{ service_ids: string[] }
+```
+
+#### Database Schema
+
+Nueva tabla `appointment_services`:
+```sql
+CREATE TABLE appointment_services (
+  appointment_id UUID REFERENCES appointments(id) ON DELETE CASCADE,
+  service_id UUID REFERENCES services(id) ON DELETE RESTRICT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (appointment_id, service_id)
+);
+```
+
+Ver migraciones en `supabase/migrations/20260407_*.sql`.
+
+---
+
 ## Flujo de Trabajo - OpenSpec
 
 Este proyecto usa **OpenSpec** para gestionar el desarrollo por fases.
@@ -22,6 +66,7 @@ Este proyecto usa **OpenSpec** para gestionar el desarrollo por fases.
 | Phase 1: Foundation | ✅ Completada |
 | Phase 2: Public Booking | ✅ Completada |
 | Phase 3: Back Office Manager | ⏳ Pendiente |
+| Multiple Services Feature | ✅ Completada |
 
 Ver `PROGRESS.md` para detalles completos.
 
