@@ -65,19 +65,22 @@
     <!-- Services Selection -->
     <section class="services-section">
       <div class="section-header">
-        <h2>Paso 1: Selecciona un servicio</h2>
+        <h2>Paso 1: Selecciona uno o más servicios</h2>
       </div>
       
       <div class="services-grid">
         @for (service of services(); track service.id) {
-          <button 
+          <div 
             class="service-card"
-            [class.selected]="selectedService()?.id === service.id"
-            (click)="onServiceChange(service)">
-            <div class="service-content">
-              <div class="service-icon">
-                <i class="pi pi-tag"></i>
-              </div>
+            [class.selected]="isServiceSelected(service.id)">
+            <label class="service-content">
+              <p-checkbox
+                [value]="service.id"
+                [(ngModel)]="selectedServiceIds"
+                [inputId]="'service-' + service.id"
+                (onChange)="onServiceToggle(service.id)"
+                binary="false">
+              </p-checkbox>
               <div class="service-info">
                 <span class="service-name">{{ service.name }}</span>
                 <span class="service-duration">
@@ -90,13 +93,8 @@
                   ${{ service.price | number:'1.2-2' }}
                 </div>
               }
-            </div>
-            @if (selectedService()?.id === service.id) {
-              <div class="selected-check">
-                <i class="pi pi-check"></i>
-              </div>
-            }
-          </button>
+            </label>
+          </div>
         }
       </div>
       
@@ -105,10 +103,39 @@
           <p>No hay servicios disponibles</p>
         </div>
       }
+
+      <!-- Services Summary -->
+      @if (selectedServices().length > 0) {
+        <div class="services-summary">
+          <h3>Servicios seleccionados</h3>
+          <div class="summary-list">
+            @for (service of selectedServices(); track service.id) {
+              <div class="summary-item">
+                <i class="pi pi-tag"></i>
+                <span>{{ service.name }}</span>
+                <span class="summary-duration">{{ service.duration_minutes }} min</span>
+                @if (service.price) {
+                  <span class="summary-price">${{ service.price | number:'1.2-2' }}</span>
+                }
+              </div>
+            }
+          </div>
+          <div class="summary-totals">
+            <div class="total-item">
+              <i class="pi pi-clock"></i>
+              <span>Duración total: <strong>{{ totalDuration() }} min</strong></span>
+            </div>
+            <div class="total-item">
+              <i class="pi pi-dollar"></i>
+              <span>Precio total: <strong>${{ totalPrice() | number:'1.2-2' }}</strong></span>
+            </div>
+          </div>
+        </div>
+      }
     </section>
 
     <!-- Date Selection -->
-    @if (selectedService()) {
+    @if (selectedServices().length > 0) {
       <section class="date-section">
         <div class="section-header">
           <h2>Paso 2: Selecciona fecha y hora</h2>
@@ -123,7 +150,7 @@
     }
 
     <!-- Time Slots -->
-    @if (selectedDate() && selectedService()) {
+    @if (selectedDate() && selectedServices().length > 0) {
       <section class="slots-section">
         <div class="slots-header">
           <div class="selected-datetime">
@@ -156,21 +183,36 @@
     }
 
     <!-- Continue Button -->
-    @if (selectedDate() && selectedTime() && selectedService()) {
+    @if (selectedDate() && selectedTime() && selectedServices().length > 0) {
       <section class="action-section">
         <div class="booking-summary">
-          <div class="summary-item">
-            <i class="pi pi-tag"></i>
-            <span>{{ selectedService()?.name }}</span>
+          <div class="summary-title">
+            <i class="pi pi-list"></i>
+            <span>Servicios ({{ selectedServices().length }})</span>
           </div>
-          <div class="summary-item">
-            <i class="pi pi-calendar"></i>
-            <span>{{ formatDate(selectedDate()) }}</span>
+          <div class="summary-services">
+            {{ selectedServicesText() }}
           </div>
-          <div class="summary-item highlight">
-            <i class="pi pi-clock"></i>
-            <span>{{ selectedTime() }}</span>
+          <div class="summary-details">
+            <div class="summary-item">
+              <i class="pi pi-calendar"></i>
+              <span>{{ formatDate(selectedDate()) }}</span>
+            </div>
+            <div class="summary-item highlight">
+              <i class="pi pi-clock"></i>
+              <span>{{ selectedTime() }}</span>
+            </div>
+            <div class="summary-item">
+              <i class="pi pi-hourglass"></i>
+              <span>{{ totalDuration() }} min</span>
+            </div>
           </div>
+          @if (totalPrice() > 0) {
+            <div class="summary-price-total">
+              <i class="pi pi-dollar"></i>
+              <span>Total: ${{ totalPrice() | number:'1.2-2' }}</span>
+            </div>
+          }
         </div>
         
         <button class="continue-btn" (click)="proceedToBooking()">

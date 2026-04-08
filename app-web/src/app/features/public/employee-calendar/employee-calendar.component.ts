@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FullCalendarModule } from '@fullcalendar/angular';
@@ -9,6 +9,8 @@ import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
+import { CheckboxModule } from 'primeng/checkbox';
+import { FormsModule } from '@angular/forms';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
@@ -16,6 +18,7 @@ import { AppointmentService } from '../../../core/services/appointment.service';
 import { Company } from '../../../core/models/company.model';
 import { User } from '../../../core/models/user.model';
 import { Service } from '../../../core/models/service.model';
+import { calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../core/models/appointment.model';
 
 @Component({
   selector: 'app-employee-calendar',
@@ -25,7 +28,9 @@ import { Service } from '../../../core/models/service.model';
     FullCalendarModule,
     RouterLink,
     ButtonModule,
-    AvatarModule
+    AvatarModule,
+    CheckboxModule,
+    FormsModule
   ],
   templateUrl: './employee-calendar.component.html',
   styleUrl: './employee-calendar.component.scss'
@@ -43,10 +48,23 @@ export class EmployeeCalendarComponent implements OnInit {
   services = signal<Service[]>([]);
   selectedDate = signal('');
   availableSlots = signal<string[]>([]);
-  selectedService = signal<Service | null>(null);
+  selectedServiceIds = signal<string[]>([]); // Changed from single service to multiple
   selectedTime = signal('');
   loading = signal(true);
   error = signal('');
+
+  // Computed signals for totals
+  selectedServices = computed(() => {
+    const allServices = this.services();
+    const selectedIds = this.selectedServiceIds();
+    return allServices.filter(s => selectedIds.includes(s.id));
+  });
+
+  totalDuration = computed(() => calculateTotalDuration(this.selectedServices()));
+
+  totalPrice = computed(() => calculateTotalPrice(this.selectedServices()));
+
+  selectedServicesText = computed(() => formatServicesList(this.selectedServices()));
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -126,28 +144,45 @@ export class EmployeeCalendarComponent implements OnInit {
   }
 
   async loadAvailableSlots() {
-    const service = this.selectedService();
+    const duration = this.totalDuration();
     const date = this.selectedDate();
     const emp = this.employee();
     const comp = this.company();
 
-    if (!date || !service || !emp || !comp) return;
+    if (!date || duration === 0 || !emp || !comp) return;
 
     const slots = await this.appointmentService.getAvailableSlots(
       comp.id,
       emp.id,
       date,
-      service.duration_minutes
+      duration
     );
     this.availableSlots.set(slots);
   }
 
-  async onServiceChange(service: Service) {
-    this.selectedService.set(service);
-    this.selectedTime.set('');
-    if (this.selectedDate()) {
-      await this.loadAvailableSlots();
+  onServiceToggle(serviceId: string) {
+    const currentIds = this.selectedServiceIds();
+    const isSelected = currentIds.includes(serviceId);
+    
+    if (isSelected) {
+      // Remove from selection
+      this.selectedServiceIds.set(currentIds.filter(id => id !== serviceId));
+    } else {
+      // Add to selection
+      this.selectedServiceIds.set([...currentIds, serviceId]);
     }
+    
+    // Clear selected time when services change
+    this.selectedTime.set('');
+    
+    // Reload available slots if date is selected
+    if (this.selectedDate() && this.selectedServiceIds().length > 0) {
+      this.loadAvailableSlots();
+    }
+  }
+
+  isServiceSelected(serviceId: string): boolean {
+    return this.selectedServiceIds().includes(serviceId);
   }
 
   selectTime(time: string) {
@@ -157,11 +192,11 @@ export class EmployeeCalendarComponent implements OnInit {
   proceedToBooking() {
     const comp = this.company();
     const emp = this.employee();
-    const service = this.selectedService();
     const date = this.selectedDate();
     const time = this.selectedTime();
+    const serviceIds = this.selectedServiceIds();
 
-    if (!comp || !emp || !service || !date || !time) {
+    if (!comp || !emp || serviceIds.length === 0 || !date || !time) {
       return;
     }
 
@@ -169,7 +204,7 @@ export class EmployeeCalendarComponent implements OnInit {
       queryParams: {
         date: date,
         time: time,
-        serviceId: service.id
+        serviceIds: serviceIds.join(',') // Pass as comma-separated string
       }
     });
   }

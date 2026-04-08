@@ -69,19 +69,19 @@
 
 ## 5. UI Booking - EmployeeCalendarComponent
 
-- [ ] 5.1 Import `CheckboxModule` from PrimeNG in `employee-calendar.component.ts`
-- [ ] 5.2 Import `FormsModule` for ngModel in `employee-calendar.component.ts`
-- [ ] 5.3 Change service selection from dropdown to checkboxes in template
-- [ ] 5.4 Add `selectedServiceIds = signal<string[]>([])` to hold selected services
-- [ ] 5.5 Add `services = signal<Service[]>([])` to hold available services
-- [ ] 5.6 Create `totalDuration = computed()` to calculate total duration from selected services
-- [ ] 5.7 Create `totalPrice = computed()` to calculate total price from selected services
-- [ ] 5.8 Create `selectedServicesText = computed()` to format services as comma-separated text
-- [ ] 5.9 Add validation to check `selectedServiceIds().length > 0` before navigation
-- [ ] 5.10 Update `navigateToBooking()` to pass `serviceIds` as comma-separated query param
-- [ ] 5.11 Add summary section showing selected services, total duration, and total price
-- [ ] 5.12 Add subscription to load services from employee on init
-- [ ] 5.13 Update availability check to use `totalDuration()` instead of single service duration
+- [x] 5.1 Import `CheckboxModule` from PrimeNG in `employee-calendar.component.ts`
+- [x] 5.2 Import `FormsModule` for ngModel in `employee-calendar.component.ts`
+- [x] 5.3 Change service selection from dropdown to checkboxes in template
+- [x] 5.4 Add `selectedServiceIds = signal<string[]>([])` to hold selected services
+- [x] 5.5 Add `services = signal<Service[]>([])` to hold available services
+- [x] 5.6 Create `totalDuration = computed()` to calculate total duration from selected services
+- [x] 5.7 Create `totalPrice = computed()` to calculate total price from selected services
+- [x] 5.8 Create `selectedServicesText = computed()` to format services as comma-separated text
+- [x] 5.9 Add validation to check `selectedServiceIds().length > 0` before navigation
+- [x] 5.10 Update `proceedToBooking()` to pass `serviceIds` as comma-separated query param
+- [x] 5.11 Add summary section showing selected services, total duration, and total price
+- [x] 5.12 Add subscription to load services from employee on init
+- [x] 5.13 Update availability check to use `totalDuration()` instead of single service duration
 - [ ] 5.14 Write component tests for service selection
 - [ ] 5.15 Write component tests for duration/price calculations
 - [ ] 5.16 Write component tests for navigation with service IDs
