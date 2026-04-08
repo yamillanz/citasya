@@ -25,13 +25,6 @@ describe('BookingFormComponent', () => {
     full_name: 'Juan Pérez'
   };
 
-  const mockService = {
-    id: 'service-1',
-    name: 'Corte de cabello',
-    duration_minutes: 30,
-    price: 25
-  };
-
   const mockServices = [
     {
       id: 'service-1',
@@ -61,7 +54,7 @@ describe('BookingFormComponent', () => {
     } as any;
 
     serviceServiceMock = {
-      getById: jest.fn().mockResolvedValue(mockService),
+      getById: jest.fn().mockResolvedValue(mockServices[0]),
       getByEmployee: jest.fn().mockResolvedValue(mockServices)
     } as any;
 
@@ -108,7 +101,7 @@ describe('BookingFormComponent', () => {
       routeMock = TestBed.inject(ActivatedRoute);
       routeMock.snapshot.queryParamMap.get.mockImplementation((key: string) => {
         if (key === 'date') return '2026-03-20';
-        if (key === 'serviceId') return 'service-1';
+        if (key === 'serviceIds') return 'service-1';
         if (key === 'time') return '10:00';
         return null;
       });
@@ -122,15 +115,7 @@ describe('BookingFormComponent', () => {
       expect(component.currentStep()).toBe(0);
     });
 
-    it('debe inicializar currentStep en 1 con query params', async () => {
-      const routeMock = TestBed.inject(ActivatedRoute);
-      routeMock.snapshot.queryParamMap.get.mockImplementation((key: string) => {
-        if (key === 'date') return '2026-03-20';
-        if (key === 'serviceId') return 'service-1';
-        if (key === 'time') return '10:00';
-        return null;
-      });
-      
+    it('debe inicializar currentStep en 1 con query params de serviceIds', async () => {
       await component.ngOnInit();
       expect(component.currentStep()).toBe(1);
     });
@@ -142,19 +127,54 @@ describe('BookingFormComponent', () => {
       expect(component.submitError()).toBe('');
     });
 
-    it('debe cargar datos iniciales desde los servicios', async () => {
-      const routeMock = TestBed.inject(ActivatedRoute);
-      routeMock.snapshot.queryParamMap.get.mockImplementation((key: string) => {
-        if (key === 'date') return '2026-03-20';
-        if (key === 'serviceId') return 'service-1';
-        if (key === 'time') return '10:00';
-        return null;
-      });
-      
+    it('debe cargar datos iniciales desde los servicios con serviceIds', async () => {
       await component.ngOnInit();
       expect(component.company()).toEqual(mockCompany);
       expect(component.employee()).toEqual(mockEmployee);
-      expect(component.service()).toEqual(mockService);
+      expect(component.selectedServices()).toEqual([mockServices[0]]);
+    });
+
+    it('debe cargar múltiples servicios desde query params', async () => {
+      routeMock.snapshot.queryParamMap.get.mockImplementation((key: string) => {
+        if (key === 'date') return '2026-03-20';
+        if (key === 'serviceIds') return 'service-1,service-2';
+        if (key === 'time') return '10:00';
+        return null;
+      });
+
+      await component.ngOnInit();
+      expect(component.selectedServices()).toEqual(mockServices);
+    });
+
+    it('debe entrar en modo abierto si no hay query params', async () => {
+      routeMock.snapshot.queryParamMap.get.mockReturnValue(null);
+
+      await component.ngOnInit();
+      expect(component.isOpenMode()).toBe(true);
+    });
+
+    it('debe calcular totalDuration correctamente', async () => {
+      routeMock.snapshot.queryParamMap.get.mockImplementation((key: string) => {
+        if (key === 'date') return '2026-03-20';
+        if (key === 'serviceIds') return 'service-1,service-2';
+        if (key === 'time') return '10:00';
+        return null;
+      });
+
+      await component.ngOnInit();
+      expect(component.totalDuration()).toBe(90);
+    });
+
+    it('debe calcular totalPrice correctamente', async () => {
+      routeMock.snapshot.queryParamMap.get.mockImplementation((key: string) => {
+        if (key === 'date') return '2026-03-20';
+        if (key === 'serviceIds') return 'service-1,service-2';
+        if (key === 'time') return '10:00';
+        return null;
+      });
+
+      await component.ngOnInit();
+      expect(component.totalPrice()).toBe(75);
     });
   });
 
@@ -264,14 +284,14 @@ describe('BookingFormComponent', () => {
       routeMock = TestBed.inject(ActivatedRoute);
       routeMock.snapshot.queryParamMap.get.mockImplementation((key: string) => {
         if (key === 'date') return '2026-03-20';
-        if (key === 'serviceId') return 'service-1';
+        if (key === 'serviceIds') return 'service-1';
         if (key === 'time') return '10:00';
         return null;
       });
       await component.ngOnInit();
     });
 
-    it('debe iniciar en paso 1', () => {
+    it('debe iniciar en paso 1 con query params', () => {
       expect(component.currentStep()).toBe(1);
     });
 
@@ -331,11 +351,11 @@ describe('BookingFormComponent', () => {
       routeMock = TestBed.inject(ActivatedRoute);
       routeMock.snapshot.queryParamMap.get.mockImplementation((key: string) => {
         if (key === 'date') return '2026-03-20';
-        if (key === 'serviceId') return 'service-1';
+        if (key === 'serviceIds') return 'service-1';
         if (key === 'time') return '10:00';
         return null;
       });
-      
+
       await component.ngOnInit();
     });
 
@@ -352,7 +372,7 @@ describe('BookingFormComponent', () => {
       expect(component.bookingForm.get('client_phone')?.touched).toBe(true);
     });
 
-    it('debe llamar appointmentService.create con datos correctos', async () => {
+    it('debe llamar appointmentService.create con service_ids array', async () => {
       component.bookingForm.patchValue({
         client_name: 'Juan Pérez',
         client_phone: '555-123-4567',
@@ -362,17 +382,42 @@ describe('BookingFormComponent', () => {
 
       await component.onSubmit();
 
-      expect(appointmentServiceMock.create).toHaveBeenCalledWith({
-        company_id: 'company-1',
-        employee_id: 'employee-1',
-        service_id: 'service-1',
-        client_name: 'Juan Pérez',
-        client_phone: '5551234567',
-        client_email: 'juan@example.com',
-        appointment_date: '2026-03-20',
-        appointment_time: '10:00',
-        notes: 'Nota de prueba'
+      expect(appointmentServiceMock.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          company_id: 'company-1',
+          employee_id: 'employee-1',
+          service_ids: ['service-1'],
+          client_name: 'Juan Pérez',
+          client_phone: '5551234567',
+          client_email: 'juan@example.com',
+          appointment_date: '2026-03-20',
+          appointment_time: '10:00',
+          notes: 'Nota de prueba'
+        })
+      );
+    });
+
+    it('debe llamar create con múltiples service_ids', async () => {
+      routeMock.snapshot.queryParamMap.get.mockImplementation((key: string) => {
+        if (key === 'date') return '2026-03-20';
+        if (key === 'serviceIds') return 'service-1,service-2';
+        if (key === 'time') return '10:00';
+        return null;
       });
+      await component.ngOnInit();
+
+      component.bookingForm.patchValue({
+        client_name: 'Juan Pérez',
+        client_phone: '555-123-4567'
+      });
+
+      await component.onSubmit();
+
+      expect(appointmentServiceMock.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          service_ids: ['service-1', 'service-2']
+        })
+      );
     });
 
     it('debe establecer success en true después de envío exitoso', async () => {
@@ -392,7 +437,7 @@ describe('BookingFormComponent', () => {
       appointmentServiceMock.create.mockImplementation(() => new Promise(resolve => {
         resolvePromise = resolve;
       }));
-      
+
       component.bookingForm.patchValue({
         client_name: 'Juan',
         client_phone: '555-123-4567'
@@ -400,16 +445,16 @@ describe('BookingFormComponent', () => {
 
       const promise = component.onSubmit();
       expect(component.loading()).toBe(true);
-      
+
       resolvePromise!();
       await promise;
-      
+
       expect(component.loading()).toBe(false);
     });
 
     it('debe manejar errores del servidor', async () => {
       appointmentServiceMock.create.mockRejectedValue(new Error('Error del servidor'));
-      
+
       component.bookingForm.patchValue({
         client_name: 'Juan',
         client_phone: '555-123-4567'
@@ -424,7 +469,7 @@ describe('BookingFormComponent', () => {
 
     it('debe limpiar submitError antes del envío', async () => {
       component.submitError.set('Error previo');
-      
+
       component.bookingForm.patchValue({
         client_name: 'Juan',
         client_phone: '555-123-4567'
@@ -461,7 +506,7 @@ describe('BookingFormComponent', () => {
       routeMock = TestBed.inject(ActivatedRoute);
       routeMock.snapshot.queryParamMap.get.mockReturnValue(null);
       serviceServiceMock.getByEmployee = jest.fn().mockResolvedValue(mockServices);
-      
+
       await component.ngOnInit();
     });
 
@@ -489,7 +534,7 @@ describe('BookingFormComponent', () => {
         appointment_date: '2026-04-10',
         appointment_time: '10:00'
       });
-      
+
       expect(component.selectionForm.get('service_id')?.valid).toBe(false);
       expect(component.selectionForm.get('service_id')?.hasError('required')).toBe(true);
     });
@@ -500,7 +545,7 @@ describe('BookingFormComponent', () => {
         appointment_date: '',
         appointment_time: '10:00'
       });
-      
+
       expect(component.selectionForm.get('appointment_date')?.valid).toBe(false);
       expect(component.selectionForm.get('appointment_date')?.hasError('required')).toBe(true);
     });
@@ -511,26 +556,26 @@ describe('BookingFormComponent', () => {
         appointment_date: '2026-04-10',
         appointment_time: ''
       });
-      
+
       expect(component.selectionForm.get('appointment_time')?.valid).toBe(false);
       expect(component.selectionForm.get('appointment_time')?.hasError('required')).toBe(true);
     });
   });
 
   describe('onServiceChange (modo abierto)', () => {
-    it('debe establecer el servicio seleccionado', async () => {
+    it('debe establecer el servicio seleccionado en selectedServices array', async () => {
       const routeMock = TestBed.inject(ActivatedRoute);
       routeMock.snapshot.queryParamMap.get.mockReturnValue(null);
       await component.ngOnInit();
-      
+
       const services = component.services();
       const event = {
         target: { value: services[0].id } as HTMLSelectElement
       } as any;
-      
+
       component.onServiceChange(event);
-      
-      expect(component.service()).toEqual(services[0]);
+
+      expect(component.selectedServices()).toEqual([services[0]]);
     });
   });
 
@@ -539,9 +584,9 @@ describe('BookingFormComponent', () => {
       const event = {
         target: { value: '2026-04-10' } as HTMLInputElement
       } as any;
-      
+
       component.onDateSelect(event);
-      
+
       expect(component.selectedDate).toBe('2026-04-10');
     });
 
@@ -549,9 +594,9 @@ describe('BookingFormComponent', () => {
       const event = {
         target: { value: '2026-04-10' } as HTMLInputElement
       } as any;
-      
+
       component.onDateSelect(event);
-      
+
       expect(component.selectionForm.get('appointment_date')?.value).toBe('2026-04-10');
     });
 
@@ -560,9 +605,9 @@ describe('BookingFormComponent', () => {
       const event = {
         target: { value: '' } as HTMLInputElement
       } as any;
-      
+
       component.onDateSelect(event);
-      
+
       expect(component.selectedDate).toBe('2026-04-10');
     });
   });
@@ -572,9 +617,9 @@ describe('BookingFormComponent', () => {
       const event = {
         target: { value: '10:30' } as HTMLInputElement
       } as any;
-      
+
       component.onTimeSelect(event);
-      
+
       expect(component.selectedTime).toBe('10:30');
     });
 
@@ -582,9 +627,9 @@ describe('BookingFormComponent', () => {
       const event = {
         target: { value: '10:30' } as HTMLInputElement
       } as any;
-      
+
       component.onTimeSelect(event);
-      
+
       expect(component.selectionForm.get('appointment_time')?.value).toBe('10:30');
     });
 
@@ -593,9 +638,9 @@ describe('BookingFormComponent', () => {
       const event = {
         target: { value: '' } as HTMLInputElement
       } as any;
-      
+
       component.onTimeSelect(event);
-      
+
       expect(component.selectedTime).toBe('10:30');
     });
   });
@@ -607,7 +652,7 @@ describe('BookingFormComponent', () => {
         appointment_date: '',
         appointment_time: ''
       });
-      
+
       expect(component.canProceedFromStep0()).toBe(false);
     });
 
@@ -617,7 +662,7 @@ describe('BookingFormComponent', () => {
         appointment_date: '',
         appointment_time: '10:00'
       });
-      
+
       expect(component.canProceedFromStep0()).toBe(false);
     });
 
@@ -627,7 +672,7 @@ describe('BookingFormComponent', () => {
         appointment_date: '2026-04-10',
         appointment_time: ''
       });
-      
+
       expect(component.canProceedFromStep0()).toBe(false);
     });
 
@@ -639,7 +684,7 @@ describe('BookingFormComponent', () => {
       });
       component.selectedDate = '2026-04-10';
       component.selectedTime = '10:00';
-      
+
       expect(component.canProceedFromStep0()).toBe(true);
     });
   });
@@ -651,9 +696,9 @@ describe('BookingFormComponent', () => {
         appointment_date: '',
         appointment_time: ''
       });
-      
+
       component.proceedFromStep0();
-      
+
       expect(component.currentStep()).toBe(0);
     });
 
@@ -663,9 +708,9 @@ describe('BookingFormComponent', () => {
         appointment_date: '',
         appointment_time: ''
       });
-      
+
       component.proceedFromStep0();
-      
+
       expect(component.selectionForm.get('service_id')?.touched).toBe(true);
       expect(component.selectionForm.get('appointment_date')?.touched).toBe(true);
       expect(component.selectionForm.get('appointment_time')?.touched).toBe(true);
@@ -675,7 +720,7 @@ describe('BookingFormComponent', () => {
       const routeMock = TestBed.inject(ActivatedRoute);
       routeMock.snapshot.queryParamMap.get.mockReturnValue(null);
       await component.ngOnInit();
-      
+
       const services = component.services();
       component.selectionForm.patchValue({
         service_id: services[0].id,
@@ -684,9 +729,9 @@ describe('BookingFormComponent', () => {
       });
       component.selectedDate = '2026-04-10';
       component.selectedTime = '10:00';
-      
+
       component.proceedFromStep0();
-      
+
       expect(component.currentStep()).toBe(1);
     });
   });
@@ -696,20 +741,20 @@ describe('BookingFormComponent', () => {
       const routeMock = TestBed.inject(ActivatedRoute);
       routeMock.snapshot.queryParamMap.get.mockReturnValue(null);
       await component.ngOnInit();
-      
+
       component.currentStep.set(1);
       expect(component.isOpenMode()).toBe(true);
-      
+
       component.prevStep();
-      
+
       expect(component.currentStep()).toBe(0);
     });
 
     it('debe retroceder del paso 2 al paso 1 en modo abierto', () => {
       component.currentStep.set(2);
-      
+
       component.prevStep();
-      
+
       expect(component.currentStep()).toBe(1);
     });
   });
@@ -717,25 +762,25 @@ describe('BookingFormComponent', () => {
   describe('loadServices (modo abierto)', () => {
     it('debe cargar servicios del empleado', async () => {
       serviceServiceMock.getByEmployee = jest.fn().mockResolvedValue(mockServices);
-      
+
       await component.loadServices('employee-1');
-      
+
       expect(serviceServiceMock.getByEmployee).toHaveBeenCalledWith('employee-1');
     });
 
     it('debe establecer error si falla la carga de servicios', async () => {
       serviceServiceMock.getByEmployee = jest.fn().mockRejectedValue(new Error('Network error'));
-      
+
       await component.loadServices('employee-1');
-      
+
       expect(component.error()).toBe('Error al cargar los servicios');
     });
 
     it('debe manejar lista vacía de servicios', async () => {
       serviceServiceMock.getByEmployee = jest.fn().mockResolvedValue([]);
-      
+
       await component.loadServices('employee-1');
-      
+
       expect(component.services()).toEqual([]);
     });
   });

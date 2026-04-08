@@ -1,6 +1,13 @@
 import { signal, computed } from '@angular/core';
 
-interface AppointmentWithService {
+interface AppointmentService {
+  id: string;
+  name: string;
+  duration_minutes: number;
+  price: number;
+}
+
+interface AppointmentWithServices {
   id: string;
   company_id: string;
   employee_id: string;
@@ -16,11 +23,11 @@ interface AppointmentWithService {
   cancellation_token?: string;
   created_at: string;
   updated_at: string;
-  service?: { name: string };
+  services?: AppointmentService[];
 }
 
 describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
-  const mockAppointments: AppointmentWithService[] = [
+  const mockAppointments: AppointmentWithServices[] = [
     {
       id: 'apt-1',
       company_id: 'company-1',
@@ -32,9 +39,12 @@ describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
       appointment_date: '2026-04-01',
       appointment_time: '10:00',
       status: 'completed',
-      amount_collected: 150,
+      amount_collected: 200,
       notes: 'Cliente frecuente',
-      service: { name: 'Corte de cabello' },
+      services: [
+        { id: 'srv-1', name: 'Corte de cabello', duration_minutes: 30, price: 50 },
+        { id: 'srv-2', name: 'Peinado', duration_minutes: 20, price: 30 }
+      ],
       created_at: '2026-04-01T10:00:00Z',
       updated_at: '2026-04-01T10:30:00Z'
     },
@@ -50,7 +60,10 @@ describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
       status: 'completed',
       amount_collected: 200,
       notes: 'Primera visita',
-      service: { name: 'Tinte de cabello' },
+      services: [
+        { id: 'srv-3', name: 'Tinte de cabello', duration_minutes: 60, price: 80 },
+        { id: 'srv-4', name: 'Tratamiento capilar', duration_minutes: 30, price: 40 }
+      ],
       created_at: '2026-04-01T11:30:00Z',
       updated_at: '2026-04-01T12:00:00Z'
     },
@@ -64,7 +77,9 @@ describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
       appointment_date: '2026-04-02',
       appointment_time: '09:00',
       status: 'cancelled',
-      service: { name: 'Barba' },
+      services: [
+        { id: 'srv-5', name: 'Barba', duration_minutes: 15, price: 20 }
+      ],
       created_at: '2026-04-02T09:00:00Z',
       updated_at: '2026-04-02T09:30:00Z'
     },
@@ -78,14 +93,16 @@ describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
       appointment_date: '2026-04-02',
       appointment_time: '14:00',
       status: 'pending',
-      service: { name: 'Corte de cabello' },
+      services: [
+        { id: 'srv-1', name: 'Corte de cabello', duration_minutes: 30, price: 50 }
+      ],
       created_at: '2026-04-02T14:00:00Z',
       updated_at: '2026-04-02T14:30:00Z'
     }
   ];
 
   const createMockEmployeeHistoryComponent = () => {
-    const allAppointments = signal<AppointmentWithService[]>([]);
+    const allAppointments = signal<AppointmentWithServices[]>([]);
     const loading = signal(true);
     const error = signal('');
 
@@ -103,7 +120,7 @@ describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
     const pageSize = signal(10);
 
     // Dialog
-    const selectedAppointment = signal<AppointmentWithService | null>(null);
+    const selectedAppointment = signal<AppointmentWithServices | null>(null);
     const dialogVisible = signal(false);
     const selectedIndex = signal(0);
 
@@ -130,7 +147,7 @@ describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
       if (query) {
         result = result.filter(apt => 
           apt.client_name.toLowerCase().includes(query) ||
-          apt.service?.name?.toLowerCase().includes(query) ||
+          apt.services?.some(s => s.name.toLowerCase().includes(query)) ||
           apt.client_phone.includes(query) ||
           apt.notes?.toLowerCase().includes(query) ||
           apt.client_email?.toLowerCase().includes(query)
@@ -198,6 +215,21 @@ describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
       return `${hours}:${minutes}`;
     };
 
+    const getServicesNames = (apt: AppointmentWithServices | null): string => {
+      if (!apt?.services || apt.services.length === 0) return 'N/A';
+      return apt.services.map(s => s.name).join(', ');
+    };
+
+    const getTotalDuration = (apt: AppointmentWithServices | null): number => {
+      if (!apt?.services) return 0;
+      return apt.services.reduce((sum, s) => sum + s.duration_minutes, 0);
+    };
+
+    const getTotalPrice = (apt: AppointmentWithServices | null): number => {
+      if (!apt?.services) return 0;
+      return apt.services.reduce((sum, s) => sum + s.price, 0);
+    };
+
     return {
       allAppointments,
       loading,
@@ -228,7 +260,10 @@ describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
       getStatusLabel,
       getStatusSeverity,
       formatDate,
-      formatTime
+      formatTime,
+      getServicesNames,
+      getTotalDuration,
+      getTotalPrice
     };
   };
 
@@ -259,11 +294,15 @@ describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
       expect(dates).toContain('2026-04-02');
     });
 
-    it('should store service names correctly', () => {
-      const services = component.allAppointments().map(apt => apt.service?.name);
-      expect(services).toContain('Corte de cabello');
-      expect(services).toContain('Tinte de cabello');
-      expect(services).toContain('Barba');
+    it('should store service names correctly from services arrays', () => {
+      const serviceNames = component.allAppointments().flatMap(apt => 
+        apt.services?.map(s => s.name) || []
+      );
+      expect(serviceNames).toContain('Corte de cabello');
+      expect(serviceNames).toContain('Peinado');
+      expect(serviceNames).toContain('Tinte de cabello');
+      expect(serviceNames).toContain('Tratamiento capilar');
+      expect(serviceNames).toContain('Barba');
     });
 
     it('should track loading state correctly', () => {
@@ -287,12 +326,12 @@ describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
       expect(filtered[0].client_name).toBe('Juan Cliente');
     });
 
-    it('should filter by service name', () => {
-      component.searchQuery.set('Tinte');
+    it('should filter by service name in services array', () => {
+      component.searchQuery.set('Peinado');
       
       const filtered = component.filteredAppointments();
       expect(filtered.length).toBe(1);
-      expect(filtered[0].service?.name).toBe('Tinte de cabello');
+      expect(filtered[0].client_name).toBe('Juan Cliente');
     });
 
     it('should filter by phone number', () => {
@@ -578,6 +617,52 @@ describe('EmployeeHistoryComponent - Behavior Driven Tests', () => {
     it('should have aria-label for view details button', () => {
       const ariaLabel = 'Ver detalles';
       expect(ariaLabel).toBeTruthy();
+    });
+  });
+
+  describe('multi-service display', () => {
+    let component: ReturnType<typeof createMockEmployeeHistoryComponent>;
+
+    beforeEach(() => {
+      component = createMockEmployeeHistoryComponent();
+      component.allAppointments.set(mockAppointments);
+      component.loading.set(false);
+    });
+
+    it('should display comma-separated service names for multi-service appointment', () => {
+      const apt = mockAppointments.find(a => a.id === 'apt-1')!; // Corte + Peinado
+      const names = component.getServicesNames(apt);
+      expect(names).toBe('Corte de cabello, Peinado');
+    });
+
+    it('should display single service name correctly', () => {
+      const apt = mockAppointments.find(a => a.id === 'apt-3')!; // Barba only
+      const names = component.getServicesNames(apt);
+      expect(names).toBe('Barba');
+    });
+
+    it('should calculate total duration for multi-service appointment', () => {
+      const apt = mockAppointments.find(a => a.id === 'apt-1')!; // 30 + 20 = 50
+      expect(component.getTotalDuration(apt)).toBe(50);
+    });
+
+    it('should calculate total price for multi-service appointment', () => {
+      const apt = mockAppointments.find(a => a.id === 'apt-1')!; // 50 + 30 = 80
+      expect(component.getTotalPrice(apt)).toBe(80);
+    });
+
+    it('should handle appointment without services', () => {
+      const names = component.getServicesNames(null);
+      expect(names).toBe('N/A');
+      expect(component.getTotalDuration(null)).toBe(0);
+      expect(component.getTotalPrice(null)).toBe(0);
+    });
+
+    it('should search across all services in multi-service appointment', () => {
+      component.searchQuery.set('Tratamiento');
+      const filtered = component.filteredAppointments();
+      expect(filtered.length).toBe(1);
+      expect(filtered[0].id).toBe('apt-2');
     });
   });
 });

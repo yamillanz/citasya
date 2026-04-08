@@ -44,7 +44,10 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
       employee_id: 'emp-1',
       service_id: 'srv-1',
       company_id: 'company-1',
-      service: { name: 'Corte de cabello' },
+      services: [
+        { id: 'srv-1', name: 'Corte de cabello', duration_minutes: 30, price: 50 },
+        { id: 'srv-2', name: 'Peinado', duration_minutes: 20, price: 30 }
+      ],
       employee: { full_name: 'Juan Pérez' }
     },
     {
@@ -54,11 +57,14 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
       appointment_date: '2026-03-20',
       appointment_time: '11:00',
       status: 'completed' as const,
-      amount_collected: 25,
+      amount_collected: 120,
       employee_id: 'emp-2',
-      service_id: 'srv-2',
+      service_id: 'srv-3',
       company_id: 'company-1',
-      service: { name: 'Tinte' },
+      services: [
+        { id: 'srv-3', name: 'Tinte', duration_minutes: 60, price: 80 },
+        { id: 'srv-4', name: 'Tratamiento capilar', duration_minutes: 30, price: 40 }
+      ],
       employee: { full_name: 'María García' }
     },
     {
@@ -71,7 +77,9 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
       employee_id: 'emp-1',
       service_id: 'srv-1',
       company_id: 'company-1',
-      service: { name: 'Corte de cabello' },
+      services: [
+        { id: 'srv-1', name: 'Corte de cabello', duration_minutes: 30, price: 50 }
+      ],
       employee: { full_name: 'Juan Pérez' }
     }
   ];
@@ -141,6 +149,21 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
       return labels[status] || status;
     };
 
+    const getServicesNames = (apt: Appointment | null): string => {
+      if (!apt?.services || apt.services.length === 0) return 'N/A';
+      return apt.services.map(s => s.name).join(', ');
+    };
+
+    const getTotalDuration = (apt: Appointment | null): number => {
+      if (!apt?.services) return 0;
+      return apt.services.reduce((sum, s) => sum + s.duration_minutes, 0);
+    };
+
+    const getTotalPrice = (apt: Appointment | null): number => {
+      if (!apt?.services) return 0;
+      return apt.services.reduce((sum, s) => sum + s.price, 0);
+    };
+
     const formatDate = (dateStr: string): string => {
       const date = new Date(dateStr);
       return date.toLocaleDateString('es-ES', {
@@ -166,7 +189,10 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
       filteredAppointments,
       getStatusSeverity,
       getStatusLabel,
-      formatDate
+      formatDate,
+      getServicesNames,
+      getTotalDuration,
+      getTotalPrice
     };
   };
 
@@ -209,19 +235,23 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
       expect(statuses).toContain('cancelled');
     });
 
-    it('should store service and employee data for each appointment', () => {
-      const services = component.appointments().map(apt => apt.service?.name);
+    it('should store services and employee data for each appointment', () => {
+      const allServiceNames = component.appointments().flatMap(apt => 
+        apt.services?.map(s => s.name) || []
+      );
       const employeeNames = component.appointments().map(apt => apt.employee?.full_name);
-      
-      expect(services).toContain('Corte de cabello');
-      expect(services).toContain('Tinte');
+
+      expect(allServiceNames).toContain('Corte de cabello');
+      expect(allServiceNames).toContain('Peinado');
+      expect(allServiceNames).toContain('Tinte');
+      expect(allServiceNames).toContain('Tratamiento capilar');
       expect(employeeNames).toContain('Juan Pérez');
       expect(employeeNames).toContain('María García');
     });
 
     it('should track amount collected for completed appointments', () => {
       const completed = component.appointments().find(apt => apt.status === 'completed');
-      expect(completed?.amount_collected).toBe(25);
+      expect(completed?.amount_collected).toBe(120);
     });
   });
 
@@ -349,6 +379,52 @@ describe('AppointmentsComponent - Behavior Driven Tests', () => {
       expect(options).toHaveLength(3); // Including default option
       expect(options[1].label).toBe('Juan Pérez');
       expect(options[2].label).toBe('María García');
+    });
+  });
+
+  describe('multi-service display in manager view', () => {
+    let component: ReturnType<typeof createMockAppointmentsComponent>;
+
+    beforeEach(() => {
+      component = createMockAppointmentsComponent();
+      component.appointments.set(mockAppointments);
+      component.employees.set(mockEmployees);
+      component.loading.set(false);
+    });
+
+    it('should display comma-separated service names for multi-service appointment', () => {
+      const apt = mockAppointments.find(a => a.id === 'apt-1')!; // Corte + Peinado
+      const names = component.getServicesNames(apt);
+      expect(names).toBe('Corte de cabello, Peinado');
+    });
+
+    it('should display single service name correctly', () => {
+      const apt = mockAppointments.find(a => a.id === 'apt-3')!; // Corte only
+      const names = component.getServicesNames(apt);
+      expect(names).toBe('Corte de cabello');
+    });
+
+    it('should calculate total duration for multi-service appointment', () => {
+      const apt = mockAppointments.find(a => a.id === 'apt-1')!; // 30 + 20 = 50
+      expect(component.getTotalDuration(apt)).toBe(50);
+    });
+
+    it('should calculate total price for multi-service appointment', () => {
+      const apt = mockAppointments.find(a => a.id === 'apt-1')!; // 50 + 30 = 80
+      expect(component.getTotalPrice(apt)).toBe(80);
+    });
+
+    it('should handle appointment without services array', () => {
+      expect(component.getServicesNames(null)).toBe('N/A');
+      expect(component.getTotalDuration(null)).toBe(0);
+      expect(component.getTotalPrice(null)).toBe(0);
+    });
+
+    it('should calculate combined totals across all appointments', () => {
+      const totalRevenue = component.appointments()
+        .filter(apt => apt.status === 'completed')
+        .reduce((sum, apt) => sum + component.getTotalPrice(apt), 0);
+      expect(totalRevenue).toBe(120); // apt-2: 80 + 40
     });
   });
 });

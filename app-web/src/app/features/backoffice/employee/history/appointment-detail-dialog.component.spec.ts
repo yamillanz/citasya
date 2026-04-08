@@ -1,6 +1,13 @@
 import { signal } from '@angular/core';
 
-interface AppointmentWithService {
+interface AppointmentService {
+  id: string;
+  name: string;
+  duration_minutes: number;
+  price: number;
+}
+
+interface AppointmentWithServices {
   id: string;
   company_id: string;
   employee_id: string;
@@ -16,11 +23,11 @@ interface AppointmentWithService {
   cancellation_token?: string;
   created_at: string;
   updated_at: string;
-  service?: { name: string };
+  services?: AppointmentService[];
 }
 
 describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
-  const mockAppointment: AppointmentWithService = {
+  const mockAppointment: AppointmentWithServices = {
     id: 'apt-1',
     company_id: 'company-1',
     employee_id: 'emp-1',
@@ -33,12 +40,33 @@ describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
     status: 'completed',
     amount_collected: 150,
     notes: 'Cliente frecuente, servicio satisfactorio',
-    service: { name: 'Corte de cabello premium' },
+    services: [
+      { id: 'srv-1', name: 'Corte de cabello premium', duration_minutes: 30, price: 50 },
+      { id: 'srv-2', name: 'Peinado', duration_minutes: 20, price: 30 }
+    ],
     created_at: '2026-04-01T10:00:00Z',
     updated_at: '2026-04-01T10:30:00Z'
   };
 
-  const mockAppointmentWithoutEmail: AppointmentWithService = {
+  const mockAppointmentSingleService: AppointmentWithServices = {
+    id: 'apt-4',
+    company_id: 'company-1',
+    employee_id: 'emp-1',
+    service_id: 'srv-1',
+    client_name: 'Luis Sánchez',
+    client_phone: '555-444-4444',
+    appointment_date: '2026-04-04',
+    appointment_time: '11:00',
+    status: 'completed',
+    amount_collected: 50,
+    services: [
+      { id: 'srv-1', name: 'Corte de cabello', duration_minutes: 30, price: 50 }
+    ],
+    created_at: '2026-04-04T11:00:00Z',
+    updated_at: '2026-04-04T11:30:00Z'
+  };
+
+  const mockAppointmentWithoutEmail: AppointmentWithServices = {
     id: 'apt-2',
     company_id: 'company-1',
     employee_id: 'emp-1',
@@ -48,12 +76,14 @@ describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
     appointment_date: '2026-04-02',
     appointment_time: '14:00',
     status: 'pending',
-    service: { name: 'Tinte de cabello' },
+    services: [
+      { id: 'srv-2', name: 'Tinte de cabello', duration_minutes: 60, price: 80 }
+    ],
     created_at: '2026-04-02T14:00:00Z',
     updated_at: '2026-04-02T14:30:00Z'
   };
 
-  const mockAppointmentWithoutNotes: AppointmentWithService = {
+  const mockAppointmentWithoutNotes: AppointmentWithServices = {
     id: 'apt-3',
     company_id: 'company-1',
     employee_id: 'emp-1',
@@ -63,13 +93,15 @@ describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
     appointment_date: '2026-04-03',
     appointment_time: '09:00',
     status: 'cancelled',
-    service: { name: 'Barba' },
+    services: [
+      { id: 'srv-3', name: 'Barba', duration_minutes: 15, price: 20 }
+    ],
     created_at: '2026-04-03T09:00:00Z',
     updated_at: '2026-04-03T09:30:00Z'
   };
 
   const createMockAppointmentDetailDialogComponent = () => {
-    const appointment = signal<AppointmentWithService | null>(null);
+    const appointment = signal<AppointmentWithServices | null>(null);
     const visible = signal(false);
     const currentIndex = signal(0);
     const totalCount = signal(0);
@@ -114,6 +146,25 @@ describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
       return `${hours}:${minutes}`;
     };
 
+    const getTotalDuration = (apt: AppointmentWithServices | null): number => {
+      if (!apt?.services) return 0;
+      return apt.services.reduce((sum, s) => sum + s.duration_minutes, 0);
+    };
+
+    const getTotalPrice = (apt: AppointmentWithServices | null): number => {
+      if (!apt?.services) return 0;
+      return apt.services.reduce((sum, s) => sum + s.price, 0);
+    };
+
+    const getServicesNames = (apt: AppointmentWithServices | null): string => {
+      if (!apt?.services || apt.services.length === 0) return 'N/A';
+      return apt.services.map(s => s.name).join(', ');
+    };
+
+    const canEditServices = (apt: AppointmentWithServices | null): boolean => {
+      return apt?.status === 'pending';
+    };
+
     return {
       appointment,
       visible,
@@ -127,7 +178,11 @@ describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
       getStatusLabel,
       getStatusSeverity,
       formatDate,
-      formatTime
+      formatTime,
+      getTotalDuration,
+      getTotalPrice,
+      getServicesNames,
+      canEditServices
     };
   };
 
@@ -192,8 +247,8 @@ describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
       expect(component.appointment()?.appointment_time).toBe('10:30');
     });
 
-    it('should display service name', () => {
-      expect(component.appointment()?.service?.name).toBe('Corte de cabello premium');
+    it('should display multiple service names', () => {
+      expect(component.getServicesNames(component.appointment())).toBe('Corte de cabello premium, Peinado');
     });
 
     it('should display status', () => {
@@ -206,6 +261,14 @@ describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
 
     it('should display notes when present', () => {
       expect(component.appointment()?.notes).toBe('Cliente frecuente, servicio satisfactorio');
+    });
+
+    it('should calculate total duration from multiple services', () => {
+      expect(component.getTotalDuration(component.appointment())).toBe(50); // 30 + 20
+    });
+
+    it('should calculate total price from multiple services', () => {
+      expect(component.getTotalPrice(component.appointment())).toBe(80); // 50 + 30
     });
   });
 
@@ -223,10 +286,8 @@ describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
       expect(appointment?.client_email).toBeUndefined();
     });
 
-    it('should display null service name as N/A', () => {
-      const appointment = component.appointment();
-      const serviceName = appointment?.service?.name || 'N/A';
-      expect(serviceName).toBe('Tinte de cabello');
+    it('should display service names from services array', () => {
+      expect(component.getServicesNames(component.appointment())).toBe('Tinte de cabello');
     });
   });
 
@@ -486,7 +547,7 @@ describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
     });
 
     it('should handle appointment without amount_collected', () => {
-      const appointmentNoAmount: AppointmentWithService = {
+      const appointmentNoAmount: AppointmentWithServices = {
         ...mockAppointment,
         amount_collected: undefined
       };
@@ -495,14 +556,17 @@ describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
       expect(component.appointment()?.amount_collected).toBeUndefined();
     });
 
-    it('should handle appointment without service', () => {
-      const appointmentNoService: AppointmentWithService = {
+    it('should handle appointment without services', () => {
+      const appointmentNoServices: AppointmentWithServices = {
         ...mockAppointment,
-        service: undefined
+        services: undefined
       };
       
-      component.appointment.set(appointmentNoService);
-      expect(component.appointment()?.service).toBeUndefined();
+      component.appointment.set(appointmentNoServices);
+      expect(component.appointment()?.services).toBeUndefined();
+      expect(component.getTotalDuration(component.appointment())).toBe(0);
+      expect(component.getTotalPrice(component.appointment())).toBe(0);
+      expect(component.getServicesNames(component.appointment())).toBe('N/A');
     });
 
     it('should handle single appointment in navigation', () => {
@@ -518,6 +582,64 @@ describe('AppointmentDetailDialogComponent - Behavior Driven Tests', () => {
       component.totalCount.set(0);
       
       expect(component.totalCount()).toBe(0);
+    });
+  });
+
+  describe('multi-service appointments', () => {
+    let component: ReturnType<typeof createMockAppointmentDetailDialogComponent>;
+
+    beforeEach(() => {
+      component = createMockAppointmentDetailDialogComponent();
+    });
+
+    it('should display names of all services', () => {
+      component.appointment.set(mockAppointment);
+      const names = component.getServicesNames(component.appointment());
+      expect(names).toContain('Corte de cabello premium');
+      expect(names).toContain('Peinado');
+    });
+
+    it('should calculate total duration as sum of all service durations', () => {
+      component.appointment.set(mockAppointment);
+      expect(component.getTotalDuration(component.appointment())).toBe(50);
+    });
+
+    it('should calculate total price as sum of all service prices', () => {
+      component.appointment.set(mockAppointment);
+      expect(component.getTotalPrice(component.appointment())).toBe(80);
+    });
+
+    it('should handle single service correctly', () => {
+      component.appointment.set(mockAppointmentSingleService);
+      expect(component.getServicesNames(component.appointment())).toBe('Corte de cabello');
+      expect(component.getTotalDuration(component.appointment())).toBe(30);
+      expect(component.getTotalPrice(component.appointment())).toBe(50);
+    });
+
+    it('should allow editing services only for pending appointments', () => {
+      component.appointment.set(mockAppointmentWithoutEmail); // pending
+      expect(component.canEditServices(component.appointment())).toBe(true);
+    });
+
+    it('should not allow editing services for completed appointments', () => {
+      component.appointment.set(mockAppointment); // completed
+      expect(component.canEditServices(component.appointment())).toBe(false);
+    });
+
+    it('should not allow editing services for cancelled appointments', () => {
+      component.appointment.set(mockAppointmentWithoutNotes); // cancelled
+      expect(component.canEditServices(component.appointment())).toBe(false);
+    });
+
+    it('should handle empty services array', () => {
+      const aptNoServices: AppointmentWithServices = {
+        ...mockAppointment,
+        services: []
+      };
+      component.appointment.set(aptNoServices);
+      expect(component.getServicesNames(component.appointment())).toBe('N/A');
+      expect(component.getTotalDuration(component.appointment())).toBe(0);
+      expect(component.getTotalPrice(component.appointment())).toBe(0);
     });
   });
 });

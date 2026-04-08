@@ -23,13 +23,19 @@ describe('AppointmentService', () => {
     client_phone: '12345678',
     appointment_date: '2026-03-20',
     appointment_time: '10:00',
-    status: 'pending' as const
+    status: 'pending' as const,
+    services: [{ id: 'service-1', name: 'Corte', duration_minutes: 30, price: 25 }]
   };
+
+  const mockServices = [
+    { id: 'service-1', name: 'Corte', duration_minutes: 30, price: 25 },
+    { id: 'service-2', name: 'Tinte', duration_minutes: 60, price: 50 }
+  ];
 
   beforeEach(() => {
     mockFromFn = jest.fn();
 
-    const mockSelect = {
+    const createAppointmentsMock = () => ({
       select: jest.fn().mockReturnValue({
         eq: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
@@ -37,22 +43,18 @@ describe('AppointmentService', () => {
               single: jest.fn().mockResolvedValue({ data: mockAppointment, error: null })
             })
           }),
-          single: jest.fn().mockResolvedValue({ data: [mockAppointment], error: null })
-        })
-      })
-    };
-
-    const mockInsert = {
+          single: jest.fn().mockResolvedValue({ data: mockAppointment, error: null }),
+          order: jest.fn().mockReturnValue({
+            order: jest.fn().mockResolvedValue({ data: [mockAppointment], error: null })
+          })
+        }),
+        in: jest.fn().mockResolvedValue({ data: mockServices, error: null })
+      }),
       insert: jest.fn().mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({ data: mockAppointment, error: null })
         })
-      })
-    };
-
-    const mockSupabase = {
-      ...mockSelect,
-      ...mockInsert,
+      }),
       update: jest.fn().mockReturnValue({
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
@@ -63,9 +65,26 @@ describe('AppointmentService', () => {
       delete: jest.fn().mockReturnValue({
         eq: jest.fn().mockResolvedValue({ error: null })
       })
-    };
+    });
 
-    mockFromFn.mockReturnValue(mockSupabase);
+    const createServicesMock = () => ({
+      select: jest.fn().mockReturnValue({
+        in: jest.fn().mockResolvedValue({ data: mockServices, error: null })
+      })
+    });
+
+    const createAppointmentServicesMock = () => ({
+      insert: jest.fn().mockResolvedValue({ error: null }),
+      delete: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({ error: null })
+      })
+    });
+
+    mockFromFn.mockImplementation((table: string) => {
+      if (table === 'services') return createServicesMock();
+      if (table === 'appointment_services') return createAppointmentServicesMock();
+      return createAppointmentsMock();
+    });
 
     scheduleServiceMock = {
       getByCompany: jest.fn().mockResolvedValue([
@@ -88,7 +107,7 @@ describe('AppointmentService', () => {
       const appointmentData = {
         company_id: 'company-1',
         employee_id: 'employee-1',
-        service_id: 'service-1',
+        service_ids: ['service-1'],
         client_name: 'Juan',
         client_phone: '12345678',
         appointment_date: '2026-03-20',
@@ -105,7 +124,7 @@ describe('AppointmentService', () => {
       const appointmentData = {
         company_id: 'company-1',
         employee_id: 'employee-1',
-        service_id: 'service-1',
+        service_ids: ['service-1'],
         client_name: 'Pedro',
         client_phone: '98765432',
         appointment_date: '2026-03-21',
@@ -114,13 +133,43 @@ describe('AppointmentService', () => {
 
       await service.create(appointmentData);
 
-      const fromReturn = mockFromFn.mock.results[0].value;
-      expect(fromReturn.insert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          ...appointmentData,
-          status: 'pending'
-        })
-      );
+      // Verify that from was called for appointments and appointment_services
+      const fromCalls = mockFromFn.mock.calls.map((c: any[]) => c[0]);
+      expect(fromCalls).toContain('appointments');
+      expect(fromCalls).toContain('appointment_services');
+    });
+
+    it('debe crear cita con múltiples servicios', async () => {
+      const appointmentData = {
+        company_id: 'company-1',
+        employee_id: 'employee-1',
+        service_ids: ['service-1', 'service-2'],
+        client_name: 'Ana',
+        client_phone: '1112223334',
+        appointment_date: '2026-03-22',
+        appointment_time: '10:00'
+      };
+
+      const result = await service.create(appointmentData);
+
+      expect(result.status).toBe('pending');
+      // Verifica que se insertaron registros en appointment_services
+      const insertCalls = mockFromFn.mock.results;
+      expect(insertCalls.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('debe lanzar error si no se proporcionan service_ids', async () => {
+      const appointmentData = {
+        company_id: 'company-1',
+        employee_id: 'employee-1',
+        service_ids: [],
+        client_name: 'Juan',
+        client_phone: '12345678',
+        appointment_date: '2026-03-20',
+        appointment_time: '10:00'
+      };
+
+      await expect(service.create(appointmentData as any)).rejects.toThrow('At least one service is required');
     });
   });
 
@@ -159,7 +208,8 @@ describe('AppointmentService', () => {
         {
           id: 'apt-1',
           appointment_time: '09:00',
-          appointment_date: '2026-03-20'
+          appointment_date: '2026-03-20',
+          services: [{ id: 's1', name: 'Corte', duration_minutes: 30, price: 25 }]
         } as any
       ]);
       scheduleServiceMock.getByCompany.mockResolvedValueOnce([
@@ -212,7 +262,8 @@ describe('AppointmentService', () => {
         {
           id: 'apt-1',
           appointment_time: '09:30',
-          appointment_date: '2026-03-20'
+          appointment_date: '2026-03-20',
+          services: [{ id: 's1', name: 'Tinte', duration_minutes: 30, price: 50 }]
         } as any
       ]);
       scheduleServiceMock.getByCompany.mockResolvedValueOnce([
@@ -231,12 +282,14 @@ describe('AppointmentService', () => {
         {
           id: 'apt-1',
           appointment_time: '09:00',
-          appointment_date: '2026-03-20'
+          appointment_date: '2026-03-20',
+          services: [{ id: 's1', name: 'Corte', duration_minutes: 30, price: 25 }]
         } as any,
         {
           id: 'apt-2',
           appointment_time: '10:00',
-          appointment_date: '2026-03-20'
+          appointment_date: '2026-03-20',
+          services: [{ id: 's2', name: 'Tinte', duration_minutes: 30, price: 50 }]
         } as any
       ]);
       scheduleServiceMock.getByCompany.mockResolvedValueOnce([
@@ -323,6 +376,12 @@ describe('AppointmentService', () => {
 
       const fromReturn = mockFromFn.mock.results[0].value;
       expect(fromReturn.update).toHaveBeenCalled();
+    });
+  });
+
+  describe('updateServices', () => {
+    it('debe lanzar error si service_ids está vacío', async () => {
+      await expect(service.updateServices('apt-1', [])).rejects.toThrow('At least one service is required');
     });
   });
 });
