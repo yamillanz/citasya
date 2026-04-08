@@ -147,7 +147,10 @@
                     <span class="client-name">{{ apt.client_name }}</span>
                     <span class="service-info">
                       <i class="pi pi-tag"></i>
-                      {{ $any(apt).service?.name || 'Servicio' }}
+                      {{ formatServicesList(apt.services || []) }}
+                      <span class="separator">•</span>
+                      <i class="pi pi-clock"></i>
+                      {{ calculateTotalDuration(apt.services || []) }} min
                       <span class="separator">•</span>
                       <i class="pi pi-user"></i>
                       {{ $any(apt).employee?.full_name || 'Empleado' }}
@@ -214,7 +217,7 @@
                     <div class="item-info">
                       <span class="item-client">{{ apt.client_name }}</span>
                       <span class="item-meta">
-                        {{ $any(apt).service?.name || 'Servicio' }} • {{ $any(apt).employee?.full_name || 'Empleado' }}
+                        {{ formatServicesList(apt.services || []) }} • {{ calculateTotalDuration(apt.services || []) }} min • {{ $any(apt).employee?.full_name || 'Empleado' }}
                       </span>
                     </div>
                     <div class="item-status">

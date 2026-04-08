@@ -11,7 +11,7 @@ import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
 import { UserService } from '../../../../core/services/user.service';
-import { Appointment, AppointmentStatus } from '../../../../core/models/appointment.model';
+import { Appointment, AppointmentStatus, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../../core/models/appointment.model';
 import { User } from '../../../../core/models/user.model';
 
 interface FilterOption {
@@ -310,4 +310,8 @@ export class AppointmentsComponent implements OnInit {
       year: 'numeric'
     });
   }
+
+  formatServicesList = formatServicesList;
+  calculateTotalDuration = calculateTotalDuration;
+  calculateTotalPrice = calculateTotalPrice;
 }

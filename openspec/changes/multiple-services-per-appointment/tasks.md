@@ -149,17 +149,17 @@
 
 ## 9. UI Backoffice - AppointmentsComponent (Manager)
 
-- [ ] 9.1 Import helper functions from `appointment.model.ts`
-- [ ] 9.2 Add `formatServices(services: Service[]): string` method
-- [ ] 9.3 Add `calculateDuration(services: Service[]): number` method
-- [ ] 9.4 Add `calculatePrice(services: Service[]): number` method
-- [ ] 9.5 Add `getStatusSeverity(status: AppointmentStatus)` method for p-tag
-- [ ] 9.6 Update template to display services as `{{ formatServices(apt.services) }}`
-- [ ] 9.7 Add column for total duration: `{{ calculateDuration(apt.services) }} min`
-- [ ] 9.8 Add column for total price: `${{ calculatePrice(apt.services) }}`
-- [ ] 9.9 Update p-table columns to accommodate multiple services text
-- [ ] 9.10 Handle empty/undefined services array gracefully
-- [ ] 9.11 Ensure detail dialog can be opened from appointment row
+- [x] 9.1 Import helper functions from `appointment.model.ts`
+- [x] 9.2 Add `formatServices(services: Service[]): string` method
+- [x] 9.3 Add `calculateDuration(services: Service[]): number` method
+- [x] 9.4 Add `calculatePrice(services: Service[]): number` method
+- [x] 9.5 Add `getStatusSeverity(status: AppointmentStatus)` method for p-tag
+- [x] 9.6 Update template to display services as `{{ formatServices(apt.services) }}`
+- [x] 9.7 Add column for total duration: `{{ calculateDuration(apt.services) }} min`
+- [x] 9.8 Add column for total price: `${{ calculatePrice(apt.services) }}`
+- [x] 9.9 Update p-table columns to accommodate multiple services text
+- [x] 9.10 Handle empty/undefined services array gracefully
+- [x] 9.11 Ensure detail dialog can be opened from appointment row
 - [ ] 9.12 Write component tests for formatServices method
 - [ ] 9.13 Write component tests for calculateDuration method
 - [ ] 9.14 Write component tests for calculatePrice method
