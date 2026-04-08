@@ -34,29 +34,29 @@
 
 ## 4. Backend Services - AppointmentService
 
-- [ ] 4.1 Add private method `getServicesByIds(ids: string[]): Promise<Service[]>` to `AppointmentService`
-- [ ] 4.2 Add private method `flattenServices(appointment: any): Appointment` to transform Supabase response
-- [ ] 4.3 Update `create()` method to accept `service_ids` array and create `appointment_services` records
-- [ ] 4.4 Add validation in `create()` to ensure `service_ids` array is not empty
-- [ ] 4.5 Calculate total duration in `create()` before availability check
-- [ ] 4.6 Update availability validation in `create()` to use total duration
-- [ ] 4.7 Create transaction in `create()` to insert both appointment and appointment_services
-- [ ] 4.8 Update `getById()` to join with `appointment_services` and load services
-- [ ] 4.9 Apply `flattenServices()` transformation in `getById()`
-- [ ] 4.10 Update `getByEmployeeAll()` to join with `appointment_services`
-- [ ] 4.11 Apply `flattenServices()` transformation in `getByEmployeeAll()`
-- [ ] 4.12 Update `getByCompany()` to join with `appointment_services`
-- [ ] 4.13 Apply `flattenServices()` transformation in `getByCompany()`
-- [ ] 4.14 Update `getByDate()` to join with `appointment_services`
-- [ ] 4.15 Apply `flattenServices()` transformation in `getByDate()`
-- [ ] 4.16 Add `updateServices(appointmentId: string, serviceIds: string[]): Promise<Appointment>` method
-- [ ] 4.17 Add validation in `updateServices()` to ensure `serviceIds` array is not empty
-- [ ] 4.18 Add validation in `updateServices()` to check appointment status is `pending`
-- [ ] 4.19 Calculate total duration in `updateServices()` before availability check
-- [ ] 4.20 Update availability validation in `updateServices()` to exclude current appointment
-- [ ] 4.21 Update `checkAvailability()` to calculate duration for each existing appointment from its services
-- [ ] 4.22 Add `addMinutes()` helper method to `AppointmentService`
-- [ ] 4.23 Add `slotsOverlap()` helper method to `AppointmentService`
+- [x] 4.1 Add private method `getServicesByIds(ids: string[]): Promise<Service[]>` to `AppointmentService`
+- [x] 4.2 Add private method `flattenServices(appointment: any): Appointment` to transform Supabase response
+- [x] 4.3 Update `create()` method to accept `service_ids` array and create `appointment_services` records
+- [x] 4.4 Add validation in `create()` to ensure `service_ids` array is not empty
+- [x] 4.5 Calculate total duration in `create()` before availability check
+- [x] 4.6 Update availability validation in `create()` to use total duration
+- [x] 4.7 Create transaction in `create()` to insert both appointment and appointment_services
+- [x] 4.8 Update `getById()` to join with `appointment_services` and load services
+- [x] 4.9 Apply `flattenServices()` transformation in `getById()`
+- [x] 4.10 Update `getByEmployeeAll()` to join with `appointment_services`
+- [x] 4.11 Apply `flattenServices()` transformation in `getByEmployeeAll()`
+- [x] 4.12 Update `getByCompany()` to join with `appointment_services`
+- [x] 4.13 Apply `flattenServices()` transformation in `getByCompany()`
+- [x] 4.14 Update `getByDate()` to join with `appointment_services`
+- [x] 4.15 Apply `flattenServices()` transformation in `getByDate()`
+- [x] 4.16 Add `updateServices(appointmentId: string, serviceIds: string[]): Promise<Appointment>` method
+- [x] 4.17 Add validation in `updateServices()` to ensure `serviceIds` array is not empty
+- [x] 4.18 Add validation in `updateServices()` to check appointment status is `pending`
+- [x] 4.19 Calculate total duration in `updateServices()` before availability check
+- [x] 4.20 Update availability validation in `updateServices()` to exclude current appointment
+- [x] 4.21 Update `checkAvailability()` to calculate duration for each existing appointment from its services
+- [x] 4.22 Add `addMinutes()` helper method to `AppointmentService`
+- [x] 4.23 Add `slotsOverlap()` helper method to `AppointmentService`
 - [ ] 4.24 Write unit tests for `getServicesByIds()`
 - [ ] 4.25 Write unit tests for `calculateTotalDuration()`
 - [ ] 4.26 Write unit tests for `calculateTotalPrice()`
