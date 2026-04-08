@@ -302,4 +302,78 @@ app-web/
 
 ---
 
+## Testing - Filosofía y Prioridades
+
+### Principio #1: Testear COMPORTAMIENTO, no implementación
+
+Los tests deben verificar **qué hace** el componente/servicio, no **cómo** lo hace internamente. Un test orientado a comportamiento sobrevive refactorizaciones; un test acoplado a implementación se rompe con cualquier cambio interno.
+
+### Prioridad de matchers (de mayor a menor)
+
+| Prioridad | Matcher | Cuándo usar |
+|-----------|---------|-------------|
+| **1ra** | `toHaveBeenCalledWith()` y derivadas | Verificar que un método/spy fue llamado con los argumentos correctos. Cubre también `toHaveBeenCalledTimes()`, `toHaveBeenLastCalledWith()`, `toHaveBeenNthCalledWith()` |
+| **2da** | Renderizado con Testing Library | Renderizar el componente con `render()` y evaluar el DOM resultante: `screen.getByText()`, `screen.getByRole()`, `screen.getByTestId()`, `screen.queryByText()`, etc. |
+| **3ra** | `toBe()` / `toEqual()` | Solo para valores primitivos o comparaciones directas cuando no hay comportamiento que verificar (ej: estados simples, cálculos puros) |
+
+### Flujo obligatorio al escribir tests
+
+```
+1. ¿Se puede verificar comportamiento con toHaveBeenCalledWith?
+   → SÍ: usarlo como test principal
+   → NO: pasar al paso 2
+
+2. ¿Se puede renderizar el componente y verificar en el DOM?
+   → SÍ: renderizar con Testing Library y buscar elementos
+   → NO: pasar al paso 3
+
+3. ¿Solo queda verificar un valor primitivo?
+   → Usar toBe() / toEqual()
+```
+
+### Ejemplos
+
+**✅ CORRECTO - Comportamiento con spies:**
+```typescript
+it('debe llamar al servicio al enviar el formulario', () => {
+  const spy = jest.spyOn(appointmentService, 'create');
+  component.onSubmit();
+  expect(spy).toHaveBeenCalledWith({ date: '2025-01-01', employeeId: 1 });
+});
+```
+
+**✅ CORRECTO - Renderizado con Testing Library:**
+```typescript
+it('debe mostrar el nombre del usuario en el header', async () => {
+  await render(EmployeeCard, {
+    componentInputs: { employee: mockEmployee },
+  });
+  expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
+});
+```
+
+**❌ INCORRECTO - Testear estado interno sin comportamiento:**
+```typescript
+it('debe tener loading en false', () => {
+  expect(component.loading()).toBe(false); // Acoplado a implementación
+});
+```
+
+**✅ CORRECTO - Verificar comportamiento derivado del estado:**
+```typescript
+it('no debe mostrar spinner cuando no está cargando', async () => {
+  await render(MyComponent);
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+});
+```
+
+### Testing Library - Configuración y uso
+
+- Usar `@analogjs/testing` con `render()` para componentes Angular
+- Priorizar queries accesibles: `getByRole()`, `getByText()`, `getByLabelText()`
+- Usar `getByTestId()` solo como último recurso
+- Evaluar interacciones del usuario con `fireEvent` o `userEvent`
+
+---
+
 *Estas reglas aplican SOLO al proyecto CitasYa*
