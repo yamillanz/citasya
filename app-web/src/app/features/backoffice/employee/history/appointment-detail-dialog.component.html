@@ -4,8 +4,10 @@
   [style]="{'width': '600px'}"
   [header]="'Detalle de Cita'"
   [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
-  (onHide)="onClose.emit()">
+  (onHide)="onClose.emit(); isEditingServices.set(false)">
   
+  <p-toast position="top-right"></p-toast>
+
   <ng-template pTemplate="content">
     @if (appointment()) {
       <div class="appointment-detail">
@@ -40,10 +42,51 @@
               <span class="label">Hora:</span>
               <span class="value">{{ formatTime(appointment()!.appointment_time) }}</span>
             </div>
-            <div class="detail-row">
-              <span class="label">Servicio:</span>
-              <span class="value">{{ appointment()!.service?.name || 'N/A' }}</span>
-            </div>
+            
+            @if (!isEditingServices()) {
+              <div class="detail-row">
+                <span class="label">Servicios:</span>
+                <div class="value services-value">
+                  @if (appointment()!.services && appointment()!.services!.length > 0) {
+                    @for (service of appointment()!.services; track service.id) {
+                      <div class="service-item">
+                        <span class="service-name">{{ service.name }}</span>
+                        <span class="service-info">{{ service.duration_minutes }} min - ${{ service.price ?? 0 }}</span>
+                      </div>
+                    }
+                  } @else {
+                    <span class="no-services">Sin servicios</span>
+                  }
+                </div>
+              </div>
+              <div class="detail-row">
+                <span class="label">Duración Total:</span>
+                <span class="value">{{ totalDuration() }} min</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Precio Total:</span>
+                <span class="value price">${{ totalPrice() }}</span>
+              </div>
+            } @else {
+              <div class="services-edit">
+                <h5>Seleccionar Servicios</h5>
+                @for (service of availableServices(); track service.id) {
+                  <div class="service-checkbox">
+                    <p-checkbox
+                      [inputId]="service.id"
+                      [value]="service.id"
+                      [(ngModel)]="editedServiceIds"
+                      [binary]="false">
+                    </p-checkbox>
+                    <label [for]="service.id" class="service-label">
+                      <span class="service-name">{{ service.name }}</span>
+                      <span class="service-info">{{ service.duration_minutes }} min - ${{ service.price ?? 0 }}</span>
+                    </label>
+                  </div>
+                }
+              </div>
+            }
+
             <div class="detail-row">
               <span class="label">Estado:</span>
               <p-tag 
@@ -95,12 +138,41 @@
           (onClick)="onNext.emit()">
         </p-button>
       </div>
-      <p-button 
-        label="Cerrar"
-        icon="pi pi-times"
-        severity="secondary"
-        (onClick)="onClose.emit()">
-      </p-button>
+      <div class="action-buttons">
+        @if (!isEditingServices() && canEditServices()) {
+          <p-button 
+            label="Editar Servicios"
+            icon="pi pi-pencil"
+            severity="info"
+            [text]="true"
+            (onClick)="startEditServices()">
+          </p-button>
+        }
+        @if (isEditingServices()) {
+          <p-button 
+            label="Cancelar"
+            icon="pi pi-times"
+            severity="secondary"
+            [text]="true"
+            (onClick)="cancelEditServices()">
+          </p-button>
+          <p-button 
+            label="Guardar"
+            icon="pi pi-check"
+            severity="success"
+            [loading]="savingServices()"
+            (onClick)="saveServices()">
+          </p-button>
+        }
+        @if (!isEditingServices()) {
+          <p-button 
+            label="Cerrar"
+            icon="pi pi-times"
+            severity="secondary"
+            (onClick)="onClose.emit()">
+          </p-button>
+        }
+      </div>
     </div>
   </ng-template>
 </p-dialog>
