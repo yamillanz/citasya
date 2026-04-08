@@ -8,6 +8,12 @@
 
 **⚠️ IMPORTANTE: TODO cambio debe seguir el flujo OpenSpec sin excepción.**
 
+### Ubicación de OpenSpec:
+- **OpenSpec SIEMPRE opera desde la raíz del proyecto**: `./openspec/`
+- **NUNCA crear cambios en** `app-web/openspec/`
+- Los comandos `openspec` deben ejecutarse desde la raíz del proyecto
+- Los artifacts (proposal, design, specs, tasks) están en `./openspec/changes/<nombre>/`
+
 ### Comandos disponibles:
 - `/opsx:new` - Iniciar nueva tarea/cambio
 - `/opsx:ff` - Fast-forward para crear todos los artifacts de un cambio
@@ -27,7 +33,7 @@
 - Para cualquier duda sobre si usar OpenSpec, SIEMPRE usar OpenSpec
 
 ### Referencia:
-- Comandos completos en `app-web/README.md`
+- Comandos completos ejecutando `openspec --help`
 - Documentation en `.agents/skills/openspec*/SKILL.md`
 
 ---
