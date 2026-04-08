@@ -88,18 +88,18 @@
 
 ## 6. UI Booking - BookingFormComponent
 
-- [ ] 6.1 Import helper functions from `appointment.model.ts`
-- [ ] 6.2 Add `serviceIds = signal<string[]>([])` to hold service IDs from query params
-- [ ] 6.3 Add `selectedServices = signal<Service[]>([])` to hold service objects
-- [ ] 6.4 Add `totalDuration = computed()` using `calculateTotalDuration()`
-- [ ] 6.5 Add `totalPrice = computed()` using `calculateTotalPrice()`
-- [ ] 6.6 Parse `serviceIds` query param in `ngOnInit()` (split by comma)
-- [ ] 6.7 Load services by IDs using `serviceService.getByIds()` or similar
-- [ ] 6.8 Update template to display list of services with name, duration, price
-- [ ] 6.9 Add total duration display in summary section
-- [ ] 6.10 Add total price display in summary section
-- [ ] 6.11 Update `submitForm()` to pass `service_ids` array to `appointmentService.create()`
-- [ ] 6.12 Add error handling for empty services array
+- [x] 6.1 Import helper functions from `appointment.model.ts`
+- [x] 6.2 Add `serviceIds = signal<string[]>([])` to hold service IDs from query params
+- [x] 6.3 Add `selectedServices = signal<Service[]>([])` to hold service objects
+- [x] 6.4 Add `totalDuration = computed()` using `calculateTotalDuration()`
+- [x] 6.5 Add `totalPrice = computed()` using `calculateTotalPrice()`
+- [x] 6.6 Parse `serviceIds` query param in `ngOnInit()` (split by comma)
+- [x] 6.7 Load services by IDs using `loadServicesByIds()` method
+- [x] 6.8 Update template to display list of services with name, duration, price
+- [x] 6.9 Add total duration display in summary section
+- [x] 6.10 Add total price display in summary section
+- [x] 6.11 Update `onSubmit()` to pass `service_ids` array to `appointmentService.create()`
+- [x] 6.12 Add error handling for empty services array
 - [ ] 6.13 Write component tests for service loading from query params
 - [ ] 6.14 Write component tests for duration/price display
 - [ ] 6.15 Write component tests for form submission with multiple services

@@ -192,7 +192,7 @@
       }
 
       <!-- Step 1: Summary -->
-      @if (currentStep() === 1 && service()) {
+      @if (currentStep() === 1 && selectedServices().length > 0) {
         <section class="step-section" @fadeInUp>
           <div class="step-card">
             <div class="card-header">
@@ -201,15 +201,30 @@
             </div>
             
             <div class="summary-content">
-              <!-- Service Info -->
+              <!-- Services Info -->
               <div class="summary-section">
                 <div class="summary-icon">
                   <i class="pi pi-tag"></i>
                 </div>
                 <div class="summary-details">
-                  <span class="summary-label">Servicio</span>
-                  <span class="summary-value">{{ service()?.name }}</span>
-                  <span class="summary-badge">{{ service()?.duration_minutes }} minutos</span>
+                  <span class="summary-label">Servicios ({{ selectedServices().length }})</span>
+                  <div class="services-list">
+                    @for (service of selectedServices(); track service.id) {
+                      <div class="service-item">
+                        <span class="service-name">{{ service.name }}</span>
+                        <span class="service-duration">{{ service.duration_minutes }} min</span>
+                        @if (service.price) {
+                          <span class="service-price">${{ service.price | number:'1.2-2' }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <div class="services-totals">
+                    <span class="total-item"><i class="pi pi-clock"></i> {{ totalDuration() }} min</span>
+                    @if (totalPrice() > 0) {
+                      <span class="total-item"><i class="pi pi-dollar"></i> ${{ totalPrice() | number:'1.2-2' }}</span>
+                    }
+                  </div>
                 </div>
               </div>
               
@@ -253,14 +268,6 @@
                   }
                 </div>
               </div>
-              
-              <!-- Price -->
-              @if (service()?.price) {
-                <div class="price-total">
-                  <span class="price-label">Total a pagar</span>
-                  <span class="price-value">${{ service()?.price | number:'1.2-2' }}</span>
-                </div>
-              }
             </div>
             
             <div class="step-actions">
@@ -449,8 +456,19 @@
             
             <div class="confirmation-details">
               <div class="detail-row">
-                <span class="detail-label">Servicio:</span>
-                <span class="detail-value">{{ service()?.name }}</span>
+                <span class="detail-label">Servicios:</span>
+                <div class="detail-services">
+                  @for (service of selectedServices(); track service.id) {
+                    <div class="detail-service-item">
+                      <span>{{ service.name }}</span>
+                      <span class="detail-service-duration">{{ service.duration_minutes }} min</span>
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Duración total:</span>
+                <span class="detail-value">{{ totalDuration() }} min</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Profesional:</span>
@@ -464,10 +482,10 @@
                 <span class="detail-label">Hora:</span>
                 <span class="detail-value">{{ selectedTime }}</span>
               </div>
-              @if (service()?.price) {
+              @if (totalPrice() > 0) {
                 <div class="detail-row price-row">
                   <span class="detail-label">Total:</span>
-                  <span class="detail-value">${{ service()?.price | number:'1.2-2' }}</span>
+                  <span class="detail-value">${{ totalPrice() | number:'1.2-2' }}</span>
                 </div>
               }
             </div>

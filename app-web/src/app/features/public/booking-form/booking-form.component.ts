@@ -12,6 +12,7 @@ import { Company } from '../../../core/models/company.model';
 import { User } from '../../../core/models/user.model';
 import { Service } from '../../../core/models/service.model';
 import { fadeInUp, stepComplete, fadeIn, shakeError } from './booking-form.animations';
+import { calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../core/models/appointment.model';
 
 function atLeastOneContactValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -58,8 +59,9 @@ export class BookingFormComponent implements OnInit {
 
   company = signal<Company | null>(null);
   employee = signal<User | null>(null);
-  service = signal<Service | null>(null);
-  services = signal<Service[]>([]);
+  selectedServices = signal<Service[]>([]);
+  services = signal<Service[]>([]); // Used in open mode for service selection
+  serviceIds = signal<string[]>([]); // IDs from query params
   
   isOpenMode = signal(false);
   selectedDate = '';
@@ -70,6 +72,13 @@ export class BookingFormComponent implements OnInit {
   success = signal(false);
   currentStep = signal(0);
   submitError = signal('');
+  
+  // Computed signals for totals
+  totalDuration = computed(() => calculateTotalDuration(this.selectedServices()));
+  
+  totalPrice = computed(() => calculateTotalPrice(this.selectedServices()));
+
+  selectedServicesText = computed(() => formatServicesList(this.selectedServices()));
   
   notesLength = computed(() => {
     const notes = this.bookingForm.get('notes')?.value;
@@ -95,7 +104,7 @@ export class BookingFormComponent implements OnInit {
     const slug = this.route.snapshot.paramMap.get('companySlug');
     const employeeId = this.route.snapshot.paramMap.get('employeeId');
     
-    const serviceId = this.route.snapshot.queryParamMap.get('serviceId');
+    const serviceIdsParam = this.route.snapshot.queryParamMap.get('serviceIds');
     const date = this.route.snapshot.queryParamMap.get('date');
     const time = this.route.snapshot.queryParamMap.get('time');
 
@@ -116,17 +125,15 @@ export class BookingFormComponent implements OnInit {
       this.company.set(company);
       this.employee.set(employee);
 
-      if (serviceId && date && time) {
-        const service = await this.serviceService.getById(serviceId);
-        if (service) {
-          this.service.set(service);
-          this.selectedDate = date;
-          this.selectedTime = time;
-          this.currentStep.set(1);
-        } else {
-          this.isOpenMode.set(true);
-          await this.loadServices(employeeId);
-        }
+      if (serviceIdsParam && date && time) {
+        const ids = serviceIdsParam.split(',');
+        this.serviceIds.set(ids);
+        this.selectedDate = date;
+        this.selectedTime = time;
+        
+        // Load services by IDs
+        await this.loadServicesByIds(ids);
+        this.currentStep.set(1);
       } else {
         this.isOpenMode.set(true);
         await this.loadServices(employeeId);
@@ -145,12 +152,22 @@ export class BookingFormComponent implements OnInit {
     }
   }
 
+  async loadServicesByIds(ids: string[]) {
+    try {
+      const allServices = await this.serviceService.getByEmployee(this.employee()!.id);
+      const selected = allServices.filter(s => ids.includes(s.id));
+      this.selectedServices.set(selected);
+    } catch (err) {
+      this.error.set('Error al cargar los servicios');
+    }
+  }
+
   onServiceChange(event: Event) {
     const select = event.target as HTMLSelectElement;
     const serviceId = select.value;
     const service = this.services().find(s => s.id === serviceId);
     if (service) {
-      this.service.set(service);
+      this.selectedServices.set([service]);
     }
   }
 
@@ -237,9 +254,9 @@ export class BookingFormComponent implements OnInit {
 
     const comp = this.company();
     const emp = this.employee();
-    const serv = this.service();
+    const services = this.selectedServices();
 
-    if (!comp || !emp || !serv) {
+    if (!comp || !emp || services.length === 0) {
       return;
     }
 
@@ -259,7 +276,7 @@ export class BookingFormComponent implements OnInit {
       await this.appointmentService.create({
         company_id: comp.id,
         employee_id: emp.id,
-        service_id: serv.id,
+        service_ids: services.map(s => s.id), // Changed to array
         client_name: this.bookingForm.value.client_name!,
         client_phone: phone,
         client_email: email,
