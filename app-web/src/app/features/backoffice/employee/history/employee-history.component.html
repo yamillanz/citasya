@@ -30,7 +30,7 @@
             type="text"
             [ngModel]="searchQuery()"
             (ngModelChange)="searchQuery.set($event); currentPage.set(0)"
-            placeholder="Buscar por cliente, servicio, teléfono o notas..."
+            placeholder="Buscar por cliente, servicios, teléfono o notas..."
             styleClass="search-input"
             aria-label="Buscar en el historial"
             class="search-input-field" />
@@ -132,17 +132,22 @@
                 Cliente
                 <p-sortIcon field="client_name"></p-sortIcon>
               </th>
-              <th pSortableColumn="service.name">
-                Servicio
-                <p-sortIcon field="service.name"></p-sortIcon>
+              <th>
+                Servicios
               </th>
-              <th pSortableColumn="amount_collected">
-                Monto
-                <p-sortIcon field="amount_collected"></p-sortIcon>
+              <th>
+                Duración
+              </th>
+              <th>
+                Precio
               </th>
               <th pSortableColumn="status">
                 Estado
                 <p-sortIcon field="status"></p-sortIcon>
+              </th>
+              <th pSortableColumn="amount_collected">
+                Monto
+                <p-sortIcon field="amount_collected"></p-sortIcon>
               </th>
               <th>Acciones</th>
             </tr>
@@ -158,19 +163,27 @@
                   <span class="client-phone">{{ apt.client_phone }}</span>
                 </div>
               </td>
-              <td>{{ apt.service?.name || 'N/A' }}</td>
               <td>
-                @if (apt.amount_collected) {
-                  <span class="amount">${{ apt.amount_collected }}</span>
-                } @else {
-                  <span class="no-amount">-</span>
-                }
+                <span class="services-text">{{ formatServicesList(apt.services || []) }}</span>
+              </td>
+              <td>
+                <span class="duration">{{ calculateTotalDuration(apt.services || []) }} min</span>
+              </td>
+              <td>
+                <span class="price">${{ calculateTotalPrice(apt.services || []) }}</span>
               </td>
               <td>
                 <p-tag 
                   [value]="getStatusLabel(apt.status)" 
                   [severity]="getStatusSeverity(apt.status)">
                 </p-tag>
+              </td>
+              <td>
+                @if (apt.amount_collected) {
+                  <span class="amount">${{ apt.amount_collected }}</span>
+                } @else {
+                  <span class="no-amount">-</span>
+                }
               </td>
               <td (click)="$event.stopPropagation()">
                 <p-button 
@@ -186,7 +199,7 @@
           
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="6" class="empty-message">
+              <td colspan="9" class="empty-message">
                 No se encontraron citas
               </td>
             </tr>

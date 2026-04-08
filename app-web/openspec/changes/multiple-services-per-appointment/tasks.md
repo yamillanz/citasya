@@ -106,16 +106,16 @@
 
 ## 7. UI Backoffice - EmployeeHistoryComponent
 
-- [ ] 7.1 Import helper functions from `appointment.model.ts` in `employee-history.component.ts`
-- [ ] 7.2 Add `formatServices(services: Service[]): string` method
-- [ ] 7.3 Add `calculateDuration(services: Service[]): number` method
-- [ ] 7.4 Add `calculatePrice(services: Service[]): number` method
-- [ ] 7.5 Add `getStatusSeverity(status: AppointmentStatus)` method for p-tag
-- [ ] 7.6 Update template to display services as `{{ formatServices(apt.services) }}`
-- [ ] 7.7 Add column for total duration: `{{ calculateDuration(apt.services) }} min`
-- [ ] 7.8 Add column for total price: `${{ calculatePrice(apt.services) }}`
-- [ ] 7.9 Update p-table columns to accommodate multiple services text
-- [ ] 7.10 Handle empty/undefined services array gracefully
+- [x] 7.1 Import helper functions from `appointment.model.ts` in `employee-history.component.ts`
+- [x] 7.2 Add `formatServices(services: Service[]): string` method
+- [x] 7.3 Add `calculateDuration(services: Service[]): number` method
+- [x] 7.4 Add `calculatePrice(services: Service[]): number` method
+- [x] 7.5 Add `getStatusSeverity(status: AppointmentStatus)` method for p-tag
+- [x] 7.6 Update template to display services as `{{ formatServices(apt.services) }}`
+- [x] 7.7 Add column for total duration: `{{ calculateDuration(apt.services) }} min`
+- [x] 7.8 Add column for total price: `${{ calculatePrice(apt.services) }}`
+- [x] 7.9 Update p-table columns to accommodate multiple services text
+- [x] 7.10 Handle empty/undefined services array gracefully
 - [ ] 7.11 Write component tests for formatServices method
 - [ ] 7.12 Write component tests for calculateDuration method
 - [ ] 7.13 Write component tests for calculatePrice method

@@ -13,26 +13,11 @@ import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
 import { User } from '../../../../core/models/user.model';
+import { Service } from '../../../../core/models/service.model';
+import { Appointment, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../../core/models/appointment.model';
 import { AppointmentDetailDialogComponent } from './appointment-detail-dialog.component';
 
-interface AppointmentWithService {
-  id: string;
-  company_id: string;
-  employee_id: string;
-  service_id: string;
-  client_name: string;
-  client_phone: string;
-  client_email?: string;
-  appointment_date: string;
-  appointment_time: string;
-  status: string;
-  amount_collected?: number;
-  notes?: string;
-  cancellation_token?: string;
-  created_at: string;
-  updated_at: string;
-  service?: { name: string };
-}
+type AppointmentWithService = Appointment;
 
 @Component({
   selector: 'app-employee-history',
@@ -105,7 +90,7 @@ export class EmployeeHistoryComponent implements OnInit {
     if (query) {
       result = result.filter(apt => 
         apt.client_name.toLowerCase().includes(query) ||
-        apt.service?.name?.toLowerCase().includes(query) ||
+        formatServicesList(apt.services || []).toLowerCase().includes(query) ||
         apt.client_phone.includes(query) ||
         apt.notes?.toLowerCase().includes(query) ||
         apt.client_email?.toLowerCase().includes(query)
@@ -219,7 +204,7 @@ export class EmployeeHistoryComponent implements OnInit {
 
     this.exporting.set(true);
 
-    const headers = ['Fecha', 'Hora', 'Cliente', 'Teléfono', 'Email', 'Servicio', 'Estado', 'Monto', 'Notas'];
+    const headers = ['Fecha', 'Hora', 'Cliente', 'Teléfono', 'Email', 'Servicios', 'Duración (min)', 'Precio', 'Estado', 'Monto', 'Notas'];
     
     const rows = data.map(apt => [
       this.formatDate(apt.appointment_date),
@@ -227,7 +212,9 @@ export class EmployeeHistoryComponent implements OnInit {
       apt.client_name,
       apt.client_phone,
       apt.client_email || '',
-      apt.service?.name || 'N/A',
+      formatServicesList(apt.services || []),
+      calculateTotalDuration(apt.services || []).toString(),
+      `$${calculateTotalPrice(apt.services || [])}`,
       this.getStatusLabel(apt.status),
       apt.amount_collected ? `$${apt.amount_collected}` : '-',
       apt.notes || ''
@@ -290,4 +277,9 @@ export class EmployeeHistoryComponent implements OnInit {
     const [hours, minutes] = timeStr.split(':');
     return `${hours}:${minutes}`;
   }
+
+  // Helper methods for template
+  formatServicesList = formatServicesList;
+  calculateTotalDuration = calculateTotalDuration;
+  calculateTotalPrice = calculateTotalPrice;
 }
