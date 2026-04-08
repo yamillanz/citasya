@@ -189,4 +189,111 @@ filteredItems = computed(() => {
 
 ---
 
+## Estructura de Carpetas del Proyecto
+
+```
+app-web/
+├── src/
+│   ├── app/
+│   │   ├── core/                    # Lógica central y compartida
+│   │   │   ├── models/              # Interfaces y tipos (user.model.ts, company.model.ts, etc.)
+│   │   │   ├── services/            # Servicios globales (auth.service.ts, appointment.service.ts, etc.)
+│   │   │   ├── guards/              # Route guards (auth.guard.ts, role.guard.ts)
+│   │   │   ├── interfaces/          # Interfaces TypeScript genéricas
+│   │   │   ├── tokens/              # Injection tokens
+│   │   │   └── supabase.ts          # Configuración de Supabase
+│   │   │
+│   │   ├── features/                # Módulos de funcionalidades (lazy loaded)
+│   │   │   ├── landing/             # Landing page pública
+│   │   │   │   ├── home/            # Página principal (/)
+│   │   │   │   ├── contact/         # Formulario de contacto (/contact)
+│   │   │   │   ├── pricing/         # Planes y precios (/pricing)
+│   │   │   │   ├── about/           # Sobre nosotros (/about)
+│   │   │   │   ├── faq/             # Preguntas frecuentes (/faq)
+│   │   │   │   └── landing.routes.ts
+│   │   │   │
+│   │   │   ├── public/              # Portal público de citas (sin login)
+│   │   │   │   ├── company-list/    # Listado de empleados (/c/:company_slug)
+│   │   │   │   ├── employee-calendar/  # Calendario público (/c/:company_slug/e/:employee_id)
+│   │   │   │   └── booking-form/    # Formulario de reserva
+│   │   │   │
+│   │   │   ├── auth/                # Autenticación
+│   │   │   │   └── components/login/
+│   │   │   │
+│   │   │   ├── backoffice/          # Panel de administración (requiere login)
+│   │   │   │   ├── backoffice.component.ts   # Layout principal del BO
+│   │   │   │   ├── superadmin/      # Panel Superadmin (/bo/superadmin/*)
+│   │   │   │   │   ├── plans/
+│   │   │   │   │   └── transactions/
+│   │   │   │   │
+│   │   │   │   ├── employee/        # Panel Employee (/bo/employee/*)
+│   │   │   │   │   ├── employee-layout.component.ts
+│   │   │   │   │   └── history/     # Historial de citas
+│   │   │   │   │       └── appointment-detail-dialog.component.ts
+│   │   │   │   │
+│   │   │   │   └── [manager]/       # Panel Manager (dashboard, citas, empleados, etc.)
+│   │   │   │
+│   │   │   ├── companies/           # [Legacy/Migrando] Gestión de empresas
+│   │   │   ├── appointments/        # [Legacy/Migrando] Gestión de citas
+│   │   │   ├── dashboard/           # [Legacy/Migrando] Dashboard
+│   │   │   ├── admin/               # [Legacy/Migrando] Admin
+│   │   │   ├── not-found/           # Página 404
+│   │   │   └── unauthorized/        # Página 403
+│   │   │
+│   │   ├── shared/                  # Componentes y servicios reutilizables
+│   │   │   ├── components/
+│   │   │   │   ├── calendar/        # Componente de calendario reutilizable
+│   │   │   │   ├── landing-header/  # Header de landing page
+│   │   │   │   ├── loading-skeleton/
+│   │   │   │   ├── route-loading/
+│   │   │   │   └── empty-state/
+│   │   │   └── services/
+│   │   │       └── toast.service.ts
+│   │   │
+│   │   ├── app.ts                   # Componente raíz
+│   │   ├── app.html                 # Template raíz
+│   │   ├── app.scss                 # Estilos globales
+│   │   ├── app.config.ts            # Configuración de la aplicación
+│   │   └── app.routes.ts            # Rutas principales
+│   │
+│   ├── environments/                # Configuraciones de entorno
+│   └── styles/                      # Estilos globales adicionales
+│
+├── angular.json
+├── tailwind.config.ts
+└── package.json
+```
+
+### Convenciones de Ubicación
+
+| Tipo de archivo | Ubicación correcta | Ejemplo |
+|----------------|-------------------|---------|
+| Modelos/Interfaces | `core/models/` | `core/models/user.model.ts` |
+| Servicios globales | `core/services/` | `core/services/auth.service.ts` |
+| Guards | `core/guards/` | `core/guards/role.guard.ts` |
+| Páginas de features | `features/[area]/[nombre]/` | `features/backoffice/superadmin/plans/` |
+| Componentes reutilizables | `shared/components/` | `shared/components/calendar/` |
+| Servicios compartidos | `shared/services/` | `shared/services/toast.service.ts` |
+
+### Flujos de Navegación
+
+```
+1. LANDING (público, sin login)
+   / → /contact → /pricing → /about → /faq
+
+2. AUTH
+   /login
+
+3. PUBLIC BOOKING (público, sin login)
+   /c/:company_slug → /c/:company_slug/e/:employee_id → booking-form
+
+4. BACKOFFICE (requiere login)
+   /bo → redirección según rol:
+       - superadmin → /bo/superadmin/*
+       - manager → /bo/dashboard (o ruta principal de manager)
+       - employee → /bo/employee/*
+```
+
+---
+
 *Estas reglas aplican SOLO al proyecto CitasYa*
