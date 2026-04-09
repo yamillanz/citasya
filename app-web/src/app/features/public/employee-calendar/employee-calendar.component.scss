@@ -562,17 +562,48 @@
    Action Section
    ================================ */
 .action-section {
-  position: sticky;
-  bottom: var(--space-lg);
-  z-index: 10;
+  max-width: 600px;
+  margin: var(--space-xl) auto 0;
+  padding: 0 var(--space-lg);
 }
 
 .booking-summary {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-lg);
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
   margin-bottom: var(--space-md);
-  flex-wrap: wrap;
+  
+  .summary-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xs);
+    
+    i {
+      color: var(--color-sage);
+      font-size: 0.875rem;
+    }
+  }
+  
+  .summary-services {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-md);
+  }
+  
+  .summary-details {
+    display: flex;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--color-border);
+  }
   
   .summary-item {
     display: flex;
@@ -589,6 +620,22 @@
     &.highlight {
       color: var(--color-text-primary);
       font-weight: 600;
+    }
+  }
+  
+  .summary-price-total {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-top: var(--space-md);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--color-border);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-sage-dark);
+    
+    i {
+      font-size: 1rem;
     }
   }
 }
@@ -650,7 +697,7 @@
     grid-template-columns: repeat(3, 1fr);
   }
   
-  .booking-summary {
-    gap: var(--space-md);
+  .booking-summary .summary-details {
+    gap: var(--space-sm);
   }
 }
