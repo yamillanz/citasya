@@ -309,6 +309,80 @@
 }
 
 /* ================================
+   Services Summary
+   ================================ */
+.services-summary {
+  max-width: 600px;
+  margin: var(--space-xl) auto 0;
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-md);
+  }
+}
+
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+
+  i {
+    color: var(--color-sage);
+    font-size: 0.8125rem;
+  }
+
+  .summary-duration {
+    margin-left: auto;
+    color: var(--color-text-muted);
+  }
+
+  .summary-price {
+    font-weight: 600;
+    color: var(--color-sage-dark);
+  }
+}
+
+.summary-totals {
+  display: flex;
+  gap: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.total-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+
+  i {
+    color: var(--color-sage);
+    font-size: 0.8125rem;
+  }
+
+  strong {
+    color: var(--color-text-primary);
+  }
+}
+
+/* ================================
    Calendar
    ================================ */
 .calendar-wrapper {
