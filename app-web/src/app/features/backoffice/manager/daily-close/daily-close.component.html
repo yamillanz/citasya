@@ -204,8 +204,14 @@
                   <div class="apt-client">{{ apt.client_name }}</div>
                   <div class="apt-service">
                     <i class="pi pi-tag"></i>
-                    {{ apt.service?.name || 'N/A' }}
+                    {{ getServicesNames(apt) }}
                   </div>
+                  @if (getTotalBudgeted(apt) > 0) {
+                    <div class="apt-budget">
+                      <span class="budget-label">Presupuesto:</span>
+                      <span class="budget-value">${{ getTotalBudgeted(apt) | number:'1.2-2' }}</span>
+                    </div>
+                  }
                 </div>
                 <div class="apt-status">
                   <span class="status-badge" [class]="getStatusClass(apt.status)">

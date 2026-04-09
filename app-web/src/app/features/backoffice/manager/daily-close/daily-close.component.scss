@@ -605,6 +605,23 @@
       color: var(--color-sage);
     }
   }
+  
+  .apt-budget {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+    font-size: 0.75rem;
+    
+    .budget-label {
+      color: var(--color-text-muted);
+    }
+    
+    .budget-value {
+      font-weight: 600;
+      color: var(--color-sage-dark);
+    }
+  }
 }
 
 .apt-status {
