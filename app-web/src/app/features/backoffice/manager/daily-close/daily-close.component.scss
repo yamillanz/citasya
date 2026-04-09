@@ -792,6 +792,42 @@
   }
 }
 
+/* ================================
+   Drawer Styles
+   ================================ */
+:host ::ng-deep {
+  .amount-drawer {
+    width: 400px !important;
+    
+    .p-drawer-header {
+      padding: var(--space-lg) var(--space-xl);
+      border-bottom: 1px solid var(--color-border);
+      
+      .p-drawer-title {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: var(--color-text-primary);
+        margin: 0;
+      }
+      
+      .p-drawer-close {
+        color: var(--color-text-muted);
+        border-radius: var(--radius-md);
+        
+        &:hover {
+          background: var(--color-sage-pale);
+          color: var(--color-sage-dark);
+        }
+      }
+    }
+    
+    .p-drawer-content {
+      padding: 0;
+    }
+  }
+}
+
 .drawer-content {
   padding: var(--space-lg);
   display: flex;
@@ -884,16 +920,35 @@
   :host ::ng-deep {
     .btn-cancel-drawer {
       flex: 1;
-      padding: var(--space-md) !important;
+      padding: var(--space-md) var(--space-lg) !important;
       border-radius: var(--radius-lg) !important;
+      font-weight: 500 !important;
+      color: var(--color-text-secondary) !important;
+      background: var(--color-sage-pale) !important;
+      border: 1px solid var(--color-border) !important;
+      transition: all var(--duration-fast) ease !important;
+      
+      &:hover {
+        background: var(--color-border) !important;
+        color: var(--color-text-primary) !important;
+      }
     }
     
     .btn-confirm {
       flex: 1;
+      padding: var(--space-md) var(--space-lg) !important;
+      border-radius: var(--radius-lg) !important;
+      font-weight: 600 !important;
       background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
       border: none !important;
-      padding: var(--space-md) !important;
-      border-radius: var(--radius-lg) !important;
+      color: white !important;
+      box-shadow: 0 4px 12px rgba(157, 193, 131, 0.3) !important;
+      transition: all var(--duration-fast) ease !important;
+      
+      &:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 16px rgba(157, 193, 131, 0.4) !important;
+      }
     }
   }
 }
