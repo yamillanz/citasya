@@ -190,34 +190,26 @@ export class DailyCloseFacade {
   }
 
   private async enrichAppointmentsWithServices(appointments: AppointmentWithRelations[]): Promise<AppointmentWithRelations[]> {
-    // Collect all service_ids that need to be loaded
-    const serviceIdsToLoad = new Set<string>();
-    for (const apt of appointments) {
-      if (!apt.services || apt.services.length === 0) {
-        if (apt.service_id) {
-          serviceIdsToLoad.add(apt.service_id);
-        }
-      }
-    }
+    // Find appointments with empty services
+    const appointmentsToEnrich = appointments.filter(apt => !apt.services || apt.services.length === 0);
+    if (appointmentsToEnrich.length === 0) return appointments;
 
-    if (serviceIdsToLoad.size === 0) return appointments;
-
-    // Load all missing services at once
-    const serviceMap = new Map<string, any>();
+    // Load all services for the company once
+    let allServices: any[] = [];
     try {
-      const allServices = await this.serviceService.getByCompany(this._companyId()!);
-      for (const svc of allServices) {
-        serviceMap.set(svc.id, svc);
-      }
+      allServices = await this.serviceService.getByCompany(this._companyId()!);
     } catch (e) {
       console.error('Error loading services for enrichment:', e);
       return appointments;
     }
 
-    // Enrich appointments
+    const serviceMap = new Map(allServices.map(s => [s.id, s]));
+
+    // Enrich appointments: use service_id as fallback for each appointment
     return appointments.map(apt => {
       if (apt.services && apt.services.length > 0) return apt;
       
+      // Fallback: use service_id to get the service from our loaded map
       if (apt.service_id && serviceMap.has(apt.service_id)) {
         const svc = serviceMap.get(apt.service_id);
         return { ...apt, services: [svc] };
