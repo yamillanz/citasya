@@ -4,6 +4,7 @@ import { AppointmentService } from '../../../../core/services/appointment.servic
 import { DailyCloseService } from '../../../../core/services/daily-close.service';
 import { CompanyService } from '../../../../core/services/company.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { ServiceService } from '../../../../core/services/service.service';
 
 export interface Employee {
   id: string;
@@ -35,6 +36,7 @@ export class DailyCloseFacade {
   private dailyCloseService = inject(DailyCloseService);
   private companyService = inject(CompanyService);
   private authService = inject(AuthService);
+  private serviceService = inject(ServiceService);
 
   // State signals
   private readonly _appointments = signal<AppointmentWithRelations[]>([]);
@@ -164,7 +166,10 @@ export class DailyCloseFacade {
         this._companyId()!,
         dateStr
       ) as AppointmentWithRelations[];
-      this._appointments.set(appointments);
+      
+      // Enrich appointments with services if missing (fallback for old data)
+      const enriched = await this.enrichAppointmentsWithServices(appointments);
+      this._appointments.set(enriched);
 
       const isClosed = await this.dailyCloseService.checkIfClosed(
         this._companyId()!,
@@ -182,6 +187,44 @@ export class DailyCloseFacade {
     } finally {
       this._loading.set(false);
     }
+  }
+
+  private async enrichAppointmentsWithServices(appointments: AppointmentWithRelations[]): Promise<AppointmentWithRelations[]> {
+    // Collect all service_ids that need to be loaded
+    const serviceIdsToLoad = new Set<string>();
+    for (const apt of appointments) {
+      if (!apt.services || apt.services.length === 0) {
+        if (apt.service_id) {
+          serviceIdsToLoad.add(apt.service_id);
+        }
+      }
+    }
+
+    if (serviceIdsToLoad.size === 0) return appointments;
+
+    // Load all missing services at once
+    const serviceMap = new Map<string, any>();
+    try {
+      const allServices = await this.serviceService.getByCompany(this._companyId()!);
+      for (const svc of allServices) {
+        serviceMap.set(svc.id, svc);
+      }
+    } catch (e) {
+      console.error('Error loading services for enrichment:', e);
+      return appointments;
+    }
+
+    // Enrich appointments
+    return appointments.map(apt => {
+      if (apt.services && apt.services.length > 0) return apt;
+      
+      if (apt.service_id && serviceMap.has(apt.service_id)) {
+        const svc = serviceMap.get(apt.service_id);
+        return { ...apt, services: [svc] };
+      }
+      
+      return apt;
+    }) as AppointmentWithRelations[];
   }
 
   selectEmployee(employee: Employee | null): void {
