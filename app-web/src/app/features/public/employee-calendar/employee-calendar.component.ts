@@ -9,8 +9,6 @@ import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
-import { CheckboxModule } from 'primeng/checkbox';
-import { FormsModule } from '@angular/forms';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
@@ -28,9 +26,7 @@ import { calculateTotalDuration, calculateTotalPrice, formatServicesList } from 
     FullCalendarModule,
     RouterLink,
     ButtonModule,
-    AvatarModule,
-    CheckboxModule,
-    FormsModule
+    AvatarModule
   ],
   templateUrl: './employee-calendar.component.html',
   styleUrl: './employee-calendar.component.scss'

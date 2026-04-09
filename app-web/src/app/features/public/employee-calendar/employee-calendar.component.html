@@ -72,15 +72,17 @@
         @for (service of services(); track service.id) {
           <div 
             class="service-card"
-            [class.selected]="isServiceSelected(service.id)">
-            <label class="service-content">
-              <p-checkbox
-                [value]="service.id"
-                [(ngModel)]="selectedServiceIds"
-                [inputId]="'service-' + service.id"
-                (onChange)="onServiceToggle(service.id)"
-                binary="false">
-              </p-checkbox>
+            [class.selected]="isServiceSelected(service.id)"
+            (click)="onServiceToggle(service.id)">
+            <div class="service-content">
+              <div class="checkbox-wrapper">
+                <input 
+                  type="checkbox"
+                  [id]="'service-' + service.id"
+                  [checked]="isServiceSelected(service.id)"
+                  (click)="$event.stopPropagation()"
+                  (change)="onServiceToggle(service.id)">
+              </div>
               <div class="service-info">
                 <span class="service-name">{{ service.name }}</span>
                 <span class="service-duration">
@@ -93,7 +95,7 @@
                   ${{ service.price | number:'1.2-2' }}
                 </div>
               }
-            </label>
+            </div>
           </div>
         }
       </div>

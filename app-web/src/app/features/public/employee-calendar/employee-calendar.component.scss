@@ -226,6 +226,19 @@
   flex: 1;
 }
 
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--color-sage);
+    cursor: pointer;
+  }
+}
+
 .service-icon {
   width: 44px;
   height: 44px;
