@@ -250,4 +250,14 @@ export class DailyCloseComponent implements OnInit {
   getInitials(name: string): string {
     return this.facade.getInitials(name);
   }
+
+  getTotalBudgeted(apt: AppointmentWithRelations | null): number {
+    if (!apt?.services || apt.services.length === 0) return 0;
+    return apt.services.reduce((sum, s) => sum + (s.price || 0), 0);
+  }
+
+  getServicesNames(apt: AppointmentWithRelations | null): string {
+    if (!apt?.services || apt.services.length === 0) return 'N/A';
+    return apt.services.map(s => s.name).join(', ');
+  }
 }

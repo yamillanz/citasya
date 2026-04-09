@@ -805,6 +805,25 @@
       font-weight: 600;
       color: var(--color-text-primary);
     }
+    
+    &.budgeted {
+      margin-top: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: white;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-sage);
+      
+      .summary-label {
+        color: var(--color-sage-dark);
+        font-weight: 600;
+      }
+      
+      .summary-value {
+        color: var(--color-sage-dark);
+        font-size: 1.125rem;
+        font-family: var(--font-display);
+      }
+    }
   }
 }
 

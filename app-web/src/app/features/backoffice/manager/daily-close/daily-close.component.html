@@ -290,12 +290,18 @@
         </div>
         <div class="summary-row">
           <span class="summary-label">Servicio:</span>
-          <span class="summary-value">{{ selectedAppointment()?.service?.name || 'N/A' }}</span>
+          <span class="summary-value">{{ getServicesNames(selectedAppointment()) }}</span>
         </div>
         <div class="summary-row">
           <span class="summary-label">Hora:</span>
           <span class="summary-value">{{ selectedAppointment()?.appointment_time }}</span>
         </div>
+        @if (getTotalBudgeted(selectedAppointment()) > 0) {
+          <div class="summary-row budgeted">
+            <span class="summary-label">Monto presupuestado:</span>
+            <span class="summary-value">${{ getTotalBudgeted(selectedAppointment()) | number:'1.2-2' }}</span>
+          </div>
+        }
       </div>
 
       <div class="amount-input-section">
