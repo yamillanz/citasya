@@ -1,17 +1,18 @@
 .dialog-header {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-xs);
 
   h2 {
     margin: 0;
-    color: #2c3e50;
+    font-family: var(--font-display);
     font-size: 1.25rem;
-    font-weight: 600;
+    font-weight: 500;
+    color: var(--color-text-primary);
   }
 
   .dialog-subtitle {
-    color: #5D6D7E;
+    color: var(--color-text-secondary);
     font-size: 0.875rem;
   }
 }
@@ -19,60 +20,89 @@
 .stats-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
 
   .stat-card {
     text-align: center;
-    padding: 0.75rem;
-    border-radius: 8px;
-    background: #f8faf7;
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+    background: var(--color-sage-pale);
 
     .stat-value {
       display: block;
+      font-family: var(--font-display);
       font-size: 1.25rem;
-      font-weight: 700;
-      color: #2c3e50;
+      font-weight: 600;
+      color: var(--color-text-primary);
     }
 
     .stat-label {
       display: block;
       font-size: 0.75rem;
-      color: #5D6D7E;
-      margin-top: 0.25rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
 
-    &.stat-completed .stat-value { color: #22c55e; }
-    &.stat-pending .stat-value { color: #f59e0b; }
-    &.stat-cancelled .stat-value { color: #ef4444; }
-    &.stat-noshow .stat-value { color: #94a3b8; }
-    &.stat-commission .stat-value { color: #9DC183; }
+    &.stat-completed .stat-value { color: #16a34a; }
+    &.stat-pending .stat-value { color: #d97706; }
+    &.stat-cancelled .stat-value { color: #dc2626; }
+    &.stat-noshow .stat-value { color: #6b7280; }
+    &.stat-amount {
+      background: linear-gradient(135deg, rgba(157, 193, 131, 0.15) 0%, rgba(157, 193, 131, 0.08) 100%);
+    }
+    &.stat-commission {
+      background: linear-gradient(135deg, rgba(157, 193, 131, 0.2) 0%, rgba(157, 193, 131, 0.1) 100%);
+    }
   }
 }
 
 .commission-cell {
   font-weight: 600;
-  color: #9DC183;
+  color: var(--color-sage-dark);
 }
 
 .empty-detail {
   text-align: center;
-  padding: 2rem;
-  color: #5D6D7E;
+  padding: var(--space-xl);
+  color: var(--color-text-muted);
 }
 
 .empty-cell {
   text-align: center;
-  color: #5D6D7E;
-  padding: 2rem !important;
+  color: var(--color-text-muted);
+  padding: var(--space-xl) !important;
 }
 
 .dialog-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-md);
 }
 
 .loading-state {
-  padding: 2rem;
+  padding: var(--space-xl);
+}
+
+:host ::ng-deep {
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background: var(--color-linen);
+      color: var(--color-text-primary);
+      font-weight: 600;
+      font-size: 0.8125rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 2px solid var(--color-sand);
+    }
+
+    .p-datatable-tbody > tr > td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+    }
+  }
 }

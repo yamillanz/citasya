@@ -1,9 +1,10 @@
 <div class="weekly-report-page">
-  <header class="report-header">
+  <header class="page-header">
     <div class="header-content">
-      <div class="header-title">
+      <div class="header-text">
+        <div class="header-badge">Reportes</div>
         <h1>Reporte Semanal</h1>
-        <p class="header-subtitle">{{ dateRangeLabel() }}</p>
+        <p>Resumen de citas completadas, montos y comisiones por empleado</p>
       </div>
       <div class="header-actions">
         <p-button
@@ -19,110 +20,175 @@
     </div>
   </header>
 
-  <!-- Filters -->
-  <section class="filters-section">
-    <div class="filters-card">
-      <div class="filter-group">
-        <label class="filter-label">Rango de fechas</label>
-        <div class="date-nav">
-          <p-button icon="pi pi-chevron-left" [rounded]="true" [text]="true" (onClick)="previousWeek()" styleClass="p-button-sm p-button-plain"></p-button>
-          <p-datepicker
-            [(ngModel)]="startDateValue"
-            (ngModelChange)="onStartDateChange()"
-            [showIcon]="true"
-            dateFormat="dd/mm/yy"
-            placeholder="Fecha inicio"
-            styleClass="date-filter">
-          </p-datepicker>
-          <span class="date-separator">a</span>
-          <p-datepicker
-            [(ngModel)]="endDateValue"
-            (ngModelChange)="onEndDateChange()"
-            [showIcon]="true"
-            dateFormat="dd/mm/yy"
-            placeholder="Fecha fin"
-            styleClass="date-filter">
-          </p-datepicker>
-          <p-button icon="pi pi-chevron-right" [rounded]="true" [text]="true" (onClick)="nextWeek()" styleClass="p-button-sm p-button-plain"></p-button>
-          <p-button label="Hoy" [outlined]="true" size="small" (onClick)="currentWeek()"></p-button>
+  @if (loading()) {
+    <div class="loading-state">
+      <p-skeleton width="100%" height="3rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="3rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="3rem"></p-skeleton>
+    </div>
+  } @else {
+    <!-- Stats Summary -->
+    <div class="stats-summary">
+      <div class="stat-item stat-primary">
+        <div class="stat-icon">
+          <i class="pi pi-calendar"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ totalAppointments() }}</span>
+          <span class="stat-label">Total Citas</span>
         </div>
       </div>
-      <div class="filter-group">
-        <label class="filter-label">Empleado</label>
-        <p-select
-          [options]="employeeOptions()"
-          [(ngModel)]="selectedEmployeeValue"
-          (onChange)="onEmployeeChange($event)"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Todos los empleados"
-          [showClear]="false"
-          styleClass="employee-filter">
-        </p-select>
+      <div class="stat-item stat-success">
+        <div class="stat-icon">
+          <i class="pi pi-dollar"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">${{ totalAmount().toFixed(2) }}</span>
+          <span class="stat-label">Total Monto</span>
+        </div>
+      </div>
+      <div class="stat-item stat-info">
+        <div class="stat-icon">
+          <i class="pi pi-wallet"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">${{ totalCommission().toFixed(2) }}</span>
+          <span class="stat-label">Total Comisión</span>
+        </div>
       </div>
     </div>
-  </section>
 
-  <!-- Summary Table -->
-  <section class="summary-section">
-    @if (loading()) {
-      <div class="loading-state">
-        <p-skeleton width="100%" height="3rem" styleClass="mb-2"></p-skeleton>
-        <p-skeleton width="100%" height="3rem" styleClass="mb-2"></p-skeleton>
-        <p-skeleton width="100%" height="3rem"></p-skeleton>
-      </div>
-    } @else if (summaryData().length === 0) {
-      <div class="empty-state">
-        <div class="empty-illustration">
-          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-            <circle cx="40" cy="40" r="40" fill="#F5F2ED"/>
-            <rect x="22" y="20" width="36" height="36" rx="4" stroke="#B8D4A3" stroke-width="2"/>
-            <path d="M30 35H50M30 45H45" stroke="#B8D4A3" stroke-width="2" stroke-linecap="round"/>
-          </svg>
+    <!-- Date Navigation Card -->
+    <div class="date-nav-card">
+      <div class="date-nav">
+        <p-button
+          icon="pi pi-chevron-left"
+          (onClick)="previousWeek()"
+          styleClass="nav-btn"
+          [outlined]="true"
+          tooltip="Semana anterior">
+        </p-button>
+
+        <div class="date-display">
+          <div class="date-icon">
+            <i class="pi pi-calendar"></i>
+          </div>
+          <div class="date-info">
+            <span class="date-label">Rango de fechas</span>
+            <span class="date-value">{{ dateRangeLabel() }}</span>
+          </div>
         </div>
-        <h3>No hay datos en el período seleccionado</h3>
-        <p>Intenta cambiar el rango de fechas o selecciona otro empleado.</p>
+
+        <p-button
+          icon="pi pi-chevron-right"
+          (onClick)="nextWeek()"
+          styleClass="nav-btn"
+          [outlined]="true"
+          tooltip="Semana siguiente">
+        </p-button>
+
+        <p-datepicker
+          [(ngModel)]="startDateValue"
+          (ngModelChange)="onStartDateChange()"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          placeholder="Fecha inicio"
+          styleClass="date-picker">
+        </p-datepicker>
+
+        <span class="date-separator">a</span>
+
+        <p-datepicker
+          [(ngModel)]="endDateValue"
+          (ngModelChange)="onEndDateChange()"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          placeholder="Fecha fin"
+          styleClass="date-picker">
+        </p-datepicker>
+
+        <p-button
+          label="Hoy"
+          [outlined]="true"
+          size="small"
+          (onClick)="currentWeek()">
+        </p-button>
+
+        <div class="filters-row">
+          <div class="filter-group">
+            <span class="filter-label">Empleado</span>
+            <p-select
+              [options]="employeeOptions()"
+              [(ngModel)]="selectedEmployeeValue"
+              (onChange)="onEmployeeChange($event)"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Todos los empleados"
+              [showClear]="false"
+              styleClass="employee-filter">
+            </p-select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Table -->
+    @if (summaryData().length === 0) {
+      <div class="summary-card">
+        <div class="empty-state">
+          <div class="empty-illustration">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <circle cx="40" cy="40" r="40" fill="#F5F2ED"/>
+              <rect x="22" y="20" width="36" height="36" rx="4" stroke="#B8D4A3" stroke-width="2"/>
+              <path d="M30 35H50M30 45H45" stroke="#B8D4A3" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>No hay datos en el período seleccionado</h3>
+          <p>Intenta cambiar el rango de fechas o selecciona otro empleado.</p>
+        </div>
       </div>
     } @else {
-      <p-table [value]="summaryData()" styleClass="p-datatable-sm" [tableStyle]="{'min-width': '50rem'}">
-        <ng-template pTemplate="header">
-          <tr>
-            <th pSortableColumn="employee_name">Empleado <p-sortIcon field="employee_name"></p-sortIcon></th>
-            <th pSortableColumn="total_appointments" styleClass="text-center">Total Citas <p-sortIcon field="total_appointments"></p-sortIcon></th>
-            <th pSortableColumn="total_amount">Total Monto <p-sortIcon field="total_amount"></p-sortIcon></th>
-            <th pSortableColumn="total_commission">Comisión <p-sortIcon field="total_commission"></p-sortIcon></th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-row>
-          <tr class="clickable-row" (click)="openEmployeeDetail(row.employee_id, row.employee_name)">
-            <td>
-              <div class="employee-cell">
-                <i class="pi pi-user employee-icon"></i>
-                <span>{{ row.employee_name }}</span>
-              </div>
-            </td>
-            <td class="text-center">
-              <span class="stat-number">{{ row.total_appointments }}</span>
-            </td>
-            <td>
-              <span class="amount">${{ row.total_amount.toFixed(2) }}</span>
-            </td>
-            <td>
-              <span class="commission">${{ row.total_commission.toFixed(2) }}</span>
-            </td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="footer">
-          <tr class="totals-row">
-            <td><strong>Total</strong></td>
-            <td class="text-center"><strong>{{ totalAppointments() }}</strong></td>
-            <td><strong class="amount">${{ totalAmount().toFixed(2) }}</strong></td>
-            <td><strong class="commission">${{ totalCommission().toFixed(2) }}</strong></td>
-          </tr>
-        </ng-template>
-      </p-table>
+      <div class="summary-card">
+        <p-table [value]="summaryData()" styleClass="p-datatable-sm" [tableStyle]="{'min-width': '50rem'}">
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="employee_name">Empleado <p-sortIcon field="employee_name"></p-sortIcon></th>
+              <th pSortableColumn="total_appointments" styleClass="text-center">Total Citas <p-sortIcon field="total_appointments"></p-sortIcon></th>
+              <th pSortableColumn="total_amount">Total Monto <p-sortIcon field="total_amount"></p-sortIcon></th>
+              <th pSortableColumn="total_commission">Comisión <p-sortIcon field="total_commission"></p-sortIcon></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr class="clickable-row" (click)="openEmployeeDetail(row.employee_id, row.employee_name)">
+              <td>
+                <div class="employee-cell">
+                  <i class="pi pi-user employee-icon"></i>
+                  <span>{{ row.employee_name }}</span>
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="stat-number">{{ row.total_appointments }}</span>
+              </td>
+              <td>
+                <span class="amount">${{ row.total_amount.toFixed(2) }}</span>
+              </td>
+              <td>
+                <span class="commission">${{ row.total_commission.toFixed(2) }}</span>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr class="totals-row">
+              <td><strong>Total</strong></td>
+              <td class="text-center"><strong>{{ totalAppointments() }}</strong></td>
+              <td><strong class="amount">${{ totalAmount().toFixed(2) }}</strong></td>
+              <td><strong class="commission">${{ totalCommission().toFixed(2) }}</strong></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
     }
-  </section>
+  }
 
   <!-- Employee Detail Dialog -->
   @if (selectedEmployee()) {
