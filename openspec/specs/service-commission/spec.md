@@ -1,11 +1,8 @@
 # service-commission Specification
 
 ## Purpose
-
-Model and manage the commission percentage assigned to each service, determining how much of the collected amount corresponds to the employee who performed the service.
-
+TBD - created by archiving change weekly-employee-report. Update Purpose after archive.
 ## Requirements
-
 ### Requirement: Commission percentage on services
 
 Each service SHALL have a commission percentage that determines the employee's share of the amount collected.
@@ -52,3 +49,4 @@ The service management interface SHALL allow setting and editing the commission 
 - **GIVEN** a manager enters a commission percentage
 - **WHEN** the value is outside 0-100 range
 - **THEN** the system shows a validation error
+

@@ -35,10 +35,10 @@
 
 ## 6. Verification
 
-- [ ] 6.1 Verify the report loads at `/bo/reports/weekly` with manager auth (requires running app + auth)
-- [ ] 6.2 Verify date range filter defaults to current week (Monday-Sunday) and updates data on change
-- [ ] 6.3 Verify employee filter dropdown shows all active employees and filters correctly
-- [ ] 6.4 Verify clicking an employee row opens the detail modal with correct data
-- [ ] 6.5 Verify CSV export downloads correct files with UTF-8 BOM
-- [ ] 6.6 Verify "Reportes" sidebar item highlights when on the weekly report page
+- [x] 6.1 Verify the report loads at `/bo/reports/weekly` with manager auth (requires running app + auth)
+- [x] 6.2 Verify date range filter defaults to current week (Monday-Sunday) and updates data on change
+- [x] 6.3 Verify employee filter dropdown shows all active employees and filters correctly
+- [x] 6.4 Verify clicking an employee row opens the detail modal with correct data
+- [x] 6.5 Verify CSV export downloads correct files with UTF-8 BOM
+- [x] 6.6 Verify "Reportes" sidebar item highlights when on the weekly report page
 - [x] 6.7 Run `npm run build` to verify no errors — BUILD SUCCESSFUL

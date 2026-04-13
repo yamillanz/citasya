@@ -1,11 +1,8 @@
 # weekly-report Specification
 
 ## Purpose
-
-Provide managers with a weekly report showing employee performance: total completed appointments, amounts collected, and commissions earned. Includes a detail modal per employee and CSV export capabilities.
-
+TBD - created by archiving change weekly-employee-report. Update Purpose after archive.
 ## Requirements
-
 ### Requirement: Weekly summary view
 
 The system SHALL display a summary table of employee performance for a given date range.
@@ -176,3 +173,4 @@ The weekly report SHALL be accessible from the backoffice sidebar.
 #### Scenario: Sidebar highlight
 - **GIVEN** the manager is on the weekly report page
 - **THEN** the "Reportes" menu item is highlighted in the sidebar
+

@@ -4,7 +4,7 @@
 
 Add the capability to query appointments grouped by employee within a date range, with computed totals for amounts and commissions.
 
-## Modified Requirements
+## ADDED Requirements
 
 ### Requirement: Aggregate appointment queries by employee
 
