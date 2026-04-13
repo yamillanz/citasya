@@ -1,0 +1,155 @@
+.weekly-report-page {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .report-header {
+    margin-bottom: 1.5rem;
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-title h1 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .header-subtitle {
+      margin: 0.25rem 0 0;
+      color: #5D6D7E;
+      font-size: 0.875rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
+
+  .filters-section {
+    margin-bottom: 1.5rem;
+
+    .filters-card {
+      display: flex;
+      align-items: flex-end;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .filter-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #5D6D7E;
+    }
+
+    .date-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .date-separator {
+      color: #5D6D7E;
+      font-size: 0.875rem;
+    }
+
+    .date-range-picker {
+      min-width: 260px;
+    }
+
+    .employee-filter {
+      min-width: 220px;
+    }
+  }
+
+  .summary-section {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+
+    .clickable-row {
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: #f8faf7;
+      }
+    }
+
+    .employee-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .employee-icon {
+      color: #9DC183;
+      font-size: 1.1rem;
+    }
+
+    .stat-number {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .amount {
+      font-weight: 500;
+      color: #2c3e50;
+    }
+
+    .commission {
+      font-weight: 600;
+      color: #9DC183;
+    }
+
+    .totals-row {
+      background: #f8faf7;
+      font-weight: 600;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+
+    .empty-illustration {
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #5D6D7E;
+      font-size: 0.9rem;
+    }
+  }
+
+  .loading-state {
+    padding: 2rem;
+  }
+}

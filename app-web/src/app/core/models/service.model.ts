@@ -4,6 +4,7 @@ export interface Service {
   name: string;
   duration_minutes: number;
   price?: number;
+  commission_percentage: number;
   is_active: boolean;
   created_at: string;
 }
@@ -13,4 +14,5 @@ export interface CreateServiceDto {
   name: string;
   duration_minutes: number;
   price?: number;
+  commission_percentage?: number;
 }

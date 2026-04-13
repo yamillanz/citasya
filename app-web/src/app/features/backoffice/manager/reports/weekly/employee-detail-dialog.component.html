@@ -1,0 +1,114 @@
+<p-dialog
+  [visible]="visible"
+  (onHide)="closeDialog()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '90vw', maxWidth: '900px' }"
+  [header]="employeeName + ' — Detalle Semanal'">
+
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <h2>{{ employeeName }}</h2>
+      <span class="dialog-subtitle">
+        {{ startDate | date:'dd MMM yyyy' }} — {{ endDate | date:'dd MMM yyyy' }}
+      </span>
+    </div>
+  </ng-template>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <p-skeleton width="100%" height="2rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="2rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="2rem"></p-skeleton>
+    </div>
+  } @else {
+    <!-- Quick Stats -->
+    <div class="stats-row">
+      <div class="stat-card stat-completed">
+        <span class="stat-value">{{ completedCount() }}</span>
+        <span class="stat-label">Completadas</span>
+      </div>
+      <div class="stat-card stat-pending">
+        <span class="stat-value">{{ pendingCount() }}</span>
+        <span class="stat-label">Pendientes</span>
+      </div>
+      <div class="stat-card stat-cancelled">
+        <span class="stat-value">{{ cancelledCount() }}</span>
+        <span class="stat-label">Canceladas</span>
+      </div>
+      <div class="stat-card stat-noshow">
+        <span class="stat-value">{{ noShowCount() }}</span>
+        <span class="stat-label">No asistió</span>
+      </div>
+      <div class="stat-card stat-amount">
+        <span class="stat-value">${{ totalAmount().toFixed(2) }}</span>
+        <span class="stat-label">Monto Total</span>
+      </div>
+      <div class="stat-card stat-commission">
+        <span class="stat-value">${{ totalCommission().toFixed(2) }}</span>
+        <span class="stat-label">Comisión</span>
+      </div>
+    </div>
+
+    <!-- Appointments Table -->
+    @if (detailData().length === 0) {
+      <div class="empty-detail">
+        <p>No hay citas en este período.</p>
+      </div>
+    } @else {
+      <p-table [value]="detailData()" styleClass="p-datatable-sm" [tableStyle]="{'min-width': '40rem'}" sortField="appointment_date" [sortOrder]="-1">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="appointment_date">Fecha <p-sortIcon field="appointment_date"></p-sortIcon></th>
+            <th>Hora</th>
+            <th>Cliente</th>
+            <th>Servicios</th>
+            <th pSortableColumn="amount_collected">Monto <p-sortIcon field="amount_collected"></p-sortIcon></th>
+            <th pSortableColumn="commission">Comisión <p-sortIcon field="commission"></p-sortIcon></th>
+            <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ formatDateDisplay(row.appointment_date) }}</td>
+            <td>{{ formatTimeDisplay(row.appointment_time) }}</td>
+            <td>{{ row.client_name }}</td>
+            <td>{{ formatServicesList(row.services) }}</td>
+            <td>${{ row.amount_collected.toFixed(2) }}</td>
+            <td class="commission-cell">${{ row.commission.toFixed(2) }}</td>
+            <td>
+              <p-tag [value]="getStatusLabel(row.status)" [severity]="getStatusSeverity(row.status)"></p-tag>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="empty-cell">No hay citas en este período.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button
+        label="Exportar CSV Detalle"
+        icon="pi pi-download"
+        severity="success"
+        [loading]="exporting()"
+        [disabled]="exporting() || detailData().length === 0"
+        (onClick)="exportDetailCsv()"
+        styleClass="p-button-sm">
+      </p-button>
+      <p-button
+        label="Cerrar"
+        icon="pi pi-times"
+        [outlined]="true"
+        (onClick)="closeDialog()"
+        styleClass="p-button-sm">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>

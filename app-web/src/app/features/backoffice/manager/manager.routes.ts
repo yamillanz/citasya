@@ -33,5 +33,9 @@ export const MANAGER_ROUTES: Routes = [
   {
     path: 'close',
     loadComponent: () => import('./daily-close/daily-close.component').then(m => m.DailyCloseComponent)
+  },
+  {
+    path: 'reports/weekly',
+    loadComponent: () => import('./reports/weekly/weekly-report.component').then(m => m.WeeklyReportComponent)
   }
 ];

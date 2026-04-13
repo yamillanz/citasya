@@ -38,7 +38,8 @@ export class BackofficeComponent implements OnInit {
     { label: 'Empleados', icon: 'pi pi-users', routerLink: '/bo/employees' },
     { label: 'Servicios', icon: 'pi pi-briefcase', routerLink: '/bo/services' },
     { label: 'Citas', icon: 'pi pi-calendar', routerLink: '/bo/appointments' },
-    { label: 'Cierre Diario', icon: 'pi pi-dollar', routerLink: '/bo/close' }
+    { label: 'Cierre Diario', icon: 'pi pi-dollar', routerLink: '/bo/close' },
+    { label: 'Reportes', icon: 'pi pi-chart-bar', routerLink: '/bo/reports/weekly' }
   ];
 
   async ngOnInit() {
