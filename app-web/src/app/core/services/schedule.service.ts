@@ -15,14 +15,19 @@ export interface Schedule {
 export class ScheduleService {
   private supabase: SupabaseClient = supabase;
 
-  async getByCompany(companyId: string): Promise<Schedule[]> {
-    const { data, error } = await this.supabase
+  async getByCompany(companyId: string, includeInactive = false): Promise<Schedule[]> {
+    let query = this.supabase
       .from('schedules')
       .select('*')
       .eq('company_id', companyId)
-      .eq('is_active', true)
       .order('day_of_week');
-    
+
+    if (!includeInactive) {
+      query = query.eq('is_active', true);
+    }
+
+    const { data, error } = await query;
+
     if (error) throw error;
     return data || [];
   }
