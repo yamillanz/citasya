@@ -2,19 +2,14 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { TableModule } from 'primeng/table';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ToastModule } from 'primeng/toast';
-import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CompanyService } from '../../../../core/services/company.service';
 import { ScheduleService, Schedule } from '../../../../core/services/schedule.service';
-import { ServiceService } from '../../../../core/services/service.service';
-import { Service } from '../../../../core/models/service.model';
 
 interface DayScheduleForm {
   day_of_week: number;
@@ -44,13 +39,10 @@ const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
     ReactiveFormsModule,
     FormsModule,
     RouterLink,
-    CardModule,
     ButtonModule,
     InputTextModule,
-    TableModule,
     ToggleSwitchModule,
-    ToastModule,
-    SkeletonModule
+    ToastModule
   ],
   providers: [MessageService],
   templateUrl: './settings.component.html',
@@ -61,13 +53,11 @@ export class SettingsComponent implements OnInit {
   private authService = inject(AuthService);
   private companyService = inject(CompanyService);
   private scheduleService = inject(ScheduleService);
-  private serviceService = inject(ServiceService);
   private messageService = inject(MessageService);
 
   loading = signal(true);
   saving = signal(false);
   companyId = signal<string | null>(null);
-  services = signal<Service[]>([]);
   daySchedules = signal<DayScheduleForm[]>([]);
   dayNames = DAY_NAMES;
   dayOrder = DAY_ORDER;
@@ -88,10 +78,9 @@ export class SettingsComponent implements OnInit {
     this.companyId.set(user.company_id);
 
     try {
-      const [company, schedules, services] = await Promise.all([
+      const [company, schedules] = await Promise.all([
         this.companyService.getById(user.company_id),
-        this.scheduleService.getByCompany(user.company_id, true),
-        this.serviceService.getByCompany(user.company_id)
+        this.scheduleService.getByCompany(user.company_id, true)
       ]);
 
       if (company) {
@@ -102,7 +91,6 @@ export class SettingsComponent implements OnInit {
         });
       }
 
-      this.services.set(services);
       this.initScheduleForms(schedules);
     } catch {
       this.messageService.add({
