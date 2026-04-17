@@ -32,8 +32,7 @@ export class SuperadminLayoutComponent implements OnInit {
   sidebarVisible = signal(false);
 
   menuItems = [
-    { label: 'Empresas', icon: 'pi pi-building', routerLink: '/sa/companies' },
-    { label: 'Usuarios', icon: 'pi pi-users', routerLink: '/sa/users' },
+    { label: 'Gestión', icon: 'pi pi-cog', routerLink: '/sa/management' },
     { label: 'Planes', icon: 'pi pi-credit-card', routerLink: '/sa/plans' },
     { label: 'Transacciones', icon: 'pi pi-dollar', routerLink: '/sa/transactions' }
   ];

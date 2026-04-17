@@ -3,16 +3,12 @@ import { Routes } from '@angular/router';
 export const SUPERADMIN_ROUTES: Routes = [
   {
     path: '',
-    redirectTo: 'companies',
+    redirectTo: 'management',
     pathMatch: 'full'
   },
   {
-    path: 'companies',
-    loadComponent: () => import('./companies/superadmin-companies.component').then(m => m.SuperadminCompaniesComponent)
-  },
-  {
-    path: 'users',
-    loadComponent: () => import('./users/superadmin-users.component').then(m => m.SuperadminUsersComponent)
+    path: 'management',
+    loadComponent: () => import('./central-management/central-management.component').then(m => m.CentralManagementComponent)
   },
   {
     path: 'plans',

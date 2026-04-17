@@ -1,0 +1,355 @@
+<div class="management-page">
+  <div class="page-header">
+    <div class="header-text">
+      <span class="header-badge">Superadmin</span>
+      <h1>Gestión Central</h1>
+      <p>Administra empresas y usuarios desde un solo lugar</p>
+    </div>
+    <p-button label="Nueva Empresa" icon="pi pi-plus" (onClick)="openCreateCompanyDialog()" />
+  </div>
+
+  <div class="filters-bar">
+    <span class="p-input-icon-left search-input">
+      <i class="pi pi-search"></i>
+      <input pInputText type="text" placeholder="Buscar por nombre o slug..."
+        [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" />
+    </span>
+    <p-select
+      [options]="statusOptions"
+      [(ngModel)]="statusFilter"
+      placeholder="Estado"
+      [style]="{ minWidth: '160px' }"
+    />
+    <p-select
+      [options]="planFilterOptions()"
+      [(ngModel)]="planFilter"
+      placeholder="Plan"
+      [style]="{ minWidth: '160px' }"
+    />
+  </div>
+
+  @if (selectedCompanies().length > 0) {
+    <div class="bulk-actions-bar">
+      <span class="selection-count">{{ selectedCompanies().length }} seleccionada(s)</span>
+      <div class="bulk-buttons">
+        <p-button label="Activar selección" icon="pi pi-check-circle"
+          styleClass="p-button-sm p-button-success" (onClick)="bulkActivateCompanies()" />
+        <p-button label="Desactivar selección" icon="pi pi-ban"
+          styleClass="p-button-sm p-button-danger" (onClick)="bulkDeactivateCompanies()" />
+      </div>
+    </div>
+  }
+
+  <div class="table-section">
+    <p-table
+      [value]="filteredCompanies()"
+      [loading]="loading()"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [(selection)]="selectedCompanies"
+      dataKey="id"
+      editMode="row"
+      styleClass="p-datatable-sm"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox />
+          </th>
+          <th pSortableColumn="name">
+            <div class="flex items-center gap-2">Nombre <p-sortIcon field="name" /></div>
+          </th>
+          <th>Slug</th>
+          <th>Plan</th>
+          <th>Estado</th>
+          <th style="width: 180px">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-company let-editing="editing" let-ri="rowIndex">
+        <tr [pEditableRow]="company"
+            [class.selected-row]="selectedCompanyId() === company.id"
+            (click)="selectCompany(company)"
+            class="company-row">
+          <td (click)="$event.stopPropagation()">
+            <p-tableCheckbox [value]="company" />
+          </td>
+          <td>
+            <p-cellEditor>
+              <ng-template #input>
+                <input pInputText type="text" [(ngModel)]="company.name" required />
+              </ng-template>
+              <ng-template #output>
+                <span class="company-name">{{ company.name }}</span>
+              </ng-template>
+            </p-cellEditor>
+          </td>
+          <td>
+            <p-cellEditor>
+              <ng-template #input>
+                <input pInputText type="text" [(ngModel)]="company.slug" />
+              </ng-template>
+              <ng-template #output>
+                <code class="slug-code">{{ company.slug }}</code>
+              </ng-template>
+            </p-cellEditor>
+          </td>
+          <td>
+            <p-cellEditor>
+              <ng-template #input>
+                <p-select [options]="planOptions()" [(ngModel)]="company.plan_id"
+                  optionLabel="label" optionValue="value" placeholder="Sin plan"
+                  [showClear]="true" [style]="{ width: '100%' }" />
+              </ng-template>
+              <ng-template #output>
+                <span class="plan-badge">{{ getPlanName(company) }}</span>
+              </ng-template>
+            </p-cellEditor>
+          </td>
+          <td>
+            @if (company.is_active) {
+              <p-tag value="Activo" severity="success" />
+            } @else {
+              <p-tag value="Inactivo" severity="secondary" />
+            }
+          </td>
+          <td>
+            <div class="action-buttons" (click)="$event.stopPropagation()">
+              @if (!editing) {
+                <p-button icon="pi pi-pencil" pRipple type="button"
+                  pInitEditableRow styleClass="p-button-rounded p-button-text p-button-sm"
+                  pTooltip="Editar" />
+                <p-button [icon]="company.is_active ? 'pi pi-ban' : 'pi pi-check'"
+                  styleClass="p-button-rounded p-button-text p-button-sm"
+                  [styleClass]="company.is_active ? 'p-button-danger' : 'p-button-success'"
+                  (onClick)="confirmToggleCompany(company)"
+                  [pTooltip]="company.is_active ? 'Desactivar' : 'Reactivar'" />
+                <p-button icon="pi pi-users" styleClass="p-button-rounded p-button-text p-button-sm"
+                  (onClick)="selectCompany(company)"
+                  pTooltip="Ver usuarios" />
+              } @else {
+                <p-button icon="pi pi-check" pRipple type="button"
+                  pSaveEditableRow styleClass="p-button-rounded p-button-text p-button-sm p-button-success"
+                  (onClick)="onCompanyRowEditSave(company)" />
+                <p-button icon="pi pi-times" pRipple type="button"
+                  pCancelEditableRow styleClass="p-button-rounded p-button-text p-button-sm p-button-danger"
+                  (onClick)="onCompanyRowEditCancel(company, ri)" />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6">
+            @if (searchTerm() || statusFilter() !== 'all' || planFilter()) {
+              <app-empty-state icon="pi pi-search" title="No se encontraron resultados"
+                [description]="'No hay empresas que coincidan con los filtros aplicados'"
+                actionLabel="Limpiar filtros" (actionClick)="clearFilters()" />
+            } @else {
+              <app-empty-state icon="pi pi-building" title="No hay empresas registradas"
+                description="Comienza agregando tu primera empresa a la plataforma"
+                actionLabel="Crear Empresa" (actionClick)="openCreateCompanyDialog()" />
+            }
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="loadingbody">
+        @for (row of [1,2,3,4,5]; track row) {
+          <tr>
+            <td><p-skeleton height="2rem" /></td>
+            <td><p-skeleton height="2rem" /></td>
+            <td><p-skeleton height="2rem" /></td>
+            <td><p-skeleton height="2rem" /></td>
+            <td><p-skeleton height="2rem" /></td>
+            <td><p-skeleton height="2rem" /></td>
+          </tr>
+        }
+      </ng-template>
+    </p-table>
+  </div>
+
+  @if (selectedCompanyId()) {
+    <div class="users-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <i class="pi pi-users"></i>
+          <h2>Usuarios de: {{ selectedCompanyName() }}</h2>
+          <span class="user-count">{{ users().length }} usuario(s)</span>
+        </div>
+        <p-button label="Nuevo Usuario" icon="pi pi-plus" styleClass="p-button-sm"
+          (onClick)="openCreateUserDialog()" />
+      </div>
+
+      @if (selectedUsers().length > 0) {
+        <div class="bulk-actions-bar">
+          <span class="selection-count">{{ selectedUsers().length }} seleccionado(s)</span>
+          <div class="bulk-buttons">
+            <p-button label="Activar selección" icon="pi pi-check-circle"
+              styleClass="p-button-sm p-button-success" (onClick)="bulkActivateUsers()" />
+            <p-button label="Desactivar selección" icon="pi pi-ban"
+              styleClass="p-button-sm p-button-danger" (onClick)="bulkDeactivateUsers()" />
+          </div>
+        </div>
+      }
+
+      <p-table
+        [value]="users()"
+        [loading]="usersLoading()"
+        [(selection)]="selectedUsers"
+        dataKey="id"
+        editMode="row"
+        styleClass="p-datatable-sm"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
+            <th pSortableColumn="full_name">
+              <div class="flex items-center gap-2">Nombre <p-sortIcon field="full_name" /></div>
+            </th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th style="width: 150px">Acciones</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-user let-editing="editing" let-ri="rowIndex">
+          <tr [pEditableRow]="user">
+            <td><p-tableCheckbox [value]="user" /></td>
+            <td>
+              <p-cellEditor>
+                <ng-template #input>
+                  <input pInputText type="text" [(ngModel)]="user.full_name" required />
+                </ng-template>
+                <ng-template #output>
+                  <span class="user-name">{{ user.full_name }}</span>
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <span class="user-email">{{ user.email }}</span>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template #input>
+                  <p-select [options]="roleOptions" [(ngModel)]="user.role"
+                    optionLabel="label" optionValue="value" [style]="{ width: '100%' }" />
+                </ng-template>
+                <ng-template #output>
+                  <p-tag [value]="getRoleLabel(user.role)" [severity]="getRoleSeverity(user.role)" />
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              @if (user.is_active) {
+                <p-tag value="Activo" severity="success" />
+              } @else {
+                <p-tag value="Inactivo" severity="secondary" />
+              }
+            </td>
+            <td>
+              <div class="action-buttons">
+                @if (!editing) {
+                  <p-button icon="pi pi-pencil" pRipple type="button"
+                    pInitEditableRow styleClass="p-button-rounded p-button-text p-button-sm"
+                    pTooltip="Editar fila" />
+                  <p-button [icon]="user.is_active ? 'pi pi-ban' : 'pi pi-check'"
+                    styleClass="p-button-rounded p-button-text p-button-sm"
+                    [styleClass]="user.is_active ? 'p-button-danger' : 'p-button-success'"
+                    (onClick)="confirmToggleUser(user)"
+                    [pTooltip]="user.is_active ? 'Desactivar' : 'Reactivar'" />
+                } @else {
+                  <p-button icon="pi pi-check" pRipple type="button"
+                    pSaveEditableRow styleClass="p-button-rounded p-button-text p-button-sm p-button-success"
+                    (onClick)="onUserRowEditSave(user)" />
+                  <p-button icon="pi pi-times" pRipple type="button"
+                    pCancelEditableRow styleClass="p-button-rounded p-button-text p-button-sm p-button-danger"
+                    (onClick)="onUserRowEditCancel(user, ri)" />
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6">
+              <app-empty-state icon="pi pi-users" title="Sin usuarios"
+                description="Esta empresa no tiene usuarios registrados"
+                actionLabel="Agregar Usuario" (actionClick)="openCreateUserDialog()" />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+</div>
+
+<p-dialog [header]="editingCompany() ? 'Editar Empresa' : 'Nueva Empresa'"
+  [(visible)]="companyDialogVisible" [modal]="true" [style]="{ width: '450px' }" [draggable]="false">
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="company-name">Nombre *</label>
+      <input pInputText id="company-name" [(ngModel)]="companyFormData().name"
+        (blur)="generateSlug()" placeholder="Nombre de la empresa" />
+    </div>
+    <div class="form-field">
+      <label for="company-slug">Slug *</label>
+      <input pInputText id="company-slug" [(ngModel)]="companyFormData().slug" placeholder="url-slug" />
+    </div>
+    <div class="form-field">
+      <label for="company-address">Dirección</label>
+      <input pInputText id="company-address" [(ngModel)]="companyFormData().address" placeholder="Dirección física" />
+    </div>
+    <div class="form-field">
+      <label for="company-phone">Teléfono</label>
+      <input pInputText id="company-phone" [(ngModel)]="companyFormData().phone" placeholder="+57 300 123 4567" />
+    </div>
+    <div class="form-field">
+      <label for="company-plan">Plan</label>
+      <p-select id="company-plan" [options]="planOptions()" [(ngModel)]="companyFormData().plan_id"
+        optionLabel="label" optionValue="value" placeholder="Sin plan"
+        [showClear]="true" [style]="{ width: '100%' }" />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" styleClass="p-button-text" (onClick)="companyDialogVisible.set(false)" [disabled]="saving()" />
+    <p-button label="Guardar" (onClick)="saveCompany()" [loading]="saving()" />
+  </ng-template>
+</p-dialog>
+
+<p-dialog [header]="editingUser() ? 'Editar Usuario' : 'Nuevo Usuario'"
+  [(visible)]="userDialogVisible" [modal]="true" [style]="{ width: '450px' }" [draggable]="false">
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="user-email">Email *</label>
+      <input pInputText id="user-email" [(ngModel)]="userFormData().email" placeholder="correo@ejemplo.com" />
+    </div>
+    <div class="form-field">
+      <label for="user-name">Nombre completo *</label>
+      <input pInputText id="user-name" [(ngModel)]="userFormData().full_name" placeholder="Juan Pérez" />
+    </div>
+    <div class="form-field">
+      <label for="user-phone">Teléfono</label>
+      <input pInputText id="user-phone" [(ngModel)]="userFormData().phone" placeholder="+57 300 123 4567" />
+    </div>
+    <div class="form-field">
+      <label for="user-role">Rol *</label>
+      <p-select id="user-role" [options]="roleOptions" [(ngModel)]="userFormData().role"
+        optionLabel="label" optionValue="value" placeholder="Seleccionar rol" [style]="{ width: '100%' }" />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" styleClass="p-button-text" (onClick)="userDialogVisible.set(false)" [disabled]="saving()" />
+    <p-button label="Guardar" (onClick)="saveUser()" [loading]="saving()" />
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog />
+<p-toast />

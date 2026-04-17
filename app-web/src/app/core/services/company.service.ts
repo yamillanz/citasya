@@ -3,6 +3,10 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { Company, CreateCompanyDto } from '../models/company.model';
 import { supabase } from '../supabase';
 
+export interface CompanyWithPlan extends Company {
+  plans?: { id: string; name: string } | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CompanyService {
   private supabase: SupabaseClient = supabase;
@@ -29,14 +33,26 @@ export class CompanyService {
     return data;
   }
 
-  async getAll(): Promise<Company[]> {
-    const { data, error } = await this.supabase
+  async getAll(): Promise<CompanyWithPlan[]> {
+    const { data: companies, error: companyError } = await this.supabase
       .from('companies')
-      .select('*, plans:plan_id(id, name)')
+      .select('*')
       .order('name');
-    
-    if (error) throw error;
-    return data || [];
+
+    if (companyError) throw companyError;
+
+    const { data: plans, error: planError } = await this.supabase
+      .from('plans')
+      .select('id, name');
+
+    if (planError) throw planError;
+
+    const planMap = new Map((plans || []).map((p: any) => [p.id, p]));
+
+    return (companies || []).map((company: any) => ({
+      ...company,
+      plans: company.plan_id ? planMap.get(company.plan_id) || null : null
+    }));
   }
 
   async create(company: Partial<Company>): Promise<Company> {
