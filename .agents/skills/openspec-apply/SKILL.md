@@ -1,11 +1,11 @@
 ---
 name: openspec-apply
-description: Implement tasks from the change using `/opsx:apply`, working through the task list and checking off items. Use when the user says "implement", "apply the change", "/opsx:apply", or "start coding from tasks".
+description: Implement tasks from the change. Use when the user says "implement", "apply the change", or "start coding from tasks".
 ---
 
 # OpenSpec Apply Skill
 
-Use **`/opsx:apply`** to implement tasks from a change. The agent reads `tasks.md`, works through tasks one by one, writes code, creates files, runs tests as needed, and checks off completed items with `[x]`.
+Use this skill to implement tasks from a change. The agent reads `tasks.md`, works through tasks one by one, writes code, creates files, runs tests as needed, and checks off completed items with `[x]`.
 
 ## When to Use
 
@@ -19,12 +19,12 @@ Use **`/opsx:apply`** to implement tasks from a change. The agent reads `tasks.m
 
 ## Workflow
 
-1. **Start implementation**
-   - `/opsx:apply` — apply the current/inferred change.
-   - `/opsx:apply <change-name>` — apply a specific change.
+1. **Check status**
+   - Run: `openspec status --change <name>`
+   - Confirm all planning artifacts are done.
 
 2. **Read tasks**
-   - The agent reads `tasks.md` and identifies incomplete tasks (unchecked `[ ]` items).
+   - Read `openspec/changes/<name>/tasks.md` and identify incomplete tasks (unchecked `[ ]` items).
 
 3. **Work through tasks**
    - For each task: read relevant specs, design, and existing code; write code; create/modify files; run tests.
@@ -35,7 +35,7 @@ Use **`/opsx:apply`** to implement tasks from a change. The agent reads `tasks.m
    - OpenSpec is fluid — updating artifacts during implementation is expected and encouraged.
 
 5. **Resume if interrupted**
-   - Run `/opsx:apply` again; it picks up where it left off based on checkbox state.
+   - Run the apply flow again; it picks up where it left off based on checkbox state.
 
 ## Outputs
 
@@ -49,11 +49,11 @@ Use **`/opsx:apply`** to implement tasks from a change. The agent reads `tasks.m
 
 ## Troubleshooting
 
-- **"Change not found"**: Specify the change name: `/opsx:apply add-dark-mode`.
-- **Tasks seem wrong**: Edit `tasks.md` (or use `/opsx:continue` to regenerate) before applying.
+- **"Change not found"**: Specify the change name: check with `openspec list`.
+- **Tasks seem wrong**: Edit `tasks.md` before applying.
 - **Implementation diverges from design**: Edit `design.md` or `specs/` as needed; OpenSpec is iterative.
 
 ## References
 
-- [OpenSpec Commands: /opsx:apply](https://github.com/Fission-AI/OpenSpec/blob/main/docs/commands.md)
-- [OpenSpec Concepts: Artifacts](https://github.com/Fission-AI/OpenSpec/blob/main/docs/concepts.md)
+- Status: `openspec status --change <name>`
+- Tasks file: `openspec/changes/<name>/tasks.md`

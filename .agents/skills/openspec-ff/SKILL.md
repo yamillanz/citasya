@@ -1,11 +1,13 @@
 ---
 name: openspec-ff
-description: Fast-forward through artifact creation with `/opsx:ff`, generating all planning artifacts (proposal, specs, design, tasks) at once. Use when the user says "fast forward", "create all artifacts", "/opsx:ff", or has a clear picture of what to build.
+description: Fast-forward through artifact creation — generate all planning artifacts (proposal, specs, design, tasks) at once. Use when the user says "fast forward", "create all artifacts", or has a clear picture of what to build.
 ---
 
 # OpenSpec Fast-Forward Skill
 
-Use **`/opsx:ff`** to fast-forward through all planning artifact creation at once. Creates all artifacts in dependency order (proposal -> specs -> design -> tasks) in a single pass.
+Use this skill to create all planning artifacts at once. Creates artifacts in dependency order (proposal → specs → design → tasks) in a single pass.
+
+**Note:** There is no `openspec ff` CLI command. This is agent-driven behavior: the agent creates each artifact sequentially using `openspec instructions`.
 
 ## When to Use
 
@@ -15,25 +17,29 @@ Use **`/opsx:ff`** to fast-forward through all planning artifact creation at onc
 
 ## Prerequisites
 
-- **An active change** exists (created via **openspec-new** or `/opsx:new`).
-- Or use `/opsx:ff <change-name>` to create and fast-forward in one step.
+- **An active change** exists (created via **openspec-new** / `openspec new change <name>`).
+- Or provide the change name to create artifacts for.
 
 ## Workflow
 
-1. **Run fast-forward**
-   - `/opsx:ff` — fast-forward the current/inferred change.
-   - `/opsx:ff <change-name>` — fast-forward a specific change.
+1. **Check current status**
+   - Run: `openspec status --change <name>`
+   - Identify which artifacts already exist and which are ready.
 
-2. **Artifacts are created in dependency order**
+2. **Create artifacts in dependency order**
    - In the default `spec-driven` schema:
-     1. `proposal.md` — why and what
-     2. `specs/**/*.md` — delta specs (requirements and scenarios)
-     3. `design.md` — technical approach
-     4. `tasks.md` — implementation checklist
-   - Each artifact reads its dependencies before being created.
+     1. `proposal.md` — why and what (no dependencies)
+     2. `specs/**/*.md` — delta specs (requires: proposal)
+     3. `design.md` — technical approach (requires: proposal)
+     4. `tasks.md` — implementation checklist (requires: specs + design)
+   - For each artifact:
+     - Run: `openspec instructions <artifact> --change <name> --json`
+     - Read the instructions and any dependency files for context.
+     - Create the artifact file.
 
 3. **Review**
-   - All planning artifacts are now available. The user can edit any of them before proceeding.
+   - Run: `openspec status --change <name>` to confirm all artifacts are created.
+   - The user can edit any artifact before proceeding.
 
 ## Outputs
 
@@ -51,9 +57,11 @@ Use **`/opsx:ff`** to fast-forward through all planning artifact creation at onc
 
 ## Troubleshooting
 
-- **"Change not found"**: Specify the name: `/opsx:ff add-dark-mode`.
-- **Artifact quality issues**: Use `/opsx:continue` instead for more control; add project context in `openspec/config.yaml` (see **openspec-config**).
+- **"Change not found"**: Specify the name explicitly: `openspec status --change <name>`.
+- **Artifact quality issues**: Use **openspec-continue** instead for more control over each artifact.
+- **Already has some artifacts**: Only create the missing ones; skip completed artifacts.
 
 ## References
 
-- [OpenSpec Commands: /opsx:ff](https://github.com/Fission-AI/OpenSpec/blob/main/docs/commands.md)
+- Status: `openspec status --change <name>`
+- Instructions: `openspec instructions <artifact> --change <name> --json`

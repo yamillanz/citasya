@@ -1,11 +1,11 @@
 ---
 name: openspec-archive
-description: Archive a completed change with `/opsx:archive`, merging delta specs into main specs and preserving the change for history. Use when the user says "archive the change", "finish up", "/opsx:archive", or "mark this change as done".
+description: Archive a completed change. Use when the user says "archive the change", "finish up", or "mark this change as done".
 ---
 
 # OpenSpec Archive Skill
 
-Use **`/opsx:archive`** to finalize a completed change. Archives by merging delta specs into the main `openspec/specs/` directory and moving the change folder to `openspec/changes/archive/`.
+Use this skill to finalize a completed change. Archives by merging delta specs into the main `openspec/specs/` directory and moving the change folder to `openspec/changes/archive/`.
 
 ## When to Use
 
@@ -20,8 +20,9 @@ Use **`/opsx:archive`** to finalize a completed change. Archives by merging delt
 ## Workflow
 
 1. **Run archive**
-   - `/opsx:archive` — archive the current/inferred change.
-   - `/opsx:archive <change-name>` — archive a specific change.
+   - Run: `openspec archive <change-name>`
+   - Or: `openspec archive <change-name> -y` to skip confirmation.
+   - Or: `openspec archive <change-name> --skip-specs` for doc-only changes.
 
 2. **What happens**
    1. Checks artifact completion status and task completion (warns if incomplete).
@@ -54,9 +55,9 @@ Use **`/opsx:archive`** to finalize a completed change. Archives by merging delt
 
 - **"Incomplete tasks"**: Archive warns but does not block. Decide whether to complete tasks first or archive as-is.
 - **"Delta specs not synced"**: Archive will prompt to sync; or run **openspec-sync** beforehand.
-- **Multiple changes to archive**: Use **openspec-bulk-archive** instead.
+- **Multiple changes to archive**: Run `openspec archive` for each change, or use `openspec archive` with the appropriate flags.
 
 ## References
 
-- [OpenSpec Commands: /opsx:archive](https://github.com/Fission-AI/OpenSpec/blob/main/docs/commands.md)
-- [OpenSpec Concepts: Archive](https://github.com/Fission-AI/OpenSpec/blob/main/docs/concepts.md)
+- CLI command: `openspec archive <change-name>`
+- Options: `-y` (skip confirm), `--skip-specs` (skip spec updates), `--no-validate` (skip validation)

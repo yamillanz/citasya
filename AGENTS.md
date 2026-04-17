@@ -14,12 +14,20 @@
 - Los comandos `openspec` deben ejecutarse desde la raíz del proyecto
 - Los artifacts (proposal, design, specs, tasks) están en `./openspec/changes/<nombre>/`
 
-### Comandos disponibles:
-- `/opsx:new` - Iniciar nueva tarea/cambio
-- `/opsx:ff` - Fast-forward para crear todos los artifacts de un cambio
-- `/opsx:apply` - Aplicar tareas desde el change
-- `/opsx:verify` - Verificar que la implementación coincide con los artifacts
-- `/opsx:archive` - Archivar cambio completado
+### Comandos CLI disponibles:
+- `openspec new change <name>` - Iniciar nueva tarea/cambio
+- `openspec status --change <name>` - Ver estado de artifacts
+- `openspec instructions <artifact> --change <name>` - Instrucciones para crear un artifact
+- `openspec list` - Listar cambios activos
+- `openspec archive <change-name>` - Archivar cambio completado
+- `openspec validate <item>` - Validar cambio o spec
+
+### Patrones del agente (no son comandos CLI, el agente los ejecuta):
+- **Continue** (siguiente artifact): `openspec status --json` → identificar listo → `openspec instructions` → crear
+- **Fast-forward** (todos los artifacts): Loop secuencial: proposal → specs → design → tasks
+- **Apply** (implementar): Leer `tasks.md` → trabajar items `[ ]` → marcar `[x]`
+- **Verify** (validar): Comparar código contra specs, design y tasks
+- **Sync** (merge delta specs): Merge delta specs del change a `openspec/specs/`
 
 ### Cuándo usar:
 - ✅ Cualquier bug fix

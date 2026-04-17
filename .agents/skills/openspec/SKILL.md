@@ -1,55 +1,74 @@
 ---
 name: openspec
-description: "OpenSpec artifact-driven workflow. Covers OPSX commands, schemas, project config. Use when applying the artifact-driven workflow (OPSX), planning or reviewing changes based on artifact dependencies, or working with OPSX commands and schema/template resolution. Keywords: OPSX, artifact graph, /opsx:."
+description: "OpenSpec artifact-driven workflow. Covers CLI commands, schemas, project config. Use when applying the artifact-driven workflow, planning or reviewing changes based on artifact dependencies, or working with OpenSpec commands."
 metadata:
   version: "1.2.0"
   release_date: "2026-02-23"
 ---
 
-# OpenSpec (OPSX) Skill
+# OpenSpec Skill
 
-Use this skill to guide or reason about the OpenSpec artifact-driven workflow system (OPSX), including artifact graphs, schema/template resolution, change lifecycle, and experimental commands/skills.
+Use this skill to guide the OpenSpec artifact-driven workflow system, including artifact graphs, schema/template resolution, and change lifecycle.
 
-## Quick Navigation
+## Quick Reference — CLI Commands
 
-- Artifact graph core concepts: references/artifact-core.md
-- OPSX workflow behavior and usage: references/opsx-workflow.md
-- Setup + profiles (init, update, config profile): references/setup-profiles.md
-- Schema customization workflow and gaps: references/schema-customization.md
-- End-to-end schema workflow gaps and proposed solution: references/schema-workflow-gaps.md
-- Experimental release plan and rollout checklist: references/experimental-release-plan.md
+| Command | Purpose |
+| --- | --- |
+| `openspec new change <name>` | Start a new change |
+| `openspec status --change <name>` | Show artifact completion status |
+| `openspec instructions <artifact> --change <name>` | Get instructions for creating an artifact |
+| `openspec list` | List all active changes |
+| `openspec archive <change-name>` | Archive a completed change |
+| `openspec validate <item>` | Validate a change or spec |
+| `openspec schemas` | List available workflow schemas |
+| `openspec config` | View/modify global config |
+| `openspec init` | Initialize OpenSpec in a project |
+| `openspec update` | Update instruction files |
 
-## Release Highlights (1.1.1 → 1.2.0)
+## Agent-Driven Patterns (no CLI subcommand)
 
-- **Profiles:** select a workflow profile via `openspec config profile` (preset: `core` or custom selection) and apply it to a project via `openspec update`.
-- **Propose workflow (all-at-once):** legacy slash command `/openspec:proposal` creates proposal + specs + design + tasks in one request (instead of `/opsx:new` + `/opsx:ff`).
-- **More tool integrations:** adds support for Pi and Kiro tool directories.
-- **Cleaner updates:** `openspec update` can prune deselected workflows to keep projects tidy.
+These are patterns the agent performs using the CLI commands above:
 
-## OPSX Commands
+| Pattern | How it works |
+| --- | --- |
+| **Continue** (next artifact) | `openspec status --change <name> --json` → find first ready → `openspec instructions <artifact> --change <name> --json` → create it |
+| **Fast-forward** (all artifacts) | Same as continue but loop through all: proposal → specs → design → tasks |
+| **Apply** (implement tasks) | Read `tasks.md` → work through `[ ]` items → mark `[x]` |
+| **Verify** (validate implementation) | Compare code against specs, design, and tasks |
+| **Sync** (merge delta specs) | Merge delta specs from change into `openspec/specs/` |
 
-| Command              | Purpose                                                  |
-| -------------------- | -------------------------------------------------------- |
-| `/opsx:explore`      | Think through ideas, investigate problems (no structure) |
-| `/opsx:new`          | Start a new change                                       |
-| `/opsx:continue`     | Create next artifact based on dependencies               |
-| `/opsx:ff`           | Fast-forward — create all planning artifacts at once     |
-| `/opsx:apply`        | Implement tasks, updating artifacts as needed            |
-| `/opsx:verify`       | Validate implementation matches spec                     |
-| `/opsx:sync`         | Sync delta specs to main specs                           |
-| `/opsx:archive`      | Archive single completed change                          |
-| `/opsx:bulk-archive` | Archive multiple completed changes at once               |
+## Artifact Dependency Graph (spec-driven schema)
 
-**Legacy (non-OPSX) command:** `/openspec:proposal` creates all planning artifacts at once. Prefer OPSX, but this can be useful for small/straightforward changes or older setups.
+```
+proposal (root, no dependencies)
+    |
+    +---> specs (requires: proposal)
+    |
+    +---> design (requires: proposal)
+            |
+            +---> tasks (requires: specs + design)
+```
+
+## Typical Workflow
+
+```
+1. openspec new change add-feature
+2. Create proposal.md (via instructions or manually)
+3. Create specs/ (via instructions or manually)
+4. Create design.md (via instructions or manually)
+5. Create tasks.md (via instructions or manually)
+6. Implement tasks (mark [x] in tasks.md)
+7. openspec archive add-feature
+```
 
 ## Schema Management
 
 ```bash
-openspec schemas                    # List available schemas
-openspec schema which --all         # Show resolution sources
-openspec schema init my-workflow    # Create new schema interactively
-openspec schema fork spec-driven my-workflow  # Fork existing schema
-openspec schema validate my-workflow  # Validate schema structure
+openspec schemas                                    # List available schemas
+openspec schema which --all                         # Show resolution sources
+openspec schema init my-workflow                    # Create new schema interactively
+openspec schema fork spec-driven my-workflow        # Fork existing schema
+openspec schema validate my-workflow                # Validate schema structure
 ```
 
 ## Project Configuration
@@ -60,8 +79,8 @@ Create `openspec/config.yaml` for per-project settings:
 schema: spec-driven
 
 context: |
-  Tech stack: TypeScript, React, Node.js
-  Testing: Vitest, Playwright
+  Tech stack: TypeScript, Angular, Supabase
+  Testing: Vitest
 
 rules:
   proposal:
@@ -77,7 +96,6 @@ rules:
 - **Artifact graph, not a workflow engine**: Dependencies enable actions; they do not force linear phases.
 - **Filesystem-as-database**: Completion is derived from file existence, not stored state.
 - **Deterministic CLI**: Commands require explicit change context (agent infers, CLI remains strict).
-- **XDG schema resolution**: User overrides take precedence over built-ins.
 - **Templates are schema-scoped**: Templates live next to schema and resolve with a strict 2-level fallback.
 
 ## Decision Rules
@@ -86,52 +104,12 @@ rules:
 - Prefer **new change** when intent or scope fundamentally shifts, or the original can be completed independently.
 - Always preserve a clear history of why artifacts changed (proposal/specs/design/tasks).
 
-## Recipes
-
-### 1) Show what is ready to create next
-
-1. Determine the active change id.
-2. Query status and ready artifacts with the change explicitly set.
-3. Present ready artifacts and their dependencies.
-
-Expected behavior: show ready artifacts, not required steps.
-
-### 2) Generate instructions for a specific artifact
-
-1. Resolve schema and template with XDG fallback.
-2. Build context: change metadata, dependency status, and target paths.
-3. Return enriched instructions in plain Markdown.
-
-### 3) Start a new change
-
-1. Validate change name (kebab-case).
-2. Create change directory and README.
-3. Show initial status and first ready artifact.
-
-### 4) Schema customization guidance
-
-1. Explain XDG override paths.
-2. Describe copying built-in schema + templates.
-3. Provide verification steps or recommended CLI commands for listing and resolving.
-
-### 5) Explain schema binding for a change
-
-1. Prefer change metadata if available.
-2. Fallback to project default schema if configured.
-3. Otherwise default to spec-driven.
-
 ## Prohibitions
 
 - Do not treat the system as a linear workflow engine.
 - Do not assume a change is active without explicit selection.
 - Do not silently fall back between schemas or templates without reporting.
 - Do not copy long vendor docs verbatim; summarize and provide actionable guidance.
-
-## Output Expectations
-
-- Give clear artifact readiness and dependency explanations.
-- Use explicit change identifiers in examples.
-- Provide concise, actionable steps and indicate whether they are informational or required.
 
 ## Links
 
