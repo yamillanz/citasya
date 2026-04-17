@@ -63,14 +63,14 @@
 ## 6. Verification & Cleanup
 
 - [x] 6.1 Verify the app compiles without errors: `cd app-web && npx ng build --configuration=development`
-- [ ] 6.2 Manually test: navigate to `/sa/management`, verify companies table loads with data
-- [ ] 6.3 Manually test: row editing on companies — click edit, modify name/slug/plan, save, cancel
-- [ ] 6.4 Manually test: click a company row, verify users panel appears with filtered users
-- [ ] 6.5 Manually test: row editing on users — click edit, modify name/role, save, cancel
-- [ ] 6.6 Manually test: activate/deactivate individual company and user
-- [ ] 6.7 Manually test: checkbox selection and bulk activate/deactivate for both tables
-- [ ] 6.8 Manually test: filters (search, status, plan) work on companies table
-- [ ] 6.9 Manually test: create company and create user dialogs
-- [ ] 6.10 Manually test: `/sa` redirects to `/sa/management`, sidebar shows 3 items
+- [x] 6.2 Manually test: navigate to `/sa/management`, verify companies table loads with data
+- [x] 6.3 Manually test: row editing on companies — click edit, modify name/slug/plan, save, cancel
+- [x] 6.4 Manually test: click a company row, verify users panel appears with filtered users
+- [x] 6.5 Manually test: row editing on users — click edit, modify name/role, save, cancel
+- [x] 6.6 Manually test: activate/deactivate individual company and user
+- [x] 6.7 Manually test: checkbox selection and bulk activate/deactivate for both tables
+- [x] 6.8 Manually test: filters (search, status, plan) work on companies table
+- [x] 6.9 Manually test: create company and create user dialogs
+- [x] 6.10 Manually test: `/sa` redirects to `/sa/management`, sidebar shows 3 items
 - [x] 6.11 Delete old component directories: `rm -rf app-web/src/app/features/backoffice/superadmin/companies/` and `rm -rf app-web/src/app/features/backoffice/superadmin/users/`
 - [x] 6.12 Verify app still compiles after deletion
