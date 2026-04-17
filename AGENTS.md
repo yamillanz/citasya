@@ -74,13 +74,37 @@
 
 ---
 
-## Esquema de Colores (Verde Salvia)
+## Guía de Estilos
+
+**⚠️ ANTES de crear cualquier componente o modificar UI, leer `STYLES.MD` en la raíz del proyecto.**
+
+El archivo `STYLES.MD` contiene la guía completa de estilos con:
+- Design tokens (colores, espaciado, tipografía, sombras, border-radius)
+- Layout patterns (páginas, headers, grids, forms)
+- Card patterns (estándar, stat card, glass card)
+- Button patterns (primario, secundario, icon)
+- Form input patterns
+- Status badge pattern
+- Loading/Empty state patterns
+- PrimeNG override patterns
+- Animaciones y utilidades globales
+- Responsive breakpoints
+- Checklist rápido para nuevos componentes
+
+**NO escanear componentes existentes para copiar estilos** - toda la información está en `STYLES.MD`.
+
+---
+
+## Esquema de Colores (Resumen)
 
 | Color | Código Hex | Uso |
 |-------|------------|-----|
 | **Verde Salvia** | `#9DC183` | Primary color, botones principales |
 | **Gris Cálido** | `#5D6D7E` | Texto secundario, bordes |
 | **Blanco Puro** | `#FFFFFF` | Fondos |
+| **Crema** | `#FAF8F5` | Fondo principal de páginas |
+
+> Para la paleta completa de colores, ver `STYLES.MD` → Design Tokens
 
 ---
 
