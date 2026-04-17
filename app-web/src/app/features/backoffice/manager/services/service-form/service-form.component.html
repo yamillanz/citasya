@@ -117,6 +117,30 @@
             </small>
           </div>
 
+          <!-- Commission Percentage -->
+          <div class="form-field">
+            <label for="commission_percentage">
+              <i class="pi pi-percentage"></i>
+              Comisión para Empleado
+            </label>
+            <div class="percentage-input">
+              <p-inputNumber 
+                id="commission_percentage"
+                formControlName="commission_percentage"
+                mode="decimal"
+                [min]="0"
+                [max]="100"
+                [minFractionDigits]="0"
+                [maxFractionDigits]="0">
+              </p-inputNumber>
+              <span class="percentage-suffix">%</span>
+            </div>
+            <small class="field-hint">
+              <i class="pi pi-info-circle"></i>
+              Porcentaje que se lleva el empleado del precio del servicio
+            </small>
+          </div>
+
           <!-- Preview Card -->
           @if (form.get('name')?.value) {
             <div class="preview-card">
@@ -134,6 +158,11 @@
                       <span class="separator">•</span>
                       <i class="pi pi-dollar"></i>
                       {{ form.get('price')?.value | number:'1.2-2' }}
+                    }
+                    @if (form.get('commission_percentage')?.value) {
+                      <span class="separator">•</span>
+                      <i class="pi pi-percentage"></i>
+                      {{ form.get('commission_percentage')?.value }}%
                     }
                   </span>
                 </div>

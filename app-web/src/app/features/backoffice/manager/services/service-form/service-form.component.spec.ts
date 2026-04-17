@@ -30,6 +30,7 @@ describe('ServiceFormComponent - Behavior Driven Tests', () => {
     name: 'Corte de cabello',
     duration_minutes: 30,
     price: 25,
+    commission_percentage: 60,
     company_id: 'company-1',
     is_active: true,
     created_at: new Date().toISOString(),
@@ -87,6 +88,7 @@ describe('ServiceFormComponent - Behavior Driven Tests', () => {
       expect(component.form.get('name')?.value).toBe('');
       expect(component.form.get('duration_minutes')?.value).toBe(30);
       expect(component.form.get('price')?.value).toBeNull();
+      expect(component.form.get('commission_percentage')?.value).toBe(50);
     });
 
     it('should validate that name is required', () => {

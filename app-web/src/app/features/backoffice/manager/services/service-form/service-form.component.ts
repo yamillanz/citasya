@@ -44,7 +44,8 @@ export class ServiceFormComponent implements OnInit {
   form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     duration_minutes: [30, [Validators.required, Validators.min(5)]],
-    price: [null as number | null]
+    price: [null as number | null],
+    commission_percentage: [50, [Validators.min(0), Validators.max(100)]]
   });
 
   async ngOnInit() {
@@ -64,7 +65,8 @@ export class ServiceFormComponent implements OnInit {
         this.form.patchValue({
           name: service.name,
           duration_minutes: service.duration_minutes,
-          price: service.price
+          price: service.price,
+          commission_percentage: service.commission_percentage ?? 50
         });
       } else {
         this.messageService.add({
@@ -100,7 +102,8 @@ export class ServiceFormComponent implements OnInit {
       const data: any = {
         name: formValue.name!,
         duration_minutes: formValue.duration_minutes!,
-        price: formValue.price || null
+        price: formValue.price || null,
+        commission_percentage: formValue.commission_percentage ?? 50
       };
 
       if (this.isEdit()) {

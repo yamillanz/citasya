@@ -327,6 +327,30 @@ form {
 }
 
 /* ================================
+   Percentage Input
+   ================================ */
+.percentage-input {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  
+  :host ::ng-deep .p-inputnumber {
+    width: 100px;
+    
+    .p-inputnumber-input {
+      text-align: center;
+      font-weight: 600;
+    }
+  }
+  
+  .percentage-suffix {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+}
+
+/* ================================
    Preview Card
    ================================ */
 .preview-card {
