@@ -113,7 +113,7 @@ describe('BookingFormComponent', () => {
     it('debe llamar a appointmentService.create con service_ids array', async () => {
       await component.ngOnInit();
       component.bookingForm.patchValue({
-        client_name: 'Juan Pérez', client_phone: '555-123-4567',
+        client_name: 'Juan Pérez', client_phone: '555-123-456789',
         client_email: 'juan@example.com', notes: 'Nota'
       });
 
@@ -133,7 +133,7 @@ describe('BookingFormComponent', () => {
         k === 'serviceIds' ? 'service-1,service-2' : k === 'date' ? '2026-03-20' : k === 'time' ? '10:00' : null
       );
       await component.ngOnInit();
-      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-4567' });
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-456789' });
 
       await component.onSubmit();
 
@@ -156,7 +156,7 @@ describe('BookingFormComponent', () => {
       let resolvePromise: () => void;
       appointmentServiceMock.create.mockImplementation(() => new Promise(r => { resolvePromise = r; }));
       await component.ngOnInit();
-      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-4567' });
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-456789' });
 
       const promise = component.onSubmit();
       expect(component.loading()).toBe(true);
@@ -169,7 +169,7 @@ describe('BookingFormComponent', () => {
     it('debe establecer submitError cuando el servidor falla', async () => {
       appointmentServiceMock.create.mockRejectedValue(new Error('Error del servidor'));
       await component.ngOnInit();
-      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-4567' });
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-456789' });
 
       await component.onSubmit();
 
@@ -179,12 +179,12 @@ describe('BookingFormComponent', () => {
 
   describe('Formulario', () => {
     it('debe validar que nombre es requerido', () => {
-      component.bookingForm.patchValue({ client_name: '', client_phone: '555-123-4567' });
+      component.bookingForm.patchValue({ client_name: '', client_phone: '555-123-456789' });
       expect(component.bookingForm.get('client_name')?.hasError('required')).toBe(true);
     });
 
-    it('debe validar teléfono con mínimo 10 dígitos', () => {
-      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123' });
+    it('debe validar teléfono con mínimo 12 dígitos', () => {
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-4567' });
       component.bookingForm.updateValueAndValidity();
       expect(component.bookingForm.errors?.['invalidPhone']).toBe(true);
     });

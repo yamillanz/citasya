@@ -26,7 +26,7 @@ function atLeastOneContactValidator(): ValidatorFn {
       return { noContact: true };
     }
     
-    if (cleanPhone && cleanPhone.length < 10) {
+    if (cleanPhone && cleanPhone.length < 12) {
       return { invalidPhone: true };
     }
     
@@ -266,8 +266,8 @@ export class BookingFormComponent implements OnInit {
     const phone = this.bookingForm.value.client_phone?.replace(/\D/g, '') || '';
     const email = this.bookingForm.value.client_email || undefined;
 
-    if (!email && phone.length < 10) {
-      this.submitError.set('El teléfono debe tener al menos 10 dígitos si no proporcionas email');
+    if (!email && phone.length < 12) {
+      this.submitError.set('El teléfono debe tener al menos 12 dígitos si no proporcionas email');
       this.loading.set(false);
       return;
     }
