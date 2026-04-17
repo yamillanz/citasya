@@ -4,7 +4,6 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -41,7 +40,6 @@ const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
     RouterLink,
     ButtonModule,
     InputTextModule,
-    ToggleSwitchModule,
     ToastModule
   ],
   providers: [MessageService],

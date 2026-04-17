@@ -97,11 +97,14 @@
               </div>
 
               <div class="col-toggle">
-                <p-toggleswitch
-                  [ngModel]="day.is_active"
-                  (ngModelChange)="onToggleChange(day.day_of_week, $event)"
-                  [ngModelOptions]="{ standalone: true }"
-                />
+                <label class="custom-toggle">
+                  <input
+                    type="checkbox"
+                    [checked]="day.is_active"
+                    (change)="onToggleChange(day.day_of_week, $any($event.target).checked)"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
               </div>
 
               <div class="col-time">
