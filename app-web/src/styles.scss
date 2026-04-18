@@ -513,3 +513,358 @@ a {
 .amount-drawer .btn-confirm .p-button-icon {
   color: white !important;
 }
+
+/* ================================
+   PrimeNG Input Styles
+   ================================ */
+.p-inputtext {
+  background: var(--color-warm-white) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-sm) var(--space-md) !important;
+  font-size: 0.9375rem !important;
+  color: var(--color-text-primary) !important;
+  transition: all var(--duration-fast) ease !important;
+  width: 100% !important;
+
+  &::placeholder {
+    color: var(--color-text-muted) !important;
+  }
+
+  &:hover:not(:focus) {
+    border-color: var(--color-sage-light) !important;
+  }
+
+  &:focus {
+    outline: none !important;
+    border-color: var(--color-sage) !important;
+    box-shadow: 0 0 0 3px var(--color-sage-pale) !important;
+  }
+}
+
+/* Input with icon wrapper */
+.p-input-icon-left {
+  width: 100% !important;
+  position: relative !important;
+  display: block !important;
+  
+  > i:first-of-type {
+    position: absolute !important;
+    left: var(--space-md) !important;
+    top: calc(50% - 3px) !important;
+    transform: translateY(-50%) !important;
+    color: var(--color-text-muted) !important;
+    z-index: 1 !important;
+  }
+  
+  .p-inputtext {
+    padding-left: 2.5rem !important;
+    width: 100% !important;
+  }
+}
+
+/* ================================
+   PrimeNG Select (Dropdown) Styles
+   ================================ */
+.p-select {
+  background: var(--color-warm-white) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  height: 2.45rem !important;
+  transition: all var(--duration-fast) ease !important;
+
+  .p-select-label {
+    padding: var(--space-sm) var(--space-md) !important;
+    font-size: 0.9375rem !important;
+    color: var(--color-text-primary) !important;
+    line-height: 1.5 !important;
+  }
+
+  .p-select-trigger {
+    width: 2.5rem !important;
+    color: var(--color-text-muted) !important;
+  }
+
+  &:hover:not(.p-disabled):not(.p-focus) {
+    border-color: var(--color-sage-light) !important;
+  }
+
+  &.p-focus {
+    border-color: var(--color-sage) !important;
+    box-shadow: 0 0 0 3px var(--color-sage-pale) !important;
+  }
+}
+
+/* Select Panel (Dropdown Options) */
+.p-select-panel {
+  background: var(--color-warm-white) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  margin-top: 4px !important;
+
+  .p-select-items {
+    padding: var(--space-xs) !important;
+  }
+
+  .p-select-item {
+    border-radius: var(--radius-sm) !important;
+    margin: 2px 0 !important;
+
+    &:not(.p-highlight):not(.p-disabled):hover {
+      background: var(--color-sage-pale) !important;
+    }
+
+    &.p-highlight {
+      background: var(--color-sage-pale) !important;
+      color: var(--color-sage-dark) !important;
+      font-weight: 500 !important;
+    }
+
+    .p-select-item-label {
+      padding: var(--space-sm) var(--space-md) !important;
+      font-size: 0.9375rem !important;
+    }
+  }
+}
+
+/* ================================
+   PrimeNG Dropdown (Legacy) Styles
+   ================================ */
+.p-dropdown {
+  background: var(--color-warm-white) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  height: 2.45rem !important;
+  transition: all var(--duration-fast) ease !important;
+
+  .p-dropdown-label {
+    padding: var(--space-sm) var(--space-md) !important;
+    font-size: 0.9375rem !important;
+    color: var(--color-text-primary) !important;
+    line-height: 1.5 !important;
+  }
+
+  .p-dropdown-trigger {
+    width: 2.5rem !important;
+    color: var(--color-text-muted) !important;
+  }
+
+  &:hover:not(.p-disabled):not(.p-focus) {
+    border-color: var(--color-sage-light) !important;
+  }
+
+  &.p-focus {
+    border-color: var(--color-sage) !important;
+    box-shadow: 0 0 0 3px var(--color-sage-pale) !important;
+  }
+}
+
+/* ================================
+   PrimeNG Checkbox Styles
+   ================================ */
+.p-checkbox {
+  .p-checkbox-box {
+    border: 2px solid var(--color-border) !important;
+    border-radius: var(--radius-sm) !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    transition: all var(--duration-fast) ease !important;
+
+    &:not(.p-disabled):hover {
+      border-color: var(--color-sage) !important;
+    }
+
+    &.p-focus {
+      box-shadow: 0 0 0 3px var(--color-sage-pale) !important;
+    }
+
+    &.p-highlight {
+      background: var(--color-sage) !important;
+      border-color: var(--color-sage) !important;
+
+      .p-checkbox-icon {
+        color: white !important;
+      }
+    }
+  }
+}
+
+/* Checkbox in table header */
+.p-datatable-thead .p-checkbox .p-checkbox-box {
+  border-color: var(--color-sage-light) !important;
+}
+
+/* ================================
+   PrimeNG Calendar (Date Picker) Styles
+   ================================ */
+.p-calendar {
+  .p-inputtext {
+    border-radius: var(--radius-md) !important;
+  }
+}
+
+.p-datepicker {
+  background: var(--color-warm-white) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: var(--space-md) !important;
+
+  .p-datepicker-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--color-border) !important;
+    padding: var(--space-sm) 0 !important;
+    margin-bottom: var(--space-sm) !important;
+
+    .p-datepicker-title {
+      font-weight: 600 !important;
+      color: var(--color-text-primary) !important;
+    }
+
+    .p-datepicker-prev,
+    .p-datepicker-next {
+      color: var(--color-text-secondary) !important;
+      border-radius: var(--radius-sm) !important;
+      
+      &:hover {
+        background: var(--color-sage-pale) !important;
+        color: var(--color-sage-dark) !important;
+      }
+    }
+  }
+
+  .p-datepicker-calendar {
+    td {
+      padding: 2px !important;
+      
+      .p-datepicker-other-month,
+      .p-datepicker-today > span {
+        color: var(--color-text-muted) !important;
+      }
+
+      > span {
+        border-radius: var(--radius-sm) !important;
+        transition: all var(--duration-fast) ease !important;
+
+        &:hover {
+          background: var(--color-sage-pale) !important;
+        }
+
+        &.p-highlight {
+          background: var(--color-sage) !important;
+          color: white !important;
+        }
+      }
+    }
+  }
+}
+
+/* ================================
+   PrimeNG Tag (Badge) Styles
+   ================================ */
+.p-tag {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: var(--radius-full) !important;
+
+  &.p-tag-success {
+    background: var(--color-sage-pale) !important;
+    color: var(--color-sage-dark) !important;
+  }
+
+  &.p-tag-secondary {
+    background: var(--color-linen) !important;
+    color: var(--color-text-secondary) !important;
+  }
+
+  &.p-tag-danger {
+    background: rgba(224, 122, 95, 0.15) !important;
+    color: var(--color-error) !important;
+  }
+
+  &.p-tag-warning {
+    background: rgba(244, 208, 63, 0.2) !important;
+    color: #b8860b !important;
+  }
+}
+
+/* ================================
+   PrimeNG Button Styles
+   ================================ */
+.p-button {
+  border-radius: var(--radius-md) !important;
+  font-weight: 500 !important;
+  transition: all var(--duration-fast) ease !important;
+
+  &.p-button-sm {
+    font-size: 0.8125rem !important;
+    padding: var(--space-xs) var(--space-md) !important;
+  }
+
+  &.p-button-rounded {
+    border-radius: var(--radius-full) !important;
+  }
+
+  &.p-button-text {
+    background: transparent !important;
+    border: none !important;
+    color: var(--color-text-secondary) !important;
+
+    &:hover {
+      background: var(--color-sage-pale) !important;
+      color: var(--color-sage-dark) !important;
+    }
+  }
+
+  &.p-button-success {
+    background: var(--color-sage) !important;
+    border-color: var(--color-sage) !important;
+
+    &:hover {
+      background: var(--color-sage-dark) !important;
+      border-color: var(--color-sage-dark) !important;
+    }
+  }
+
+  &.p-button-danger {
+    background: var(--color-error) !important;
+    border-color: var(--color-error) !important;
+
+    &:hover {
+      background: #c96b50 !important;
+      border-color: #c96b50 !important;
+    }
+  }
+}
+
+/* ================================
+   PrimeNG Paginator Styles
+   ================================ */
+.p-paginator {
+  background: var(--color-warm-white) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-md) !important;
+
+  .p-paginator-element {
+    border-radius: var(--radius-sm) !important;
+    color: var(--color-text-secondary) !important;
+
+    &:hover {
+      background: var(--color-sage-pale) !important;
+      color: var(--color-sage-dark) !important;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px var(--color-sage-pale) !important;
+    }
+  }
+
+  .p-paginator-page.p-highlight {
+    background: var(--color-sage) !important;
+    border-color: var(--color-sage) !important;
+    color: white !important;
+  }
+}
