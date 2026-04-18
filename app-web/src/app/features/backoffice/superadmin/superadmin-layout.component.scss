@@ -1,6 +1,6 @@
 .backoffice-layout {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 312px 1fr;
   grid-template-rows: auto 1fr;
   min-height: 100vh;
   background: var(--color-cream);
@@ -19,7 +19,7 @@
   @media (min-width: 1025px) {
     display: flex;
     flex-direction: column;
-    width: 260px;
+    width: 312px;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border-right: 1px solid var(--color-sand);
@@ -52,13 +52,13 @@
   }
   
   svg {
-    height: 38px;
+    height: 45.6px;
     width: auto;
   }
 }
 
 .sidebar-badge {
-  font-size: 0.6875rem;
+  font-size: 0.825rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -94,11 +94,11 @@
   border-radius: var(--radius-md);
   transition: all var(--duration-fast) ease;
   font-weight: 500;
-  font-size: 0.9375rem;
+  font-size: 1.125rem;
 
   i {
-    font-size: 1.125rem;
-    width: 24px;
+    font-size: 1.35rem;
+    width: 28.8px;
     text-align: center;
   }
 
@@ -140,23 +140,23 @@
 }
 
 .user-avatar {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
   color: white;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.2rem;
   border-radius: var(--radius-md);
   
   &.small {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    font-size: 0.875rem;
+    width: 43.2px;
+    height: 43.2px;
+    min-width: 43.2px;
+    font-size: 1.05rem;
     border-radius: var(--radius-sm);
   }
 }
@@ -170,7 +170,7 @@
 
 .user-name {
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 1.05rem;
   color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -178,7 +178,7 @@
 }
 
 .user-email {
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   color: var(--color-text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -219,9 +219,9 @@
   box-sizing: border-box;
 
   @media (min-width: 1025px) {
-    margin-left: 260px;
+    margin-left: 312px;
     padding-right: var(--space-xl);
-    padding-left: var(--space-xl);
+    padding-left: var(--space-md);
   }
 
   @media (max-width: 1024px) {
@@ -261,7 +261,7 @@
   display: block;
   
   svg {
-    height: 34px;
+    height: 40.8px;
     width: auto;
   }
 }
@@ -296,7 +296,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: 280px;
+  width: 336px;
   max-width: 85vw;
   background: white;
   display: flex;
@@ -317,7 +317,7 @@
   background: var(--color-linen);
 
   svg {
-    height: 34px;
+    height: 40.8px;
     width: auto;
   }
 }
@@ -339,11 +339,11 @@
   border-radius: var(--radius-md);
   transition: all var(--duration-fast) ease;
   font-weight: 500;
-  font-size: 0.9375rem;
+  font-size: 1.125rem;
 
   i {
-    font-size: 1.125rem;
-    width: 24px;
+    font-size: 1.35rem;
+    width: 28.8px;
     text-align: center;
   }
 

@@ -5,7 +5,7 @@
       <h1>Gestión Central</h1>
       <p>Administra empresas y usuarios desde un solo lugar</p>
     </div>
-    <p-button label="Nueva Empresa" icon="pi pi-plus" (onClick)="openCreateCompanyDialog()" />
+    <p-button label="Nueva Empresa" icon="pi pi-plus" (onClick)="openCreateCompanyDialog()" size="large" />
   </div>
 
   <div class="filters-bar">
@@ -182,7 +182,7 @@
           <span class="user-count">{{ users().length }} usuario(s)</span>
         </div>
         <p-button label="Nuevo Usuario" icon="pi pi-plus" styleClass="p-button-sm"
-          (onClick)="openCreateUserDialog()" />
+          (onClick)="openCreateUserDialog()" size="large" />
       </div>
 
       @if (selectedUsers().length > 0) {
@@ -292,7 +292,7 @@
 </div>
 
 <p-dialog [header]="editingCompany() ? 'Editar Empresa' : 'Nueva Empresa'"
-  [(visible)]="companyDialogVisible" [modal]="true" [style]="{ width: '450px' }" [draggable]="false">
+  [(visible)]="companyDialogVisible" [modal]="true" [style]="{ width: '540px' }" [draggable]="false">
   <div class="form-grid">
     <div class="form-field">
       <label for="company-name">Nombre *</label>
@@ -325,7 +325,7 @@
 </p-dialog>
 
 <p-dialog [header]="editingUser() ? 'Editar Usuario' : 'Nuevo Usuario'"
-  [(visible)]="userDialogVisible" [modal]="true" [style]="{ width: '450px' }" [draggable]="false">
+  [(visible)]="userDialogVisible" [modal]="true" [style]="{ width: '540px' }" [draggable]="false">
   <div class="form-grid">
     <div class="form-field">
       <label for="user-email">Email *</label>
