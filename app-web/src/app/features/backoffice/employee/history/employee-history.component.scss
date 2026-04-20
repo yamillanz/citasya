@@ -3,10 +3,14 @@
 }
 
 .employee-history {
-  padding: var(--space-xl);
-  
+  padding: 3rem;
+  width: 100%;
+  max-width: 1584px;
+  margin-right: 2rem;
+  animation: fadeIn 0.4s ease;
+
   @media (max-width: 768px) {
-    padding: var(--space-md);
+    padding: var(--space-lg) var(--space-md);
   }
 }
 
@@ -667,4 +671,9 @@
   text-align: center;
   padding: var(--space-xl) !important;
   color: var(--color-text-muted);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
