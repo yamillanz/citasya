@@ -26,3 +26,21 @@ export const roleGuard = (allowedRoles: UserRole[]): CanActivateFn => {
 export const managerGuard: CanActivateFn = roleGuard(['manager', 'superadmin']);
 export const employeeGuard: CanActivateFn = roleGuard(['employee', 'manager', 'superadmin']);
 export const superadminGuard: CanActivateFn = roleGuard(['superadmin']);
+
+export const canBeEmployeeGuard: CanActivateFn = async () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  const user = await authService.getCurrentUser();
+  if (!user) {
+    router.navigate(['/login']);
+    return false;
+  }
+
+  if (user.can_be_employee) {
+    return true;
+  }
+
+  router.navigate(['/bo/dashboard']);
+  return false;
+};

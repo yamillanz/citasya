@@ -13,7 +13,7 @@
     </div>
 
     <nav class="sidebar-nav">
-      @for (item of menuItems; track item.routerLink) {
+      @for (item of menuItems(); track item.routerLink) {
         <a 
           [routerLink]="item.routerLink" 
           routerLinkActive="active"
@@ -80,7 +80,7 @@
         </div>
         
         <nav class="mobile-sidebar-nav">
-          @for (item of menuItems; track item.routerLink) {
+          @for (item of menuItems(); track item.routerLink) {
             <a 
               [routerLink]="item.routerLink" 
               routerLinkActive="active"

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { canBeEmployeeGuard } from '../../../core/guards/role.guard';
 
 export const MANAGER_ROUTES: Routes = [
   {
@@ -41,5 +42,15 @@ export const MANAGER_ROUTES: Routes = [
   {
     path: 'settings',
     loadComponent: () => import('./settings/settings.component').then(m => m.SettingsComponent)
+  },
+  {
+    path: 'mi-calendario',
+    loadComponent: () => import('../employee/calendar/employee-calendar.component').then(m => m.EmployeeCalendarComponent),
+    canActivate: [canBeEmployeeGuard]
+  },
+  {
+    path: 'mi-historial',
+    loadComponent: () => import('../employee/history/employee-history.component').then(m => m.EmployeeHistoryComponent),
+    canActivate: [canBeEmployeeGuard]
   }
 ];

@@ -8,6 +8,7 @@ export interface User {
   photo_url?: string;
   role: UserRole;
   company_id?: string;
+  can_be_employee: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -19,4 +20,5 @@ export interface CreateUserDto {
   phone?: string;
   role: UserRole;
   company_id?: string;
+  can_be_employee?: boolean;
 }

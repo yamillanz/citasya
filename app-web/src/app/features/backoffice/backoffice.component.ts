@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -8,6 +8,12 @@ import { DrawerModule } from 'primeng/drawer';
 import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../core/services/auth.service';
 import { User } from '../../core/models/user.model';
+
+interface MenuItem {
+  label: string;
+  icon: string;
+  routerLink: string;
+}
 
 @Component({
   selector: 'app-backoffice',
@@ -33,7 +39,7 @@ export class BackofficeComponent implements OnInit {
   user = signal<User | null>(null);
   sidebarVisible = signal(false);
 
-  menuItems = [
+  private baseMenuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'pi pi-home', routerLink: '/bo/dashboard' },
     { label: 'Empleados', icon: 'pi pi-users', routerLink: '/bo/employees' },
     { label: 'Servicios', icon: 'pi pi-briefcase', routerLink: '/bo/services' },
@@ -42,6 +48,19 @@ export class BackofficeComponent implements OnInit {
     { label: 'Reportes', icon: 'pi pi-chart-bar', routerLink: '/bo/reports/weekly' },
     { label: 'Configuración', icon: 'pi pi-cog', routerLink: '/bo/settings' }
   ];
+
+  private employeeMenuItems: MenuItem[] = [
+    { label: 'Mi Calendario', icon: 'pi pi-calendar', routerLink: '/bo/mi-calendario' },
+    { label: 'Mi Historial', icon: 'pi pi-clock', routerLink: '/bo/mi-historial' }
+  ];
+
+  menuItems = computed(() => {
+    const user = this.user();
+    if (user?.can_be_employee) {
+      return [...this.baseMenuItems, ...this.employeeMenuItems];
+    }
+    return this.baseMenuItems;
+  });
 
   async ngOnInit() {
     this.user.set(await this.authService.getCurrentUser());

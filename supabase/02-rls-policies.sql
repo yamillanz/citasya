@@ -289,6 +289,11 @@ RETURNS TEXT AS $$
     SELECT role FROM profiles WHERE id = auth.uid();
 $$ LANGUAGE SQL SECURITY DEFINER;
 
+CREATE OR REPLACE FUNCTION get_current_user_can_be_employee()
+RETURNS BOOLEAN AS $$
+    SELECT can_be_employee FROM profiles WHERE id = auth.uid();
+$$ LANGUAGE SQL SECURITY DEFINER;
+
 -- ============================================================================
 -- FIN DEL SCRIPT
 -- ============================================================================

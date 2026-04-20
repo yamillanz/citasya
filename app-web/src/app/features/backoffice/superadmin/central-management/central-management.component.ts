@@ -363,11 +363,17 @@ export class CentralManagementComponent implements OnInit {
 
   async onUserRowEditSave(user: UserWithCompany) {
     try {
-      await this.userService.update(user.id, {
+      const updateData: Partial<User> = {
         full_name: user.full_name,
         phone: user.phone,
         role: user.role
-      });
+      };
+
+      if (user.role === 'manager') {
+        updateData.can_be_employee = user.can_be_employee ?? false;
+      }
+
+      await this.userService.update(user.id, updateData);
       this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Usuario actualizado' });
     } catch (error) {
       const clone = this.clonedUsers()[user.id];
@@ -489,7 +495,7 @@ export class CentralManagementComponent implements OnInit {
     const companyId = this.selectedCompanyId();
     if (!companyId) return;
     this.editingUser.set(null);
-    this.userFormData.set({ email: '', full_name: '', phone: '', role: 'employee', company_id: companyId });
+    this.userFormData.set({ email: '', full_name: '', phone: '', role: 'employee', company_id: companyId, can_be_employee: false });
     this.userDialogVisible.set(true);
   }
 

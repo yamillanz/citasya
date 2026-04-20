@@ -214,6 +214,7 @@
             </th>
             <th>Email</th>
             <th>Rol</th>
+            <th>Empleado</th>
             <th>Estado</th>
             <th style="width: 150px">Acciones</th>
           </tr>
@@ -243,6 +244,24 @@
                 </ng-template>
                 <ng-template #output>
                   <p-tag [value]="getRoleLabel(user.role)" [severity]="getRoleSeverity(user.role)" />
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>
+              <p-cellEditor>
+                <ng-template #input>
+                  @if (user.role === 'manager') {
+                    <p-checkbox [(ngModel)]="user.can_be_employee" [binary]="true" />
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </ng-template>
+                <ng-template #output>
+                  @if (user.role === 'manager' && user.can_be_employee) {
+                    <p-tag value="Sí" severity="info" />
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
                 </ng-template>
               </p-cellEditor>
             </td>
@@ -279,7 +298,7 @@
 
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="6">
+            <td colspan="7">
               <app-empty-state icon="pi pi-users" title="Sin usuarios"
                 description="Esta empresa no tiene usuarios registrados"
                 actionLabel="Agregar Usuario" (actionClick)="openCreateUserDialog()" />
@@ -344,6 +363,12 @@
       <p-select id="user-role" [options]="roleOptions" [(ngModel)]="userFormData().role"
         optionLabel="label" optionValue="value" placeholder="Seleccionar rol" [style]="{ width: '100%' }" />
     </div>
+    @if (userFormData().role === 'manager') {
+      <div class="form-field form-field-checkbox">
+        <p-checkbox [(ngModel)]="userFormData().can_be_employee" [binary]="true"
+          inputId="canBeEmployee" label="Puede actuar como empleado" />
+      </div>
+    }
   </div>
   <ng-template pTemplate="footer">
     <p-button label="Cancelar" styleClass="p-button-text" (onClick)="userDialogVisible.set(false)" [disabled]="saving()" />

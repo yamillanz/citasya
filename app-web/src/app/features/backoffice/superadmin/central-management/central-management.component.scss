@@ -248,6 +248,18 @@
   }
 }
 
+.form-field-checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.text-muted {
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+  font-size: 0.875rem;
+}
+
 :host ::ng-deep {
   .p-datatable {
     .p-datatable-header {

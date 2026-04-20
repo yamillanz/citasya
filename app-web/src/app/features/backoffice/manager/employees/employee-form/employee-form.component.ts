@@ -48,6 +48,7 @@ export class EmployeeFormComponent implements OnInit {
   services = signal<Service[]>([]);
   selectedServices = signal<string[]>([]);
   companyId = signal<string | null>(null);
+  editingRole = signal<UserRole | null>(null);
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -97,6 +98,7 @@ export class EmployeeFormComponent implements OnInit {
           phone: employee.phone || '',
           photo_url: employee.photo_url || ''
         });
+        this.editingRole.set(employee.role);
         // TODO: Load assigned services
       } else {
         this.messageService.add({
@@ -145,18 +147,22 @@ export class EmployeeFormComponent implements OnInit {
         email: formValue.email!,
         full_name: formValue.full_name!,
         phone: formValue.phone || null,
-        photo_url: formValue.photo_url || null,
-        role: 'employee' as UserRole
+        photo_url: formValue.photo_url || null
       };
 
       if (this.isEdit()) {
+        const role = this.editingRole();
+        if (role) {
+          data.role = role;
+        }
         await this.userService.update(this.employeeId(), data);
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
-          detail: 'Empleado actualizado correctamente'
+          detail: role === 'manager' ? 'Manager actualizado correctamente' : 'Empleado actualizado correctamente'
         });
       } else {
+        data.role = 'employee' as UserRole;
         data.company_id = this.companyId();
         await this.userService.create(data);
         this.messageService.add({

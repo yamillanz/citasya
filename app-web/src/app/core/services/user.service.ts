@@ -12,8 +12,8 @@ export class UserService {
       .from('profiles')
       .select('*')
       .eq('company_id', companyId)
-      .eq('role', 'employee')
       .eq('is_active', true)
+      .or('role.eq.employee,and(role.eq.manager,can_be_employee.eq.true)')
       .order('full_name');
     
     if (error) throw error;
@@ -111,6 +111,18 @@ export class UserService {
     const { data, error } = await this.supabase
       .from('profiles')
       .update({ is_active: true, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  async updateCanBeEmployee(id: string, value: boolean): Promise<User> {
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .update({ can_be_employee: value, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
       .single();

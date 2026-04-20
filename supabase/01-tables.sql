@@ -63,6 +63,7 @@ CREATE TABLE profiles (
     photo_url TEXT,
     role TEXT CHECK (role IN ('superadmin', 'manager', 'employee')) DEFAULT 'employee',
     company_id UUID REFERENCES companies(id) ON DELETE SET NULL,
+    can_be_employee BOOLEAN DEFAULT false,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -71,7 +72,11 @@ CREATE TABLE profiles (
 COMMENT ON TABLE profiles IS 'Perfiles de usuario asociados a auth.users';
 COMMENT ON COLUMN profiles.role IS 'Rol: superadmin (sistema), manager (dueño), employee (empleado)';
 COMMENT ON COLUMN profiles.company_id IS 'Empresa a la que pertenece el usuario';
+COMMENT ON COLUMN profiles.can_be_employee IS 'Si un manager puede actuar como empleado (prestar servicios)';
 COMMENT ON COLUMN profiles.is_active IS 'Si el usuario está activo en el sistema';
+
+ALTER TABLE profiles ADD CONSTRAINT can_be_employee_only_for_managers
+  CHECK (can_be_employee = false OR role = 'manager');
 
 -- ============================================================================
 -- 5. TABLA: services (Servicios por empresa)
