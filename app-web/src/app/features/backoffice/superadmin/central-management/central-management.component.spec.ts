@@ -45,12 +45,17 @@ describe('CentralManagementComponent - Behavior Driven Tests', () => {
     {
       id: 'user-1', email: 'admin@alpha.com', full_name: 'Admin Alpha',
       phone: '555-111', role: 'manager' as const, company_id: 'comp-1',
-      is_active: true, created_at: '2025-01-01', updated_at: '2025-01-01'
+      can_be_employee: true, is_active: true, created_at: '2025-01-01', updated_at: '2025-01-01'
     },
     {
       id: 'user-2', email: 'emp@alpha.com', full_name: 'Empleado Alpha',
       phone: '555-222', role: 'employee' as const, company_id: 'comp-1',
-      is_active: false, created_at: '2025-01-01', updated_at: '2025-01-01'
+      can_be_employee: false, is_active: false, created_at: '2025-01-01', updated_at: '2025-01-01'
+    },
+    {
+      id: 'user-3', email: 'manager2@alpha.com', full_name: 'Manager Sin Empleado',
+      phone: '555-333', role: 'manager' as const, company_id: 'comp-1',
+      can_be_employee: false, is_active: true, created_at: '2025-01-01', updated_at: '2025-01-01'
     }
   ];
 
@@ -207,7 +212,7 @@ describe('CentralManagementComponent - Behavior Driven Tests', () => {
       component.selectCompany(mockCompanies[0]);
       await fixture.whenStable();
 
-      expect(component.users().length).toBe(2);
+      expect(component.users().length).toBe(3);
       expect(component.users()[0].full_name).toBe('Admin Alpha');
     });
 
@@ -807,6 +812,7 @@ describe('CentralManagementComponent - Behavior Driven Tests', () => {
       expect(component.editingUser()).toBeNull();
       expect(component.userFormData().role).toBe('employee');
       expect(component.userFormData().company_id).toBe('comp-1');
+      expect(component.userFormData().can_be_employee).toBe(false);
     });
 
     it('should validate required fields when saving a user', async () => {
@@ -1005,6 +1011,32 @@ describe('CentralManagementComponent - Behavior Driven Tests', () => {
       expect(component.editingUserId()).toBeNull();
       expect(user.full_name).toBe('Admin Alpha');
     });
+
+    it('should include can_be_employee in update data when saving manager row edit', async () => {
+      const managerUser = { ...mockUsers[0], can_be_employee: true };
+      await component.onUserRowEditSave(managerUser);
+
+      expect(userServiceMock.update).toHaveBeenCalledWith('user-1',
+        expect.objectContaining({ can_be_employee: true, role: 'manager' })
+      );
+    });
+
+    it('should not include can_be_employee in update data when saving employee row edit', async () => {
+      const employeeUser = { ...mockUsers[1] };
+      await component.onUserRowEditSave(employeeUser);
+
+      const updateCall = userServiceMock.update.mock.calls[0][1] as any;
+      expect(updateCall.can_be_employee).toBeUndefined();
+    });
+
+    it('should set can_be_employee to false when manager has it undefined', async () => {
+      const managerWithout = { ...mockUsers[2], can_be_employee: undefined as any };
+      await component.onUserRowEditSave(managerWithout);
+
+      expect(userServiceMock.update).toHaveBeenCalledWith('user-3',
+        expect.objectContaining({ can_be_employee: false, role: 'manager' })
+      );
+    });
   });
 
   describe('helper methods', () => {
@@ -1028,6 +1060,59 @@ describe('CentralManagementComponent - Behavior Driven Tests', () => {
     it('should return plan name for companies with plan', () => {
       const companyWithPlan = mockCompanies[0];
       expect(component.getPlanName(companyWithPlan)).toBe('Básico');
+    });
+  });
+
+  describe('when superadmin edits user with can_be_employee', () => {
+    beforeEach(async () => {
+      await component.ngOnInit();
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      component.selectCompany(mockCompanies[0]);
+      await fixture.whenStable();
+    });
+
+    it('should preserve can_be_employee=true when toggling manager user status', async () => {
+      let confirmOptions: any;
+      jest.spyOn(confirmationService, 'confirm').mockImplementation((opts: any) => {
+        confirmOptions = opts;
+      });
+
+      const managerUser = mockUsers[0];
+      component.confirmToggleUser(managerUser);
+      await confirmOptions.accept();
+
+      expect(userServiceMock.deactivate).toHaveBeenCalledWith('user-1');
+    });
+
+    it('should create user with can_be_employee=false by default', async () => {
+      component.openCreateUserDialog();
+
+      expect(component.userFormData().can_be_employee).toBe(false);
+    });
+
+    it('should include can_be_employee in user row edit save for managers', async () => {
+      const managerUser = { ...mockUsers[0] };
+      managerUser.can_be_employee = true;
+      component.onUserRowEditInit(managerUser);
+
+      managerUser.can_be_employee = false;
+      await component.onUserRowEditSave(managerUser);
+
+      expect(userServiceMock.update).toHaveBeenCalledWith('user-1',
+        expect.objectContaining({ can_be_employee: false, role: 'manager' })
+      );
+    });
+
+    it('should not include can_be_employee for employee row edit saves', async () => {
+      const employeeUser = { ...mockUsers[1] };
+      component.onUserRowEditInit(employeeUser);
+
+      await component.onUserRowEditSave(employeeUser);
+
+      const updateCall = userServiceMock.update.mock.calls[0][1] as any;
+      expect(updateCall.can_be_employee).toBeUndefined();
     });
   });
 

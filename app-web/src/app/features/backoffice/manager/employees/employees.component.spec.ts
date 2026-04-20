@@ -19,6 +19,7 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
     full_name: 'Manager Test',
     role: 'manager' as const,
     company_id: 'company-1',
+    can_be_employee: false,
     is_active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -33,6 +34,7 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
       photo_url: 'https://example.com/juan.jpg',
       role: 'employee' as const,
       company_id: 'company-1',
+      can_be_employee: false,
       is_active: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
@@ -44,7 +46,20 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
       phone: '555-987-6543',
       role: 'employee' as const,
       company_id: 'company-1',
+      can_be_employee: false,
       is_active: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'mgr-1',
+      email: 'carlos@test.com',
+      full_name: 'Carlos López',
+      phone: '555-456-7890',
+      role: 'manager' as const,
+      company_id: 'company-1',
+      can_be_employee: true,
+      is_active: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }
@@ -94,7 +109,7 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
     });
 
     it('should load employees into component state', () => {
-      expect(component.employees().length).toBe(2);
+      expect(component.employees().length).toBe(3);
       expect(component.employees()[0].full_name).toBe('Juan Pérez');
     });
 
@@ -103,6 +118,7 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
       
       expect(compiled.textContent).toContain('Juan Pérez');
       expect(compiled.textContent).toContain('María García');
+      expect(compiled.textContent).toContain('Carlos López');
     });
 
     it('should display employee emails', () => {
@@ -110,6 +126,7 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
       
       expect(compiled.textContent).toContain('juan@test.com');
       expect(compiled.textContent).toContain('maria@test.com');
+      expect(compiled.textContent).toContain('carlos@test.com');
     });
 
     it('should display employee phone numbers when available', () => {
@@ -117,6 +134,7 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
       
       expect(compiled.textContent).toContain('555-123-4567');
       expect(compiled.textContent).toContain('555-987-6543');
+      expect(compiled.textContent).toContain('555-456-7890');
     });
 
     it('should show status indicator for each employee', () => {
@@ -124,6 +142,25 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
       
       expect(compiled.textContent).toContain('Activo');
       expect(compiled.textContent).toContain('Inactivo');
+    });
+
+    it('should display Manager + Empleado label for manager with can_be_employee', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.textContent).toContain('Manager + Empleado');
+    });
+
+    it('should display Propietario label for manager without can_be_employee', async () => {
+      const employeesWithoutFlag = mockEmployees.filter(e => e.role === 'employee' || !e.can_be_employee);
+      const managerOwner = { ...mockUser, id: 'mgr-2', can_be_employee: false };
+      employeesWithoutFlag.push({ ...managerOwner, full_name: 'Ana Dueña', email: 'ana@test.com', phone: '', role: 'manager' });
+      userServiceMock.getByCompany = jest.fn().mockResolvedValue(employeesWithoutFlag);
+      
+      await component.ngOnInit();
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.textContent).toContain('Propietario');
     });
   });
 

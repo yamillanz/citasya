@@ -22,6 +22,7 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
     full_name: 'Manager Test',
     role: 'manager' as const,
     company_id: 'company-1',
+    can_be_employee: false,
     is_active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -35,6 +36,21 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
     photo_url: 'https://example.com/juan.jpg',
     role: 'employee' as const,
     company_id: 'company-1',
+    can_be_employee: false,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  const mockManagerEmployee = {
+    id: 'mgr-1',
+    email: 'carlos@test.com',
+    full_name: 'Carlos López',
+    phone: '555-456-7890',
+    photo_url: '',
+    role: 'manager' as const,
+    company_id: 'company-1',
+    can_be_employee: true,
     is_active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -248,6 +264,86 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
       await component.ngOnInit();
 
       expect(router.navigate).toHaveBeenCalledWith(['/bo/employees']);
+    });
+  });
+
+  describe('when editing a manager with can_be_employee', () => {
+    beforeEach(waitForAsync(async () => {
+      userServiceMock.getById = jest.fn().mockResolvedValue(mockManagerEmployee);
+      
+      const activatedRouteMock = {
+        snapshot: {
+          paramMap: {
+            get: jest.fn().mockReturnValue('mgr-1')
+          }
+        }
+      };
+
+      await TestBed.configureTestingModule({
+        imports: [EmployeeFormComponent, ReactiveFormsModule, RouterTestingModule],
+        providers: [
+          { provide: AuthService, useValue: authServiceMock },
+          { provide: UserService, useValue: userServiceMock },
+          { provide: ServiceService, useValue: serviceServiceMock },
+          { provide: ActivatedRoute, useValue: activatedRouteMock },
+          MessageService
+        ],
+        schemas: [NO_ERRORS_SCHEMA]
+      }).compileComponents();
+
+      router = TestBed.inject(Router);
+      jest.spyOn(router, 'navigate').mockResolvedValue(true);
+
+      fixture = TestBed.createComponent(EmployeeFormComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+      await fixture.whenStable();
+    }));
+
+    it('should preserve manager role when submitting edit', async () => {
+      await component.ngOnInit();
+
+      component.form.patchValue({
+        full_name: 'Carlos López Actualizado',
+        phone: '555-999-9999'
+      });
+
+      await component.onSubmit();
+
+      expect(userServiceMock.update).toHaveBeenCalledWith('mgr-1',
+        expect.objectContaining({ role: 'manager', full_name: 'Carlos López Actualizado' })
+      );
+    });
+
+    it('should not overwrite role to employee when editing manager', async () => {
+      await component.ngOnInit();
+
+      component.form.patchValue({
+        full_name: 'Carlos Modified'
+      });
+
+      await component.onSubmit();
+
+      const updateCall = userServiceMock.update.mock.calls[0][1] as any;
+      expect(updateCall.role).toBe('manager');
+      expect(updateCall.role).not.toBe('employee');
+    });
+
+    it('should store editingRole as manager when loading manager user', async () => {
+      await component.ngOnInit();
+
+      expect(component.editingRole()).toBe('manager');
+    });
+
+    it('should show manager-specific success message after update', async () => {
+      await component.ngOnInit();
+
+      component.form.patchValue({ full_name: 'Carlos Updated' });
+      await component.onSubmit();
+
+      expect(userServiceMock.update).toHaveBeenCalledWith('mgr-1',
+        expect.objectContaining({ role: 'manager' })
+      );
     });
   });
 });
