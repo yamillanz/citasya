@@ -4,13 +4,16 @@
 
 .employee-history {
   padding: 3rem;
-  width: 100%;
+  width: calc(100% - 5rem);
   max-width: 1584px;
   margin-right: 5rem;
   animation: fadeIn 0.4s ease;
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
     padding: var(--space-lg) var(--space-md);
+    width: 100%;
+    margin-right: 0;
   }
 }
 
