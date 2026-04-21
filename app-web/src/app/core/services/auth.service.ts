@@ -14,7 +14,12 @@ export class AuthService {
       password
     });
     if (error) throw error;
-    return this.getUserData(data.user.id);
+    const user = await this.getUserData(data.user.id);
+    if (!user.is_active) {
+      await this.signOut();
+      throw new Error('Tu cuenta ha sido desactivada. Contacta al administrador.');
+    }
+    return user;
   }
   
   async signUp(email: string, password: string, userData: Partial<User>): Promise<User> {
@@ -36,7 +41,12 @@ export class AuthService {
   async getCurrentUser(): Promise<User | null> {
     const { data } = await this.supabase.auth.getUser();
     if (!data.user) return null;
-    return this.getUserData(data.user.id);
+    const user = await this.getUserData(data.user.id);
+    if (!user.is_active) {
+      await this.signOut();
+      return null;
+    }
+    return user;
   }
   
   private async getUserData(userId: string): Promise<User> {

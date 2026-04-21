@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
@@ -34,6 +35,7 @@ interface UserWithCompany extends User {
     TableModule,
     ButtonModule,
     InputTextModule,
+    PasswordModule,
     TagModule,
     DialogModule,
     SelectModule,
@@ -495,7 +497,7 @@ export class CentralManagementComponent implements OnInit {
     const companyId = this.selectedCompanyId();
     if (!companyId) return;
     this.editingUser.set(null);
-    this.userFormData.set({ email: '', full_name: '', phone: '', role: 'employee', company_id: companyId, can_be_employee: false });
+    this.userFormData.set({ email: '', full_name: '', phone: '', role: 'employee', company_id: companyId, can_be_employee: false, password: '' });
     this.userDialogVisible.set(true);
   }
 
@@ -506,10 +508,22 @@ export class CentralManagementComponent implements OnInit {
       return;
     }
 
+    if (!this.editingUser()) {
+      if (!data.password) {
+        this.messageService.add({ severity: 'warn', summary: 'Validación', detail: 'La contraseña es requerida para crear un usuario' });
+        return;
+      }
+      if (data.password.length < 6) {
+        this.messageService.add({ severity: 'warn', summary: 'Validación', detail: 'La contraseña debe tener al menos 6 caracteres' });
+        return;
+      }
+    }
+
     this.saving.set(true);
     try {
       if (this.editingUser()) {
-        await this.userService.update(this.editingUser()!.id, data);
+        const { password, ...updateData } = data;
+        await this.userService.update(this.editingUser()!.id, updateData);
         this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Usuario actualizado correctamente' });
       } else {
         await this.userService.create(data as CreateUserDto);

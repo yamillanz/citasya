@@ -21,4 +21,5 @@ export interface CreateUserDto {
   role: UserRole;
   company_id?: string;
   can_be_employee?: boolean;
+  password?: string;
 }

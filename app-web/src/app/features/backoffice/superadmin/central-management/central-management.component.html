@@ -355,6 +355,12 @@
       <input pInputText id="user-name" [(ngModel)]="userFormData().full_name" placeholder="Juan Pérez" />
     </div>
     <div class="form-field">
+      <label for="user-password">Contraseña {{ editingUser() ? '' : '*' }}</label>
+      <p-password id="user-password" [(ngModel)]="userFormData().password"
+        placeholder="Mínimo 6 caracteres" [toggleMask]="true" [feedback]="false"
+        [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }" />
+    </div>
+    <div class="form-field">
       <label for="user-phone">Teléfono</label>
       <input pInputText id="user-phone" [(ngModel)]="userFormData().phone" placeholder="+57 300 123 4567" />
     </div>

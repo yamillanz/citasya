@@ -64,13 +64,21 @@ export class UserService {
   }
 
   async create(user: CreateUserDto): Promise<User> {
-    const { data, error } = await this.supabase
-      .from('profiles')
-      .insert(user)
-      .select()
-      .single();
-    
-    if (error) throw error;
+    const { data, error } = await this.supabase.functions.invoke('create-user', {
+      body: user,
+    });
+
+    if (error) {
+      const message = error.message?.toLowerCase() || '';
+      if (message.includes('already') || message.includes('duplicate') || message.includes('registered') || message.includes('unique')) {
+        throw new Error('El email ya existe');
+      }
+      if (message.includes('password') && message.includes('6')) {
+        throw new Error('La contraseña debe tener al menos 6 caracteres');
+      }
+      throw new Error(error.message || 'No se pudo crear el usuario');
+    }
+
     return data;
   }
 
