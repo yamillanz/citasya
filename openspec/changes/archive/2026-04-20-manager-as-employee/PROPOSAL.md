@@ -6,7 +6,7 @@ Habilitar que un usuario con rol `manager` también pueda actuar como `employee`
 
 ## Problem Statement
 
-En CitasYa, un usuario tiene un único rol: `superadmin`, `manager` o `employee`. Esto funciona bien para empresas medianas/grandes donde roles están claramente separados. Sin embargo, en empresas pequeñas (2-3 empleados), el dueño frecuentemente también presta servicios y necesita:
+En holacitas, un usuario tiene un único rol: `superadmin`, `manager` o `employee`. Esto funciona bien para empresas medianas/grandes donde roles están claramente separados. Sin embargo, en empresas pequeñas (2-3 empleados), el dueño frecuentemente también presta servicios y necesita:
 
 - Ver su propio calendario de citas
 - Recibir reservas directas de clientes

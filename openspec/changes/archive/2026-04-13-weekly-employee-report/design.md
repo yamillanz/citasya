@@ -1,6 +1,6 @@
 ## Context
 
-CitasYa is an appointment management system built with Angular 20, PrimeNG, and Supabase. Managers currently have a dashboard with daily stats and a "Cierre Diario" (daily close) feature that generates PDFs, but there is no weekly reporting capability to see employee performance over time. The app uses signals, standalone components, Facade pattern (seen in daily-close), and Supabase direct queries.
+holacitas is an appointment management system built with Angular 20, PrimeNG, and Supabase. Managers currently have a dashboard with daily stats and a "Cierre Diario" (daily close) feature that generates PDFs, but there is no weekly reporting capability to see employee performance over time. The app uses signals, standalone components, Facade pattern (seen in daily-close), and Supabase direct queries.
 
 The database has `services` without a `commission_percentage` field. Commission calculation is a new concept that needs to be added at the service level. The appointment model already supports multiple services via `appointment_services` join table.
 

@@ -1,6 +1,6 @@
 ## Context
 
-The Superadmin role needs a centralized backoffice to manage the entire CitasYa platform. This includes:
+The Superadmin role needs a centralized backoffice to manage the entire holacitas platform. This includes:
 
 - **Companies**: All businesses using the platform
 - **Users**: Managers and employees across all companies

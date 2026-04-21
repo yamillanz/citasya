@@ -1,6 +1,6 @@
 ## Context
 
-This design covers Phase 2 of CitasYa: Public Booking Portal. The system currently has authentication and basic data models (Phase 1 complete). This phase adds public-facing pages for booking without client registration, enabling the core value proposition of the SaaS platform.
+This design covers Phase 2 of holacitas: Public Booking Portal. The system currently has authentication and basic data models (Phase 1 complete). This phase adds public-facing pages for booking without client registration, enabling the core value proposition of the SaaS platform.
 
 **Current State:**
 - Supabase database with tables: companies, users, services, schedules, appointments

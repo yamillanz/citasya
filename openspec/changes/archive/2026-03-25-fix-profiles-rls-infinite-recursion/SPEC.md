@@ -69,4 +69,4 @@ Reemplazar todas las subconsultas a `profiles` en las políticas RLS por las fun
 
 ## File Location
 
-SQL file: `/supabase-citasya/02-rls-policies.sql`
+SQL file: `/supabase-holacitas/02-rls-policies.sql`

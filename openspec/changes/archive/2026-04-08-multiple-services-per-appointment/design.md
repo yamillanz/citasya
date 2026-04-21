@@ -1,6 +1,6 @@
 ## Context
 
-Citasya es un sistema de reservas de citas donde clientes pueden agendar servicios con empleados de empresas. Actualmente, el modelo de datos tiene una relación 1:1 entre `appointments` y `services`, donde cada cita solo puede tener un servicio asociado.
+holacitas es un sistema de reservas de citas donde clientes pueden agendar servicios con empleados de empresas. Actualmente, el modelo de datos tiene una relación 1:1 entre `appointments` y `services`, donde cada cita solo puede tener un servicio asociado.
 
 **Estado actual:**
 - Tabla `appointments` tiene campo `service_id` (FK a `services`)

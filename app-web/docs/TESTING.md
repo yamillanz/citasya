@@ -1,4 +1,4 @@
-# Testing Strategy - CitasYa
+# Testing Strategy - holacitas
 
 ## Stack de Testing
 

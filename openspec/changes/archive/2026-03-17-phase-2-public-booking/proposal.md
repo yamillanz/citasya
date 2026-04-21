@@ -1,6 +1,6 @@
 ## Why
 
-Enable public access to company and employee calendars for appointment booking without requiring client registration. This eliminates friction in the booking process, allowing potential clients to quickly schedule appointments via shareable links. This is a core differentiator for CitasYa and essential for Phase 2 of the SaaS platform.
+Enable public access to company and employee calendars for appointment booking without requiring client registration. This eliminates friction in the booking process, allowing potential clients to quickly schedule appointments via shareable links. This is a core differentiator for holacitas and essential for Phase 2 of the SaaS platform.
 
 ## What Changes
 
