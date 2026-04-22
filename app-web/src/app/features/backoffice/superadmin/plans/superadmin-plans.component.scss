@@ -1,7 +1,12 @@
 .page-container {
-  padding: var(--space-xl);
+  padding: var(--space-xl) var(--space-lg);
+  width: 100%;
   max-width: 1000px;
-  margin: 0 auto;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    padding: var(--space-lg) var(--space-md);
+  }
 }
 
 .page-header {

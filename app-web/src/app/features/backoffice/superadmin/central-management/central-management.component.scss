@@ -1,11 +1,8 @@
 .management-page {
-  padding: 3rem;
+  padding: var(--space-xl) var(--space-lg);
   width: 100%;
-  max-width: 1584px;
-  margin-top: 0;
-  margin-right: 2rem;
-  margin-bottom: 0;
-  margin-left: 0;
+  max-width: 1400px;
+  margin: 0;
   animation: fadeIn 0.4s ease;
 
   @media (max-width: 768px) {
@@ -70,7 +67,6 @@
   margin-bottom: var(--space-lg);
   flex-wrap: wrap;
   width: 100%;
-  max-width: 1584px;
 
   .search-input {
     flex: 1;
@@ -116,7 +112,6 @@
 .table-section {
   margin-bottom: var(--space-xl);
   width: 100%;
-  max-width: 1584px;
   
   :host ::ng-deep {
     .p-datatable {
@@ -176,7 +171,6 @@
   border: 2px solid var(--color-sage-pale);
   animation: slideDown 0.3s var(--ease-out-expo);
   width: 100%;
-  max-width: 1584px;
 }
 
 .panel-header {

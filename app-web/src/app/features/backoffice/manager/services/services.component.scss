@@ -1,8 +1,13 @@
 .services-page {
-  padding: 2.5rem;
-  max-width: 1200px;
+  padding: var(--space-xl) var(--space-lg);
+  width: 100%;
+  max-width: 1400px;
   margin: 0;
   animation: fadeIn 0.4s ease;
+
+  @media (max-width: 768px) {
+    padding: var(--space-lg) var(--space-md);
+  }
 }
 
 @keyframes fadeIn {
