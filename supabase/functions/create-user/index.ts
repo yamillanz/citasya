@@ -1,5 +1,17 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
+function decodeJwtPayload(token: string): any {
+  const base64Url = token.split('.')[1]
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split('')
+      .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+      .join('')
+  )
+  return JSON.parse(jsonPayload)
+}
+
 Deno.serve(async (req: Request) => {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -22,25 +34,33 @@ Deno.serve(async (req: Request) => {
       })
     }
 
-    // Cliente con anon key para verificar el JWT del llamador
-    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!
-    const supabaseClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-    })
-
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser()
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'No autorizado' }), {
+    const token = authHeader.replace('Bearer ', '')
+    let payload: any
+    try {
+      payload = decodeJwtPayload(token)
+    } catch {
+      return new Response(JSON.stringify({ error: 'Token inválido' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
+    const callerUserId = payload.sub
+    if (!callerUserId) {
+      return new Response(JSON.stringify({ error: 'Token inválido' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Cliente admin para consultar profiles y crear usuario en Auth
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
+
     // Verificar que el llamador es superadmin
-    const { data: profile, error: profileError } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
-      .eq('id', user.id)
+      .eq('id', callerUserId)
       .single()
 
     if (profileError || !profile || profile.role !== 'superadmin') {
@@ -66,9 +86,6 @@ Deno.serve(async (req: Request) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-
-    // Cliente con service_role para crear usuario en Auth
-    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
 
     const { data: authData, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
