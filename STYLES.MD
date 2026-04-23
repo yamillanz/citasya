@@ -153,19 +153,62 @@ El proyecto usa un enfoque híbrido:
 
 ### Página Backoffice (estructura universal)
 
+**IMPORTANTE**: Todas las páginas dentro del backoffice (rutas `/bo/*`) deben seguir este patrón para mantener consistencia de centrado con el sidebar:
+
 ```scss
 .<page-name>-page {
-  padding: 2.5rem;
-  max-width: 1200px;
+  padding: var(--space-xl) var(--space-lg);
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
   animation: fadeIn 0.4s ease;
-}
 
-@media (max-width: 768px) {
-  .<page-name>-page {
+  @media (max-width: 768px) {
     padding: var(--space-lg) var(--space-md);
   }
 }
 ```
+
+**Reglas clave:**
+- `width: 100%` + `max-width: 1400px` + `margin: 0 auto` → centra el contenido dentro del área disponible
+- El `max-width` puede ajustarse según el contenido (ej: formularios simples pueden usar 700px-900px)
+- NUNCA usar solo `margin: 0` (pega el contenido a la izquierda)
+
+### Layout del Backoffice con Sidebar
+
+El componente `backoffice.component.scss` maneja la estructura base. **Si se modifica, afecta a TODAS las páginas del backoffice.**
+
+```scss
+// backoffice.component.scss
+.main-content {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
+
+  @media (min-width: 1025px) {
+    margin-left: 260px;
+    width: calc(100% - 260px);  // ← CRÍTICO: evita desbordamiento
+    padding-right: var(--space-xl);
+    padding-left: 0;
+  }
+
+  @media (max-width: 1024px) {
+    margin-left: 0;
+    padding-left: var(--space-sm);
+    padding-right: var(--space-sm);
+    min-height: calc(100vh - 73px);
+  }
+}
+```
+
+**Por qué `width: calc(100% - 260px)` es necesario:**
+- El sidebar es fijo (`position: fixed`) de 260px
+- Sin el `calc`, `width: 100%` + `margin-left: 260px` = desbordamiento horizontal
+- El `calc` garantiza que el área de contenido ocupe exactamente el espacio sobrante
+- Las páginas hijas pueden entonces centrarse correctamente con `margin: 0 auto`
 
 ### Header de Página (patrón universal)
 
@@ -834,6 +877,7 @@ Definidas en `src/styles.scss`:
 
 ## Checklist Rápido para Nuevo Componente
 
+### Estilos base
 1. ✅ Usar CSS custom properties (`var(--color-*)`, `var(--space-*)`, etc.)
 2. ✅ NO usar clases de Tailwind en templates
 3. ✅ Fondo de página: `var(--color-cream)`
@@ -846,3 +890,9 @@ Definidas en `src/styles.scss`:
 10. ✅ Responsive con `@media (max-width: 768px)`
 11. ✅ PrimeNG overrides con `:host ::ng-deep` + `!important`
 12. ✅ Animación de entrada: `animation: fadeIn 0.4s ease`
+
+### Layout (especialmente páginas del backoffice)
+13. ✅ Contenedor de página: `width: 100%; max-width: 1400px; margin: 0 auto;`
+14. ✅ Padding de página: `var(--space-xl) var(--space-lg)` desktop, `var(--space-lg) var(--space-md)` mobile
+15. ✅ Si el contenido es un formulario simple, usar `max-width: 700px` en lugar de 1400px
+16. ✅ Verificar que no haya desbordamiento horizontal con el sidebar de 260px
