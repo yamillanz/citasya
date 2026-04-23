@@ -1,16 +1,18 @@
+<a href="#main-content" class="skip-link">Saltar al contenido</a>
+
 <header class="landing-header">
   <div class="header-container">
     <!-- Logo -->
     <a routerLink="/" class="logo-link">
-      <svg 
-        width="160" 
-        height="44" 
-        viewBox="0 0 165 44" 
-        fill="none" 
+      <svg
+        width="160"
+        height="44"
+        viewBox="0 0 165 44"
+        fill="none"
         xmlns="http://www.w3.org/2000/svg"
         class="logo-svg"
       >
-        <text x="0" y="30" font-family="'Fraunces', Georgia, serif" font-size="24" font-weight="600" letter-spacing="-0.5">
+        <text x="0" y="30" font-family="'Fraunces', Georgia, serif" font-size="24" font-weight="700" letter-spacing="-0.5">
           <tspan fill="#9DC183">holacitas</tspan><tspan fill="#5D6D7E">.app</tspan>
         </text>
       </svg>
@@ -19,22 +21,14 @@
     <!-- Desktop Navigation -->
     <nav class="desktop-nav">
       @for (item of menuItems; track item.label) {
-        @if (item.routerLink) {
-          <a 
-            [routerLink]="item.routerLink" 
-            [fragment]="item.fragment"
-            class="nav-link"
-          >
-            {{ item.label }}
-          </a>
-        } @else {
-          <a 
-            [href]="'#' + item.fragment"
-            class="nav-link"
-          >
-            {{ item.label }}
-          </a>
-        }
+        <a
+          [routerLink]="item.routerLink"
+          [fragment]="item.fragment"
+          class="nav-link"
+          [class.active]="isActive(item)"
+        >
+          {{ item.label }}
+        </a>
       }
     </nav>
 
@@ -53,8 +47,9 @@
     </div>
 
     <!-- Mobile Menu Button -->
-    <p-button 
-      icon="pi pi-bars" 
+    <p-button
+      class="mobile-menu-trigger"
+      icon="pi pi-bars"
       styleClass="p-button-rounded p-button-text mobile-menu-btn"
       (onClick)="mobileMenuVisible = true"
     />
@@ -79,7 +74,7 @@
           fill="none" 
           xmlns="http://www.w3.org/2000/svg"
         >
-          <text x="0" y="28" font-family="'Fraunces', Georgia, serif" font-size="22" font-weight="600" letter-spacing="-0.5">
+          <text x="0" y="28" font-family="'Fraunces', Georgia, serif" font-size="22" font-weight="700" letter-spacing="-0.5">
             <tspan fill="#9DC183">holacitas</tspan><tspan fill="#5D6D7E">.app</tspan>
           </text>
         </svg>
@@ -89,26 +84,16 @@
     <div class="mobile-menu-content">
       <nav class="mobile-nav">
         @for (item of menuItems; track item.label) {
-          @if (item.routerLink) {
-            <a 
-              [routerLink]="item.routerLink" 
-              [fragment]="item.fragment"
-              class="mobile-nav-link"
-              (click)="mobileMenuVisible = false"
-            >
-              {{ item.label }}
-              <i class="pi pi-arrow-right"></i>
-            </a>
-          } @else {
-            <a 
-              [href]="'#' + item.fragment"
-              class="mobile-nav-link"
-              (click)="mobileMenuVisible = false"
-            >
-              {{ item.label }}
-              <i class="pi pi-arrow-right"></i>
-            </a>
-          }
+          <a
+            [routerLink]="item.routerLink"
+            [fragment]="item.fragment"
+            class="mobile-nav-link"
+            [class.active]="isActive(item)"
+            (click)="mobileMenuVisible = false"
+          >
+            {{ item.label }}
+            <i class="pi pi-arrow-right"></i>
+          </a>
         }
       </nav>
       

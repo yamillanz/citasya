@@ -2,11 +2,12 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { LandingHeaderComponent } from '../../../shared/components/landing-header/landing-header.component';
 
 @Component({
   selector: 'app-faq',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, LandingHeaderComponent],
   templateUrl: './faq.component.html',
   styleUrl: './faq.component.scss'
 })
