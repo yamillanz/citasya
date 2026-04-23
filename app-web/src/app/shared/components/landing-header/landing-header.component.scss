@@ -48,9 +48,15 @@
   align-items: center;
   text-decoration: none;
   transition: transform var(--duration-fast) ease;
+  border-radius: var(--radius-sm);
   
   &:hover {
     transform: scale(1.02);
+  }
+  
+  &:focus-visible {
+    outline: 2px solid var(--color-sage);
+    outline-offset: 4px;
   }
 }
 
@@ -103,6 +109,12 @@
   &.active {
     font-weight: 600;
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-sage);
+    outline-offset: 4px;
+    border-radius: var(--radius-sm);
+  }
 }
 
 .auth-buttons {
@@ -121,13 +133,18 @@
     font-weight: 500;
     padding: var(--space-sm) var(--space-md) !important;
     transition: all var(--duration-fast) ease !important;
-    
+
     &:hover {
       color: var(--color-text-primary) !important;
       background: rgba(157, 193, 131, 0.08) !important;
     }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-sage) !important;
+      outline-offset: 2px !important;
+    }
   }
-  
+
   .nav-btn-primary {
     background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
     border: none !important;
@@ -138,10 +155,15 @@
     color: white !important;
     box-shadow: 0 4px 15px rgba(157, 193, 131, 0.35);
     transition: all var(--duration-normal) var(--ease-out-expo) !important;
-    
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(157, 193, 131, 0.45);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-sage-dark) !important;
+      outline-offset: 3px !important;
     }
   }
   
