@@ -32,23 +32,6 @@
     right: -150px;
     animation: float 10s ease-in-out infinite;
   }
-
-  &.blob-2 {
-    width: 400px;
-    height: 400px;
-    bottom: -200px;
-    left: -100px;
-    animation: float 8s ease-in-out infinite reverse;
-  }
-
-  &.blob-3 {
-    width: 300px;
-    height: 300px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    animation: float 12s ease-in-out infinite;
-  }
 }
 
 @keyframes float {
@@ -111,9 +94,11 @@
 
 .pricing-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--space-xl);
   align-items: stretch;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .pricing-card {
@@ -130,7 +115,6 @@
 
   &:nth-child(1) { animation-delay: 0ms; }
   &:nth-child(2) { animation-delay: 100ms; }
-  &:nth-child(3) { animation-delay: 200ms; }
 
   &:hover {
     transform: translateY(-8px);
@@ -142,33 +126,43 @@
   }
 
   &.featured {
-    background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
-    transform: scale(1.05);
+    background: white;
+    border: 2px solid var(--color-sage);
+    box-shadow: 0 0 0 4px var(--color-sage-pale), var(--shadow-xl);
     z-index: 1;
 
-    .plan-name,
-    .price-amount,
-    .price-period,
+    .plan-name {
+      color: var(--color-text-primary);
+    }
+
+    .price-amount {
+      color: var(--color-sage);
+    }
+
+    .price-period {
+      color: var(--color-text-muted);
+    }
+
     .feature-item span {
-      color: white;
+      color: var(--color-text-secondary);
     }
 
     .check-icon {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
+      background: var(--color-sage-pale);
+      color: var(--color-sage);
     }
 
     .plan-btn {
-      background: white;
-      color: var(--color-sage-dark);
+      background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+      color: white;
 
       &:hover {
-        background: var(--color-cream);
+        background: linear-gradient(135deg, var(--color-sage-dark) 0%, var(--color-sage) 100%);
       }
     }
 
     &:hover {
-      transform: scale(1.05) translateY(-8px);
+      transform: translateY(-8px);
     }
   }
 }
@@ -218,9 +212,6 @@
   justify-content: center;
   gap: var(--space-xs);
 
-  &.custom .price-amount {
-    font-size: 1.75rem;
-  }
 }
 
 .price-amount {
@@ -273,10 +264,6 @@
   color: var(--color-sage);
   border-radius: 50%;
 
-  &.neutral {
-    background: var(--color-linen);
-    color: var(--color-text-muted);
-  }
 }
 
 .card-footer {
@@ -320,14 +307,63 @@
       box-shadow: 0 8px 25px rgba(157, 193, 131, 0.5);
     }
   }
+}
 
-  &.outline {
-    background: transparent;
-    border: 2px solid var(--color-sage);
-    color: var(--color-sage-dark);
+/* ================================
+   Enterprise Section
+   ================================ */
+.enterprise-section {
+  margin-top: var(--space-2xl);
+  text-align: center;
+}
 
-    &:hover {
-      background: var(--color-sage-pale);
+.enterprise-content {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  box-shadow: var(--shadow-md);
+  max-width: 600px;
+  margin: 0 auto;
+
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-sm);
+  }
+
+  p {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xl);
+    line-height: 1.6;
+  }
+}
+
+.enterprise-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  background: transparent;
+  border: 2px solid var(--color-sage);
+  color: var(--color-sage-dark);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: all var(--duration-fast) ease;
+
+  svg {
+    transition: transform var(--duration-fast) ease;
+  }
+
+  &:hover {
+    background: var(--color-sage-pale);
+
+    svg {
+      transform: translateX(4px);
     }
   }
 }
@@ -340,25 +376,6 @@
   padding: var(--space-4xl) var(--space-lg);
   background: linear-gradient(180deg, var(--color-cream) 0%, var(--color-linen) 100%);
   overflow: hidden;
-}
-
-.faq-background {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.blob-faq {
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  top: -200px;
-  right: -200px;
-  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-  background: linear-gradient(135deg, var(--color-sage-light) 0%, var(--color-sage-pale) 100%);
-  opacity: 0.3;
-  animation: float 12s ease-in-out infinite;
 }
 
 .faq-content {
@@ -569,16 +586,6 @@
     }
   }
 
-  &.outline {
-    background: transparent;
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.5);
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: white;
-    }
-  }
 }
 
 /* ================================
@@ -592,12 +599,7 @@
   }
 
   .pricing-card.featured {
-    transform: none;
     order: -1;
-
-    &:hover {
-      transform: translateY(-8px);
-    }
   }
 }
 

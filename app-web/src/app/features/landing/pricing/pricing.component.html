@@ -5,8 +5,6 @@
   <section class="hero-section" id="main-content">
     <div class="hero-background">
       <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
-      <div class="blob blob-3"></div>
     </div>
     
     <div class="hero-content">
@@ -38,7 +36,7 @@
           </div>
           <h2 class="plan-name">Básico</h2>
           <div class="plan-price">
-            <span class="price-amount">$25</span>
+            <span class="price-amount">$29.99</span>
             <span class="price-period">/mes</span>
           </div>
         </div>
@@ -111,7 +109,7 @@
           </div>
           <h2 class="plan-name">Medio</h2>
           <div class="plan-price">
-            <span class="price-amount">$60</span>
+            <span class="price-amount">$59.99</span>
             <span class="price-period">/mes</span>
           </div>
         </div>
@@ -178,85 +176,25 @@
           </a>
         </div>
       </div>
+    </div>
 
-      <!-- Custom Plan -->
-      <div class="pricing-card">
-        <div class="card-header">
-          <div class="plan-icon">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-              <circle cx="16" cy="16" r="16" fill="#F5F2ED"/>
-              <path d="M16 8V24M8 16H24M12 12L20 20M12 20L20 12" stroke="#5D6D7E" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h2 class="plan-name">Custom</h2>
-          <div class="plan-price custom">
-            <span class="price-amount">Negociado</span>
-          </div>
-        </div>
-        
-        <div class="card-body">
-          <ul class="features-list">
-            <li class="feature-item">
-              <div class="check-icon neutral">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <span>Usuarios ilimitados</span>
-            </li>
-            <li class="feature-item">
-              <div class="check-icon neutral">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <span>Empresas ilimitadas</span>
-            </li>
-            <li class="feature-item">
-              <div class="check-icon neutral">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <span>Todas las funcionalidades</span>
-            </li>
-            <li class="feature-item">
-              <div class="check-icon neutral">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <span>Soporte dedicado 24/7</span>
-            </li>
-            <li class="feature-item">
-              <div class="check-icon neutral">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <span>Personalización completa</span>
-            </li>
-          </ul>
-        </div>
-        
-        <div class="card-footer">
-          <a routerLink="/contact" class="plan-btn outline">
-            <span>Contactar</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </a>
-        </div>
+    <!-- Enterprise Section -->
+    <div class="enterprise-section">
+      <div class="enterprise-content">
+        <h3>¿Necesitas más?</h3>
+        <p>Usuarios ilimitados, múltiples empresas, personalización completa y soporte dedicado 24/7.</p>
+        <a routerLink="/contact" class="enterprise-btn">
+          <span>Hablemos</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
       </div>
     </div>
   </section>
 
   <!-- FAQ Section -->
   <section class="faq-section">
-    <div class="faq-background">
-      <div class="blob blob-faq"></div>
-    </div>
-    
     <div class="faq-content">
       <div class="section-header">
         <h2>Preguntas frecuentes</h2>
@@ -360,14 +298,11 @@
         <h2>¿Listo para comenzar?</h2>
         <p>Únete a cientos de negocios que ya confían en holacitas para gestionar sus citas.</p>
         <div class="cta-buttons">
-          <a routerLink="/signup" class="cta-btn primary">
-            <span>Crear cuenta gratis</span>
+          <a routerLink="/contact" class="cta-btn primary">
+            <span>Contáctanos para comenzar</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-          </a>
-          <a routerLink="/contact" class="cta-btn outline">
-            <span>Hablar con ventas</span>
           </a>
         </div>
       </div>
