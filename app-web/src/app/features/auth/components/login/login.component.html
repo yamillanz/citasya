@@ -2,27 +2,25 @@
   <!-- Background Elements -->
   <div class="auth-bg">
     <div class="auth-blob auth-blob-1"></div>
-    <div class="auth-blob auth-blob-2"></div>
-    <div class="auth-grid"></div>
   </div>
 
   <!-- Auth Card -->
   <div class="auth-container">
     <div class="auth-card">
-      <!-- Logo -->
-      <a routerLink="/" class="auth-logo">
-        <svg width="175" height="48" viewBox="0 0 180 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <g>
-            <text x="0" y="32" font-family="'Fraunces', Georgia, serif" font-size="26" font-weight="600" letter-spacing="-0.5">
-              <tspan fill="#9DC183">holacitas</tspan><tspan fill="#5D6D7E">.app</tspan>
-            </text>
-          </g>
-        </svg>
-        <p class="auth-tagline">Gestión de citas simplificada</p>
-      </a>
-
       <!-- Form Card -->
       <div class="auth-form-card">
+        <!-- Logo -->
+        <a routerLink="/" class="auth-logo">
+          <svg width="220" height="60" viewBox="0 0 220 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g>
+              <text x="0" y="40" font-family="'Fraunces', Georgia, serif" font-size="32" font-weight="700" letter-spacing="-0.5">
+                <tspan fill="#9DC183">holacitas</tspan><tspan fill="#5D6D7E">.app</tspan>
+              </text>
+            </g>
+          </svg>
+          <p class="auth-tagline">Gestión de citas simplificada</p>
+        </a>
+
         <div class="auth-form-header">
           <h1>Bienvenido de vuelta</h1>
           <p>Ingresa tus credenciales para continuar</p>
@@ -31,16 +29,18 @@
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <!-- Email Field -->
           <div class="form-field">
-            <label for="email">Correo electrónico</label>
+            <label for="email">Correo electrónico <span class="required-marker" aria-hidden="true">*</span></label>
             <div class="input-wrapper">
               <i class="pi pi-envelope input-icon"></i>
               <input 
                 pInputText 
-                id="email" 
+                inputId="email" 
+                id="email"
                 type="email" 
                 formControlName="email"
                 placeholder="tu@email.com"
                 class="form-input"
+                autocomplete="email"
                 [class.ng-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
               />
             </div>
@@ -57,17 +57,19 @@
 
           <!-- Password Field -->
           <div class="form-field">
-            <label for="password">Contraseña</label>
+            <label for="password">Contraseña <span class="required-marker" aria-hidden="true">*</span></label>
             <div class="input-wrapper">
               <i class="pi pi-lock input-icon"></i>
               <p-password 
-                id="password" 
+                inputId="password"
+                id="password"
                 formControlName="password"
                 placeholder="Tu contraseña"
                 [feedback]="false"
                 [toggleMask]="true"
                 styleClass="password-input"
                 inputStyleClass="form-input"
+                autocomplete="current-password"
                 (onToggle)="togglePassword()"
               />
             </div>
@@ -76,7 +78,7 @@
             }
           </div>
 
-          <!-- Remember Me & Forgot -->
+          <!-- Remember Me -->
           <div class="form-options">
             <label class="checkbox-label">
               <p-checkbox 
@@ -86,7 +88,6 @@
               />
               <span>Recordarme</span>
             </label>
-            <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
           </div>
 
           <!-- Error Message -->
@@ -106,23 +107,6 @@
           />
         </form>
 
-        <!-- Divider -->
-        <div class="auth-divider">
-          <span>o</span>
-        </div>
-
-        <!-- Social Proof -->
-        <div class="auth-social-proof">
-          <div class="proof-avatars">
-            <div class="proof-avatar">MG</div>
-            <div class="proof-avatar">CS</div>
-            <div class="proof-avatar">AR</div>
-          </div>
-          <p class="proof-text">
-            <strong>+500 profesionales</strong> ya confían en holacitas
-          </p>
-        </div>
-
         <!-- Footer -->
         <div class="auth-footer">
           <p>¿No tienes cuenta? <a routerLink="/register">Crea una gratis</a></p>
@@ -131,9 +115,4 @@
     </div>
   </div>
 
-  <!-- Decorative Elements -->
-  <div class="auth-decoration">
-    <div class="deco-shape deco-shape-1"></div>
-    <div class="deco-shape deco-shape-2"></div>
-  </div>
 </div>
