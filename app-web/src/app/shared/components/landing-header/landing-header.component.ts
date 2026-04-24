@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
-import { DialogModule } from 'primeng/dialog';
+import { DrawerModule } from 'primeng/drawer';
 import { DividerModule } from 'primeng/divider';
 import { MenuItem } from 'primeng/api';
 import { filter } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-landing-header',
   standalone: true,
-  imports: [RouterLink, ButtonModule, MenuModule, DialogModule, DividerModule],
+  imports: [RouterLink, ButtonModule, MenuModule, DrawerModule, DividerModule],
   templateUrl: './landing-header.component.html',
   styleUrl: './landing-header.component.scss'
 })

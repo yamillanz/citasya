@@ -56,31 +56,27 @@
   </div>
 
   <!-- Mobile Menu -->
-  <p-dialog 
-    [(visible)]="mobileMenuVisible" 
-    [modal]="true" 
-    [style]="{ width: '85vw', maxWidth: '360px' }"
-    [showHeader]="true"
-    header="Menú"
+  <p-drawer
+    [(visible)]="mobileMenuVisible"
+    position="right"
     styleClass="mobile-drawer"
-    [closable]="true"
+    [blockScroll]="true"
+    [showCloseIcon]="false"
   >
-    <ng-template pTemplate="header">
-      <div class="drawer-header">
-        <svg 
-          width="120" 
-          height="32" 
-          viewBox="0 0 140 36" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <text x="0" y="28" font-family="'Fraunces', Georgia, serif" font-size="22" font-weight="700" letter-spacing="-0.5">
-            <tspan fill="#9DC183">holacitas</tspan><tspan fill="#5D6D7E">.app</tspan>
-          </text>
-        </svg>
-      </div>
-    </ng-template>
-    
+    <div class="mobile-sidebar-header">
+      <svg
+        width="120"
+        height="32"
+        viewBox="0 0 140 36"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <text x="0" y="28" font-family="'Fraunces', Georgia, serif" font-size="22" font-weight="700" letter-spacing="-0.5">
+          <tspan fill="#9DC183">holacitas</tspan><tspan fill="#5D6D7E">.app</tspan>
+        </text>
+      </svg>
+    </div>
+
     <div class="mobile-menu-content">
       <nav class="mobile-nav">
         @for (item of menuItems; track item.label) {
@@ -96,21 +92,15 @@
           </a>
         }
       </nav>
-      
+
       <div class="mobile-auth-buttons">
-        <p-button 
-          label="Iniciar sesión" 
+        <p-button
+          label="Iniciar sesión"
           styleClass="p-button-outlined w-full"
           routerLink="/login"
           (onClick)="mobileMenuVisible = false"
         />
-        <p-button 
-          label="Crear cuenta gratis" 
-          styleClass="p-button-primary w-full"
-          routerLink="/signup"
-          (onClick)="mobileMenuVisible = false"
-        />
       </div>
     </div>
-  </p-dialog>
+  </p-drawer>
 </header>
