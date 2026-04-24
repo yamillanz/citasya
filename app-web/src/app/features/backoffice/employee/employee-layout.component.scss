@@ -211,9 +211,9 @@
 
   @media (min-width: 1025px) {
     margin-left: 260px;
+    width: calc(100% - 260px);
     padding-right: var(--space-xl);
-    padding-left: 1rem;
-    max-width: calc(100vw - 260px);
+    padding-left: 0;
   }
 
   @media (max-width: 1024px) {
