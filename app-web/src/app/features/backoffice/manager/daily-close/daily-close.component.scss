@@ -188,7 +188,7 @@
 
 .stats-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-md);
   margin-bottom: var(--space-lg);
 }
@@ -273,7 +273,7 @@
 
 .main-content {
   display: grid;
-  grid-template-columns: 30% 70%;
+  grid-template-columns: 3fr 7fr;
   gap: var(--space-lg);
   min-height: 500px;
 }
@@ -970,7 +970,7 @@
 
 @media (max-width: 1024px) {
   .main-content {
-    grid-template-columns: 35% 65%;
+    grid-template-columns: 35fr 65fr;
   }
 }
 
