@@ -835,7 +835,8 @@ describe('CentralManagementComponent - Behavior Driven Tests', () => {
         full_name: 'Nuevo Usuario',
         phone: '555-000',
         role: 'employee',
-        company_id: 'comp-1'
+        company_id: 'comp-1',
+        password: 'test1234'
       });
 
       await component.saveUser();
@@ -847,7 +848,7 @@ describe('CentralManagementComponent - Behavior Driven Tests', () => {
 
     it('should close dialog after successful user creation', async () => {
       component.openCreateUserDialog();
-      component.userFormData.set({ email: 'new@test.com', full_name: 'Nuevo', role: 'employee' });
+      component.userFormData.set({ email: 'new@test.com', full_name: 'Nuevo', role: 'employee', password: 'test1234' });
 
       await component.saveUser();
 
@@ -859,7 +860,7 @@ describe('CentralManagementComponent - Behavior Driven Tests', () => {
       userServiceMock.create = jest.fn().mockRejectedValue(new Error('duplicate key value violates unique constraint "profiles_email_key"'));
 
       component.openCreateUserDialog();
-      component.userFormData.set({ email: 'admin@alpha.com', full_name: 'Test', role: 'employee' });
+      component.userFormData.set({ email: 'admin@alpha.com', full_name: 'Test', role: 'employee', password: 'test1234' });
 
       await component.saveUser();
 

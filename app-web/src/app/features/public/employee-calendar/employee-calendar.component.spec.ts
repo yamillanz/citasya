@@ -45,7 +45,7 @@ describe('EmployeeCalendarComponent (Public)', () => {
         { provide: UserService, useValue: userServiceMock },
         { provide: ServiceService, useValue: serviceServiceMock },
         { provide: AppointmentService, useValue: appointmentServiceMock },
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: (k: string) => k === 'companySlug' ? 'peluqueria-juan' : k === 'employeeId' ? 'employee-1' : null } } } },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: (k: string) => k === 'companySlug' ? 'peluqueria-juan' : k === 'employeeId' ? 'employee-1' : null }, queryParamMap: { get: jest.fn().mockReturnValue(null) } } } },
         { provide: Router, useValue: routerMock }
       ]
     }).compileComponents();
@@ -218,6 +218,46 @@ describe('EmployeeCalendarComponent (Public)', () => {
         ['/c', mockCompany.slug, 'e', mockEmployee.id, 'book'],
         { queryParams: { date: '2026-04-10', time: '10:30', serviceIds: 'service-1,service-2' } }
       );
+    });
+  });
+
+  describe('Pre-selección via query param serviceId', () => {
+    it('debe pre-seleccionar servicio cuando serviceId es válido', async () => {
+      const routeMock = TestBed.inject(ActivatedRoute);
+      (routeMock.snapshot.queryParamMap.get as jest.Mock).mockReturnValue('service-1');
+
+      await component.ngOnInit();
+
+      expect(component.selectedServiceIds()).toContain('service-1');
+      expect(component.selectedServiceIds()).toHaveLength(1);
+    });
+
+    it('no debe pre-seleccionar cuando serviceId no existe', async () => {
+      const routeMock = TestBed.inject(ActivatedRoute);
+      (routeMock.snapshot.queryParamMap.get as jest.Mock).mockReturnValue(null);
+
+      await component.ngOnInit();
+
+      expect(component.selectedServiceIds()).toHaveLength(0);
+    });
+
+    it('no debe pre-seleccionar cuando serviceId no pertenece al empleado', async () => {
+      const routeMock = TestBed.inject(ActivatedRoute);
+      (routeMock.snapshot.queryParamMap.get as jest.Mock).mockReturnValue('service-inexistente');
+
+      await component.ngOnInit();
+
+      expect(component.selectedServiceIds()).toHaveLength(0);
+    });
+
+    it('no debe duplicar selección si ya estaba seleccionado', async () => {
+      const routeMock = TestBed.inject(ActivatedRoute);
+      (routeMock.snapshot.queryParamMap.get as jest.Mock).mockReturnValue('service-1');
+      component.selectedServiceIds.set(['service-1']);
+
+      await component.ngOnInit();
+
+      expect(component.selectedServiceIds()).toHaveLength(1);
     });
   });
 });

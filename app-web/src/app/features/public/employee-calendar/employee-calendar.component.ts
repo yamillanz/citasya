@@ -117,6 +117,14 @@ export class EmployeeCalendarComponent implements OnInit {
 
       const services = await this.serviceService.getByEmployee(employeeId);
       this.services.set(services);
+
+      const serviceId = this.route.snapshot.queryParamMap.get('serviceId');
+      if (serviceId && services.some(s => s.id === serviceId)) {
+        this.selectedServiceIds.update(ids => {
+          if (ids.includes(serviceId)) return ids;
+          return [...ids, serviceId];
+        });
+      }
     } catch (err) {
       this.error.set('Error al cargar los datos');
     } finally {

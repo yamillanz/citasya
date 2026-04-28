@@ -6,8 +6,10 @@ import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
+import { ServiceService } from '../../../core/services/service.service';
 import { Company } from '../../../core/models/company.model';
 import { User } from '../../../core/models/user.model';
+import { Service } from '../../../core/models/service.model';
 
 @Component({
   selector: 'app-company-list',
@@ -26,9 +28,11 @@ export class CompanyListComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private companyService = inject(CompanyService);
   private userService = inject(UserService);
+  private serviceService = inject(ServiceService);
 
   company = signal<Company | null>(null);
   employees = signal<User[]>([]);
+  servicesByEmployee = signal<Record<string, Service[]>>({});
   loading = signal(true);
   error = signal('');
 
@@ -51,6 +55,9 @@ export class CompanyListComponent implements OnInit {
       this.company.set(company);
       const employees = await this.userService.getEmployeesByCompany(company.id);
       this.employees.set(employees);
+      const employeeIds = employees.map(e => e.id);
+      const servicesMap = await this.serviceService.getServicesForEmployees(employeeIds);
+      this.servicesByEmployee.set(servicesMap);
     } catch (err) {
       this.error.set('Error al cargar los datos');
     } finally {

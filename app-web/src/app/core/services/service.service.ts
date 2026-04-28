@@ -32,6 +32,25 @@ export class ServiceService {
     return services;
   }
 
+  async getServicesForEmployees(employeeIds: string[]): Promise<Record<string, Service[]>> {
+    if (employeeIds.length === 0) return {};
+    const { data, error } = await this.supabase
+      .from('employee_services')
+      .select('employee_id, service:services(*)')
+      .in('employee_id', employeeIds);
+    if (error) throw error;
+    const result: Record<string, Service[]> = {};
+    for (const row of (data || [])) {
+      const svc = (row as any).service as any as Service | null;
+      if (!svc || !svc.is_active) continue;
+      (result[row.employee_id] ??= []).push(svc);
+    }
+    for (const id of employeeIds) {
+      result[id] ??= [];
+    }
+    return result;
+  }
+
   async getById(id: string): Promise<Service | null> {
     const { data, error } = await this.supabase
       .from('services')

@@ -66,8 +66,8 @@
   @if (!loading() && !error() && employees().length > 0) {
     <section class="employees-section">
       <div class="section-header">
-        <h2>Selecciona un profesional</h2>
-        <p>Elige al especialista que atenderá tu cita</p>
+        <h2>Nuestros servicios</h2>
+        <p>Selecciona el servicio que necesitas</p>
       </div>
       
       <div class="employees-grid">
@@ -80,27 +80,51 @@
             </div>
             
             <div class="card-content">
-              <div class="employee-avatar">
-                @if (employee.photo_url) {
-                  <img [src]="employee.photo_url" [alt]="employee.full_name">
-                } @else {
-                  <div class="avatar-placeholder">
-                    {{ employee.full_name.charAt(0) }}
-                  </div>
-                }
+              <div class="card-content-top">
+                <div class="employee-avatar">
+                  @if (employee.photo_url) {
+                    <img [src]="employee.photo_url" [alt]="employee.full_name">
+                  } @else {
+                    <div class="avatar-placeholder">
+                      {{ employee.full_name.charAt(0) }}
+                    </div>
+                  }
+                </div>
+
+                <div class="employee-info">
+                  <h3 class="employee-name">{{ employee.full_name }}</h3>
+                  @if (employee.phone) {
+                    <span class="employee-contact">
+                      <i class="pi pi-phone"></i>
+                      {{ employee.phone }}
+                    </span>
+                  }
+                </div>
               </div>
-              
-              <div class="employee-info">
-                <h3 class="employee-name">{{ employee.full_name }}</h3>
-                @if (employee.phone) {
-                  <span class="employee-contact">
-                    <i class="pi pi-phone"></i>
-                    {{ employee.phone }}
-                  </span>
-                }
-              </div>
-              
-              <a 
+
+              @if ((servicesByEmployee()[employee.id]?.length ?? 0) > 0) {
+                <div class="employee-services">
+                  @for (service of servicesByEmployee()[employee.id]; track service.id) {
+                    <a
+                      class="service-item"
+                      [routerLink]="['/c', company()?.slug, 'e', employee.id]"
+                      [queryParams]="{ serviceId: service.id }">
+                      <span class="service-name">{{ service.name }}</span>
+                      <span class="service-meta">
+                        <i class="pi pi-clock"></i> {{ service.duration_minutes }} min
+                      </span>
+                      <span class="service-price" [class.free]="!service.price">
+                        {{ service.price ? ('$' + (service.price | number:'1.2-2')) : 'Gratuito' }}
+                      </span>
+                      <i class="pi pi-chevron-right service-arrow"></i>
+                    </a>
+                  }
+                </div>
+              } @else {
+                <p class="no-services">Sin servicios asignados</p>
+              }
+
+              <a
                 [routerLink]="['/c', company()?.slug, 'e', employee.id]"
                 class="book-btn">
                 <span>Ver disponibilidad</span>

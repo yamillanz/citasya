@@ -251,6 +251,12 @@
 .card-content {
   position: relative;
   display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.card-content-top {
+  display: flex;
   align-items: center;
   gap: var(--space-lg);
 }
@@ -306,6 +312,87 @@
   }
 }
 
+.employee-services {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.service-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out-expo);
+
+  &:hover {
+    background: var(--color-sage-pale);
+    transform: translateX(4px);
+
+    .service-arrow {
+      opacity: 1;
+      color: var(--color-sage);
+    }
+  }
+}
+
+.service-name {
+  flex: 1;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  min-width: 0;
+}
+
+.service-meta {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  i {
+    font-size: 0.75rem;
+  }
+}
+
+.service-price {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  font-size: 0.9375rem;
+
+  &.free {
+    font-weight: 400;
+    color: var(--color-text-muted);
+    font-style: italic;
+    font-size: 0.8125rem;
+  }
+}
+
+.service-arrow {
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity var(--duration-fast) ease;
+  margin-left: -4px;
+}
+
+.no-services {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-sm) 0;
+  margin: 0;
+}
+
 .book-btn {
   display: flex;
   align-items: center;
@@ -340,7 +427,7 @@
     padding: var(--space-2xl) var(--space-md);
   }
   
-  .card-content {
+  .card-content-top {
     flex-direction: column;
     text-align: center;
   }
@@ -349,6 +436,22 @@
     .employee-name {
       font-size: 1.125rem;
     }
+  }
+
+  .service-item {
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-sm);
+  }
+
+  .service-meta,
+  .service-price {
+    font-size: 0.75rem;
+  }
+
+  .service-name {
+    font-size: 0.875rem;
+    flex-basis: 100%;
   }
   
   .book-btn {

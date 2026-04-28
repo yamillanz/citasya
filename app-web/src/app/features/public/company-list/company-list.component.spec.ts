@@ -4,12 +4,14 @@ import { CompanyListComponent } from './company-list.component';
 import { ActivatedRoute } from '@angular/router';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
+import { ServiceService } from '../../../core/services/service.service';
 
 describe('CompanyListComponent', () => {
   let component: CompanyListComponent;
   let fixture: ComponentFixture<CompanyListComponent>;
   let companyServiceMock: jest.Mocked<CompanyService>;
   let userServiceMock: jest.Mocked<UserService>;
+  let serviceServiceMock: jest.Mocked<ServiceService>;
 
   const mockCompany = {
     id: 'company-1',
@@ -25,6 +27,16 @@ describe('CompanyListComponent', () => {
     { id: 'emp-2', full_name: 'María López', photo_url: null }
   ];
 
+  const mockServicesMap = {
+    'emp-1': [
+      { id: 'svc-1', name: 'Corte', duration_minutes: 30, price: 15, company_id: 'company-1', commission_percentage: 0, is_active: true, created_at: '' },
+      { id: 'svc-2', name: 'Tinte', duration_minutes: 90, price: 45, company_id: 'company-1', commission_percentage: 0, is_active: true, created_at: '' }
+    ],
+    'emp-2': [
+      { id: 'svc-3', name: 'Afeitado', duration_minutes: 20, price: 10, company_id: 'company-1', commission_percentage: 0, is_active: true, created_at: '' }
+    ]
+  };
+
   beforeEach(async () => {
     companyServiceMock = {
       getBySlug: jest.fn().mockResolvedValue(mockCompany)
@@ -34,12 +46,17 @@ describe('CompanyListComponent', () => {
       getEmployeesByCompany: jest.fn().mockResolvedValue(mockEmployees)
     } as any;
 
+    serviceServiceMock = {
+      getServicesForEmployees: jest.fn().mockResolvedValue(mockServicesMap)
+    } as any;
+
     await TestBed.configureTestingModule({
       imports: [CompanyListComponent],
       providers: [
         provideNoopAnimations(),
         { provide: CompanyService, useValue: companyServiceMock },
         { provide: UserService, useValue: userServiceMock },
+        { provide: ServiceService, useValue: serviceServiceMock },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -114,6 +131,18 @@ describe('CompanyListComponent', () => {
 
       expect(component.error()).toBe('Empresa no encontrada');
       expect(component.company()).toBeNull();
+    });
+
+    it('debe cargar servicios para los empleados via batch fetch', () => {
+      expect(serviceServiceMock.getServicesForEmployees).toHaveBeenCalledWith(['emp-1', 'emp-2']);
+    });
+
+    it('debe almacenar los servicios por empleado', () => {
+      const servicesMap = component.servicesByEmployee();
+      expect(servicesMap['emp-1'].length).toBe(2);
+      expect(servicesMap['emp-1'][0].name).toBe('Corte');
+      expect(servicesMap['emp-2'].length).toBe(1);
+      expect(servicesMap['emp-2'][0].name).toBe('Afeitado');
     });
   });
 });
