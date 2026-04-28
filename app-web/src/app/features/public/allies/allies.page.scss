@@ -97,8 +97,33 @@
   margin: 0 auto;
 }
 
-.search-input {
+::ng-deep .search-section .p-iconfield {
   width: 100%;
+  position: relative;
+
+  .p-inputicon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 1rem !important;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: 0;
+
+    i {
+      font-size: 1rem;
+      color: var(--color-text-muted);
+    }
+  }
+
+  .p-inputtext {
+    width: 100%;
+    padding-left: 3rem !important;
+    border-radius: var(--radius-lg);
+  }
 }
 
 /* ================================
