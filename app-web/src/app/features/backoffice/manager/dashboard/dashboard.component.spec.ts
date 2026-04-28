@@ -1,10 +1,10 @@
-import { ComponentFixture, TestBed, NO_ERRORS_SCHEMA } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { ComponentFixture, TestBed, fakeAsync, tick, flush, waitForAsync, NO_ERRORS_SCHEMA } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DashboardComponent } from './dashboard.component';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
+import { CompanyService } from '../../../../core/services/company.service';
+import { MessageService } from 'primeng/api';
 import { Router, ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
@@ -14,6 +14,17 @@ describe('DashboardComponent - Behavior Driven Tests', () => {
   let fixture: ComponentFixture<DashboardComponent>;
   let authServiceMock: jest.Mocked<AuthService>;
   let appointmentServiceMock: jest.Mocked<AppointmentService>;
+  let companyServiceMock: jest.Mocked<CompanyService>;
+  let messageServiceMock: jest.Mocked<MessageService>;
+
+  const mockCompany = {
+    id: 'company-1',
+    name: 'Mi Empresa',
+    slug: 'mi-empresa',
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
 
   const mockUser = {
     id: 'user-1',
@@ -68,11 +79,21 @@ describe('DashboardComponent - Behavior Driven Tests', () => {
       getByDate: jest.fn().mockResolvedValue(mockAppointments)
     } as any;
 
+    companyServiceMock = {
+      getById: jest.fn().mockResolvedValue(mockCompany)
+    } as any;
+
+    messageServiceMock = {
+      add: jest.fn()
+    } as any;
+
     await TestBed.configureTestingModule({
-      imports: [DashboardComponent, RouterTestingModule, RouterTestingModule],
+      imports: [DashboardComponent, RouterTestingModule],
       providers: [
         { provide: AuthService, useValue: authServiceMock },
-        { provide: AppointmentService, useValue: appointmentServiceMock }
+        { provide: AppointmentService, useValue: appointmentServiceMock },
+        { provide: CompanyService, useValue: companyServiceMock },
+        { provide: MessageService, useValue: messageServiceMock }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -207,6 +228,38 @@ describe('DashboardComponent - Behavior Driven Tests', () => {
       
       expect(servicesLink).toBeTruthy();
       expect(servicesLink?.textContent).toContain('Servicios');
+    });
+  });
+
+  describe('copyPublicLink', () => {
+    beforeEach(async () => {
+      await component.ngOnInit();
+      fixture.detectChanges();
+      await fixture.whenStable();
+    });
+
+    it('should copy company public link to clipboard', async () => {
+      const writeTextSpy = jest.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, {
+        clipboard: { writeText: writeTextSpy }
+      });
+
+      await component.copyPublicLink();
+
+      expect(writeTextSpy).toHaveBeenCalledWith(`${window.location.origin}/c/mi-empresa`);
+      expect(messageServiceMock.add).toHaveBeenCalledWith(
+        expect.objectContaining({ severity: 'success', summary: 'Link copiado' })
+      );
+    });
+
+    it('should show error when company slug is not available', async () => {
+      component.companySlug.set('');
+
+      await component.copyPublicLink();
+
+      expect(messageServiceMock.add).toHaveBeenCalledWith(
+        expect.objectContaining({ severity: 'error' })
+      );
     });
   });
 

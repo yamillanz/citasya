@@ -90,8 +90,13 @@
   }
 }
 
-.header-date {
-  .date-card {
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.date-card {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
@@ -110,11 +115,14 @@
       color: var(--color-text-primary);
     }
   }
-}
 
 /* ================================
    Stats Section
    ================================ */
+::ng-deep .share-tooltip .p-tooltip-text {
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+}
 .stats-section {
   margin-bottom: var(--space-2xl);
 }

@@ -25,5 +25,5 @@
 
 ## Phase 5: Verificación
 
-- [ ] 5.1 Verificación visual en navegador
-- [ ] 5.2 Verificación de regresión (flujo sin query param intacto)
+- [x] 5.1 Verificación visual en navegador
+- [x] 5.2 Verificación de regresión (flujo sin query param intacto)

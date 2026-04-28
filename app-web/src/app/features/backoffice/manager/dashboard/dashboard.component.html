@@ -13,7 +13,19 @@
           <h1>Buenos días, {{ user()?.full_name?.split(' ')?.[0] || 'Usuario' }}</h1>
           <p>Aquí está el resumen de tu negocio hoy {{ todayFormatted }}</p>
         </div>
-        <div class="header-date">
+        <div class="header-actions">
+          @if (companySlug()) {
+            <p-button
+              label="Tu enlace"
+              icon="pi pi-copy"
+              [loading]="copying()"
+              (onClick)="copyPublicLink()"
+              styleClass="share-link-btn"
+              pTooltip="Copia tu enlace"
+              tooltipPosition="left"
+              tooltipStyleClass="share-tooltip">
+            </p-button>
+          }
           <div class="date-card">
             <i class="pi pi-calendar"></i>
             <span>{{ todayFormatted }}</span>
