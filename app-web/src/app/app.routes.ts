@@ -56,6 +56,11 @@ export const routes: Routes = [
       .then(m => m.NotFoundComponent)
   },
   {
+    path: 'aliados',
+    loadComponent: () => import('./features/public/allies/allies.page')
+      .then(m => m.AlliesPage)
+  },
+  {
     path: 'c/:companySlug',
     loadComponent: () => import('./features/public/company-list/company-list.component')
       .then(m => m.CompanyListComponent)

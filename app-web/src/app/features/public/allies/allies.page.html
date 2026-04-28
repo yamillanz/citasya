@@ -1,0 +1,203 @@
+<div class="allies-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+    </div>
+
+    <div class="hero-content">
+      <span class="hero-badge">Aliados</span>
+      <h1 class="hero-title">Encuentra tu negocio</h1>
+      <p class="hero-subtitle">Descubre negocios y agenda tu cita en segundos</p>
+    </div>
+  </section>
+
+  <!-- Search Bar -->
+  <section class="search-section">
+    <div class="search-container">
+      <p-iconfield>
+        <p-inputicon>
+          <i class="pi pi-search"></i>
+        </p-inputicon>
+        <input
+          pInputText
+          type="text"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          placeholder="Buscar negocio por nombre..."
+          class="search-input"
+        />
+      </p-iconfield>
+    </div>
+  </section>
+
+  <!-- Content Section -->
+  <section class="content-section">
+    <div class="container">
+
+      <!-- Loading: Skeleton Grid -->
+      @if (loading()) {
+        <div class="allies-grid">
+          @for (i of [1,2,3,4,5,6]; track i) {
+            <div class="ally-card skeleton">
+              <div class="card-content-top">
+                <p-skeleton shape="circle" size="72px" />
+                <div class="skeleton-lines">
+                  <p-skeleton width="60%" height="20px" styleClass="mb-2" />
+                  <p-skeleton width="40%" height="14px" />
+                </div>
+              </div>
+              <div class="skeleton-services">
+                <p-skeleton width="100%" height="14px" />
+                <p-skeleton width="80%" height="14px" />
+                <p-skeleton width="65%" height="14px" />
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Error State -->
+      @if (!loading() && error()) {
+        <div class="error-state">
+          <div class="error-illustration">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <circle cx="40" cy="40" r="40" fill="#FEE2E2"/>
+              <circle cx="40" cy="30" r="12" stroke="#E07A5F" stroke-width="2.5"/>
+              <path d="M32 50C32 43.373 36.373 39 43 39H47C53.627 39 58 43.373 58 50" stroke="#E07A5F" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M38 56V60M52 56V60" stroke="#E07A5F" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>Algo sali&oacute; mal</h3>
+          <p>{{ error() }}</p>
+          <p-button label="Reintentar" styleClass="btn-primary" (onClick)="retry()" />
+        </div>
+      }
+
+      <!-- Empty: No companies at all -->
+      @if (!loading() && !error() && companies().length === 0 && !searchQuery()) {
+        <div class="empty-state">
+          <div class="empty-illustration">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <circle cx="40" cy="40" r="40" fill="#E8F0E0"/>
+              <rect x="24" y="20" width="32" height="28" rx="2" stroke="#9DC183" stroke-width="2"/>
+              <line x1="24" y1="28" x2="56" y2="28" stroke="#9DC183" stroke-width="2"/>
+              <circle cx="35" cy="40" r="4" stroke="#9DC183" stroke-width="2"/>
+              <path d="M37 43L43 49L37 55" stroke="#9DC183" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>A&uacute;n no hay negocios registrados</h3>
+          <p>Vuelve pronto para descubrir nuevos negocios donde agendar tu cita.</p>
+        </div>
+      }
+
+      <!-- Empty: No search results -->
+      @if (!loading() && !error() && companies().length === 0 && searchQuery()) {
+        <div class="empty-state">
+          <div class="empty-illustration">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <circle cx="40" cy="40" r="40" fill="#E8F0E0"/>
+              <circle cx="34" cy="34" r="14" stroke="#9DC183" stroke-width="2.5"/>
+              <line x1="44.5" y1="44.5" x2="56" y2="56" stroke="#9DC183" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>No encontramos negocios para &quot;{{ searchQuery() }}&quot;</h3>
+          <p>Prueba con otro t&eacute;rmino o revisa la ortograf&iacute;a.</p>
+        </div>
+      }
+
+      <!-- Companies Grid -->
+      @if (!loading() && !error() && companies().length > 0) {
+        <div class="allies-grid">
+          @for (ally of companies(); track ally.id; let i = $index) {
+            <a
+              class="ally-card"
+              [routerLink]="['/c', ally.slug]"
+              [style.animation-delay.ms]="i * 100"
+            >
+              <div class="card-decoration">
+                <svg viewBox="0 0 150 150" fill="currentColor">
+                  <circle cx="0" cy="0" r="120" />
+                </svg>
+              </div>
+
+              <div class="card-content">
+                <div class="card-content-top">
+                  <!-- Logo / Avatar -->
+                  <div class="ally-avatar">
+                    @if (ally.logo_url) {
+                      <img [src]="ally.logo_url" [alt]="ally.name" />
+                    } @else {
+                      <div class="avatar-placeholder">{{ ally.name.charAt(0).toUpperCase() }}</div>
+                    }
+                  </div>
+
+                  <div class="ally-info">
+                    <span class="ally-name">{{ ally.name }}</span>
+                    @if (ally.address) {
+                      <span class="ally-contact">
+                        <i class="pi pi-map-marker"></i>
+                        {{ ally.address }}
+                      </span>
+                    }
+                    @if (ally.phone) {
+                      <span class="ally-contact">
+                        <i class="pi pi-phone"></i>
+                        {{ ally.phone }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <!-- Services Inline -->
+                @if ((servicesByCompany()[ally.id]?.length ?? 0) > 0) {
+                  <div class="ally-services">
+                    @for (service of visibleServices(ally.id); track service.id) {
+                      <div class="service-item">
+                        <span class="service-name">{{ service.name }}</span>
+                        <span class="service-meta">
+                          <i class="pi pi-clock"></i> {{ service.duration_minutes }} min
+                        </span>
+                        <span class="service-price" [class.free]="!service.price">
+                          {{ service.price ? ('$' + (service.price | number:'1.2-2')) : 'Gratuito' }}
+                        </span>
+                      </div>
+                    }
+                    @if ((servicesByCompany()[ally.id]?.length ?? 0) > maxVisibleServices) {
+                      <button
+                        type="button"
+                        class="show-more-btn"
+                        (click)="toggleShowAll(ally.id); $event.preventDefault(); $event.stopPropagation()"
+                      >
+                        {{ showAllServices()[ally.id] ? 'Ver menos' : 'Ver m&aacute;s (' + ((servicesByCompany()[ally.id]?.length ?? 0) - maxVisibleServices) + ')' }}
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            </a>
+          }
+        </div>
+
+        <!-- Sentinel for Infinite Scroll -->
+        <div #sentinel class="sentinel"></div>
+
+        <!-- Loading More Spinner -->
+        @if (loadingMore()) {
+          <div class="loading-more">
+            <div class="loading-spinner-sm"></div>
+            <p>Cargando m&aacute;s negocios...</p>
+          </div>
+        }
+
+        <!-- No More Results -->
+        @if (!hasMore() && !loadingMore() && companies().length > 0 && !searchQuery()) {
+          <div class="no-more">
+            <p>Has visto todos los negocios disponibles</p>
+          </div>
+        }
+      }
+    </div>
+  </section>
+</div>

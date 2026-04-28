@@ -24,7 +24,8 @@ export class LandingHeaderComponent {
     { label: 'Características', routerLink: '/', fragment: 'features' },
     { label: 'Precios', routerLink: '/pricing' },
     { label: 'Sobre nosotros', routerLink: '/about' },
-    { label: 'Contacto', routerLink: '/contact' }
+    { label: 'Contacto', routerLink: '/contact' },
+    { label: 'Aliados', routerLink: '/aliados' }
   ];
 
   constructor() {

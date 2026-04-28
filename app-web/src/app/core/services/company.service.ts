@@ -101,4 +101,44 @@ export class CompanyService {
     if (error) throw error;
     return data;
   }
+
+  async getActiveCompaniesPaginated(
+    page: number,
+    size: number,
+    search?: string
+  ): Promise<{ data: CompanyWithPlan[]; hasMore: boolean }> {
+    const start = page * size;
+    const end = start + size - 1;
+
+    let query = this.supabase
+      .from('companies')
+      .select('*', { count: 'exact' })
+      .eq('is_active', true);
+
+    if (search && search.trim()) {
+      query = query.ilike('name', `%${search.trim()}%`);
+    }
+
+    const { data: companies, error, count } = await query
+      .order('name')
+      .range(start, end);
+
+    if (error) throw error;
+
+    const { data: plans } = await this.supabase
+      .from('plans')
+      .select('id, name');
+
+    const planMap = new Map((plans || []).map((p: any) => [p.id, p]));
+    const totalCount = count ?? 0;
+    const hasMore = start + (companies || []).length < totalCount;
+
+    return {
+      data: (companies || []).map((company: any) => ({
+        ...company,
+        plans: company.plan_id ? planMap.get(company.plan_id) || null : null,
+      })),
+      hasMore,
+    };
+  }
 }

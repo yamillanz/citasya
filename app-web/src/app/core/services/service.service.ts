@@ -85,6 +85,25 @@ export class ServiceService {
     return data;
   }
 
+  async getServicesByCompanies(companyIds: string[]): Promise<Record<string, Service[]>> {
+    if (companyIds.length === 0) return {};
+    const { data, error } = await this.supabase
+      .from('services')
+      .select('*')
+      .in('company_id', companyIds)
+      .eq('is_active', true)
+      .order('name');
+    if (error) throw error;
+    const result: Record<string, Service[]> = {};
+    for (const svc of (data || [])) {
+      (result[svc.company_id] ??= []).push(svc);
+    }
+    for (const id of companyIds) {
+      result[id] ??= [];
+    }
+    return result;
+  }
+
   async delete(id: string): Promise<void> {
     const { error } = await this.supabase
       .from('services')
