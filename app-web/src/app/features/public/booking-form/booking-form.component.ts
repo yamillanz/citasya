@@ -1,6 +1,14 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidationErrors, ValidatorFn, AbstractControl } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  ValidationErrors,
+  ValidatorFn,
+  AbstractControl,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -12,24 +20,28 @@ import { Company } from '../../../core/models/company.model';
 import { User } from '../../../core/models/user.model';
 import { Service } from '../../../core/models/service.model';
 import { fadeInUp, stepComplete, fadeIn, shakeError } from './booking-form.animations';
-import { calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../core/models/appointment.model';
+import {
+  calculateTotalDuration,
+  calculateTotalPrice,
+  formatServicesList,
+} from '../../../core/models/appointment.model';
 
 function atLeastOneContactValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const group = control as FormGroup;
     const phone = group.get('client_phone')?.value;
     const email = group.get('client_email')?.value;
-    
+
     const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
-    
+
     if (!cleanPhone && !email) {
       return { noContact: true };
     }
-    
+
     if (cleanPhone && cleanPhone.length < 12) {
       return { invalidPhone: true };
     }
-    
+
     return null;
   };
 }
@@ -37,16 +49,10 @@ function atLeastOneContactValidator(): ValidatorFn {
 @Component({
   selector: 'app-booking-form',
   standalone: true,
-  imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    RouterLink,
-    ButtonModule,
-    InputTextModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ButtonModule, InputTextModule],
   templateUrl: './booking-form.component.html',
   styleUrl: './booking-form.component.scss',
-  animations: [fadeInUp, stepComplete, fadeIn, shakeError]
+  animations: [fadeInUp, stepComplete, fadeIn, shakeError],
 })
 export class BookingFormComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -62,24 +68,24 @@ export class BookingFormComponent implements OnInit {
   selectedServices = signal<Service[]>([]);
   services = signal<Service[]>([]); // Used in open mode for service selection
   serviceIds = signal<string[]>([]); // IDs from query params
-  
+
   isOpenMode = signal(false);
   selectedDate = '';
   selectedTime = '';
-  
+
   loading = signal(false);
   error = signal('');
   success = signal(false);
   currentStep = signal(0);
   submitError = signal('');
-  
+
   // Computed signals for totals
   totalDuration = computed(() => calculateTotalDuration(this.selectedServices()));
-  
+
   totalPrice = computed(() => calculateTotalPrice(this.selectedServices()));
 
   selectedServicesText = computed(() => formatServicesList(this.selectedServices()));
-  
+
   notesLength = computed(() => {
     const notes = this.bookingForm.get('notes')?.value;
     return notes ? notes.length : 0;
@@ -90,20 +96,23 @@ export class BookingFormComponent implements OnInit {
   selectionForm = this.fb.group({
     service_id: ['', Validators.required],
     appointment_date: ['', Validators.required],
-    appointment_time: ['', Validators.required]
+    appointment_time: ['', Validators.required],
   });
 
-  bookingForm = this.fb.group({
-    client_name: ['', [Validators.required, Validators.minLength(2)]],
-    client_phone: [''],
-    client_email: [''],
-    notes: ['']
-  }, { validators: atLeastOneContactValidator() });
+  bookingForm = this.fb.group(
+    {
+      client_name: ['', [Validators.required, Validators.minLength(2)]],
+      client_phone: [''],
+      client_email: [''],
+      notes: [''],
+    },
+    { validators: atLeastOneContactValidator() },
+  );
 
   async ngOnInit() {
     const slug = this.route.snapshot.paramMap.get('companySlug');
     const employeeId = this.route.snapshot.paramMap.get('employeeId');
-    
+
     const serviceIdsParam = this.route.snapshot.queryParamMap.get('serviceIds');
     const date = this.route.snapshot.queryParamMap.get('date');
     const time = this.route.snapshot.queryParamMap.get('time');
@@ -130,7 +139,7 @@ export class BookingFormComponent implements OnInit {
         this.serviceIds.set(ids);
         this.selectedDate = date;
         this.selectedTime = time;
-        
+
         // Load services by IDs
         await this.loadServicesByIds(ids);
         this.currentStep.set(1);
@@ -155,7 +164,7 @@ export class BookingFormComponent implements OnInit {
   async loadServicesByIds(ids: string[]) {
     try {
       const allServices = await this.serviceService.getByEmployee(this.employee()!.id);
-      const selected = allServices.filter(s => ids.includes(s.id));
+      const selected = allServices.filter((s) => ids.includes(s.id));
       this.selectedServices.set(selected);
     } catch (err) {
       this.error.set('Error al cargar los servicios');
@@ -165,7 +174,7 @@ export class BookingFormComponent implements OnInit {
   onServiceChange(event: Event) {
     const select = event.target as HTMLSelectElement;
     const serviceId = select.value;
-    const service = this.services().find(s => s.id === serviceId);
+    const service = this.services().find((s) => s.id === serviceId);
     if (service) {
       this.selectedServices.set([service]);
     }
@@ -193,7 +202,7 @@ export class BookingFormComponent implements OnInit {
 
   proceedFromStep0() {
     if (!this.canProceedFromStep0()) {
-      Object.values(this.selectionForm.controls).forEach(control => {
+      Object.values(this.selectionForm.controls).forEach((control) => {
         control.markAsTouched();
       });
       return;
@@ -229,17 +238,19 @@ export class BookingFormComponent implements OnInit {
   }
 
   hasContactError(): boolean {
-    return !!(this.bookingForm.errors?.['noContact'] && 
-           this.bookingForm.get('client_phone')?.touched && 
-           this.bookingForm.get('client_email')?.touched);
+    return !!(
+      this.bookingForm.errors?.['noContact'] &&
+      this.bookingForm.get('client_phone')?.touched &&
+      this.bookingForm.get('client_email')?.touched
+    );
   }
 
   hasInvalidPhoneError(): boolean {
-    return !!(this.bookingForm.errors?.['invalidPhone']);
+    return !!this.bookingForm.errors?.['invalidPhone'];
   }
 
   async onSubmit() {
-    Object.values(this.bookingForm.controls).forEach(control => {
+    Object.values(this.bookingForm.controls).forEach((control) => {
       control.markAsTouched();
     });
 
@@ -276,13 +287,13 @@ export class BookingFormComponent implements OnInit {
       await this.appointmentService.create({
         company_id: comp.id,
         employee_id: emp.id,
-        service_ids: services.map(s => s.id), // Changed to array
+        service_ids: services.map((s) => s.id), // Changed to array
         client_name: this.bookingForm.value.client_name!,
         client_phone: phone,
         client_email: email,
         appointment_date: this.selectedDate,
         appointment_time: this.selectedTime,
-        notes: this.bookingForm.value.notes || undefined
+        notes: this.bookingForm.value.notes || undefined,
       });
 
       this.currentStep.set(3);
@@ -300,7 +311,7 @@ export class BookingFormComponent implements OnInit {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
+      year: 'numeric',
     });
   }
 
@@ -308,7 +319,7 @@ export class BookingFormComponent implements OnInit {
     const cleaned = value.replace(/\D/g, '');
     if (cleaned.length <= 3) return cleaned;
     if (cleaned.length <= 6) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 12)}`;
   }
 
   onPhoneInput(event: Event): void {
