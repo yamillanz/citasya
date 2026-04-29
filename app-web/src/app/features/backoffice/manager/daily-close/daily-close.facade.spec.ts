@@ -4,6 +4,7 @@ import { AppointmentService } from '../../../../core/services/appointment.servic
 import { DailyCloseService } from '../../../../core/services/daily-close.service';
 import { CompanyService } from '../../../../core/services/company.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { ServiceService } from '../../../../core/services/service.service';
 import { User } from '../../../../core/models/user.model';
 import { AppointmentStatus } from '../../../../core/models/appointment.model';
 
@@ -13,6 +14,7 @@ describe('DailyCloseFacade', () => {
   let mockDailyCloseService: any;
   let mockCompanyService: any;
   let mockAuthService: any;
+  let mockServiceService: any;
 
   const mockUser: User = {
     id: 'user-1',
@@ -74,6 +76,9 @@ describe('DailyCloseFacade', () => {
     mockAuthService = {
       getCurrentUser: jest.fn()
     };
+    mockServiceService = {
+      getByCompany: jest.fn().mockResolvedValue([])
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -81,7 +86,8 @@ describe('DailyCloseFacade', () => {
         { provide: AppointmentService, useValue: mockAppointmentService },
         { provide: DailyCloseService, useValue: mockDailyCloseService },
         { provide: CompanyService, useValue: mockCompanyService },
-        { provide: AuthService, useValue: mockAuthService }
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: ServiceService, useValue: mockServiceService }
       ]
     });
 
@@ -90,6 +96,7 @@ describe('DailyCloseFacade', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    mockServiceService.getByCompany.mockResolvedValue([]);
   });
 
   describe('Initialization', () => {
