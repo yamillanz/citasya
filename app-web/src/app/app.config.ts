@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
@@ -9,6 +9,7 @@ import { routes } from './app.routes';
 import { CONFIRMATION_DIALOG } from './core/tokens/confirmation-dialog.token';
 import { PrimeNGConfirmationDialog } from './core/services/primeng-confirmation-dialog.service';
 import { DailyCloseFacade } from './features/backoffice/manager/daily-close/daily-close.facade';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -34,6 +35,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: CONFIRMATION_DIALOG,
       useClass: PrimeNGConfirmationDialog
-    }
+    },
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ]
 };
