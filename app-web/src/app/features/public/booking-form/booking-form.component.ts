@@ -32,12 +32,11 @@ function atLeastOneContactValidator(): ValidatorFn {
     const phone = group.get('client_phone')?.value;
     const email = group.get('client_email')?.value;
 
-    const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
-
-    if (!cleanPhone && !email) {
+    if (!phone?.trim() && !email?.trim()) {
       return { noContact: true };
     }
 
+    const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
     if (cleanPhone && cleanPhone.length < 12) {
       return { invalidPhone: true };
     }
@@ -274,10 +273,11 @@ export class BookingFormComponent implements OnInit {
     this.loading.set(true);
     this.submitError.set('');
 
-    const phone = this.bookingForm.value.client_phone?.replace(/\D/g, '') || '';
-    const email = this.bookingForm.value.client_email || undefined;
+    const phoneRaw = this.bookingForm.value.client_phone?.trim() || '';
+    const phone = phoneRaw.replace(/\D/g, '') || undefined;
+    const email = this.bookingForm.value.client_email?.trim() || undefined;
 
-    if (!email && phone.length < 12) {
+    if (!email && phone && phone.length < 12) {
       this.submitError.set('El teléfono debe tener al menos 12 dígitos si no proporcionas email');
       this.loading.set(false);
       return;
@@ -315,16 +315,4 @@ export class BookingFormComponent implements OnInit {
     });
   }
 
-  formatPhone(value: string): string {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length <= 3) return cleaned;
-    if (cleaned.length <= 6) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 12)}`;
-  }
-
-  onPhoneInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const formatted = this.formatPhone(input.value);
-    this.bookingForm.patchValue({ client_phone: formatted });
-  }
 }

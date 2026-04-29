@@ -337,8 +337,7 @@
                     type="tel" 
                     pInputText 
                     formControlName="client_phone"
-                    placeholder="555-123-4567"
-                    (input)="onPhoneInput($event)"
+                    placeholder="Ej: 5512345678"
                     [class.ng-invalid]="bookingForm.get('client_phone')?.touched && bookingForm.get('client_phone')?.invalid"
                     [class.ng-dirty]="bookingForm.get('client_phone')?.touched">
                   <div class="validation-icon">
@@ -354,6 +353,13 @@
                   </small>
                 }
               </div>
+
+              @if (hasInvalidPhoneError()) {
+                <div class="field-error group-error">
+                  <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+                  El teléfono debe tener al menos 12 dígitos
+                </div>
+              }
 
               <!-- Email -->
               <div class="form-field">
@@ -389,13 +395,6 @@
                 <div class="field-error group-error">
                   <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
                   Debes ingresar al menos un teléfono o email
-                </div>
-              }
-
-              @if (hasInvalidPhoneError()) {
-                <div class="field-error group-error">
-                  <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-                  El teléfono debe tener al menos 12 dígitos
                 </div>
               }
 

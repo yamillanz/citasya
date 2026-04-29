@@ -184,7 +184,7 @@ describe('BookingFormComponent', () => {
     });
 
     it('debe validar teléfono con mínimo 12 dígitos', () => {
-      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-4567' });
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '04143333' });
       component.bookingForm.updateValueAndValidity();
       expect(component.bookingForm.errors?.['invalidPhone']).toBe(true);
     });
