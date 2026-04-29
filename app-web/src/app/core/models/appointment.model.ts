@@ -26,7 +26,7 @@ export interface CreateAppointmentDto {
   employee_id: string;
   service_ids: string[]; // Changed from single service_id to array
   client_name: string;
-  client_phone: string;
+  client_phone?: string;
   client_email?: string;
   appointment_date: string;
   appointment_time: string;
