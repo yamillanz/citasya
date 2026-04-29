@@ -29,9 +29,9 @@
 - [x] 4.1 Build de Angular exitoso — sin errores de TypeScript
 - [x] 4.2 Flujo de login revisado — validación de `is_active` implementada en `AuthService.signIn()` y `getCurrentUser()`
 - [x] 4.3 Flujo de creación revisado — `UserService.create()` invoca Edge Function, formulario incluye contraseña
-- [ ] 4.4 Probar login con usuario activo → debe funcionar normalmente
-- [ ] 4.5 Probar login con usuario inactivo (`is_active = false`) → debe mostrar mensaje "Tu cuenta ha sido desactivada. Contacta al administrador."
-- [ ] 4.6 Probar creación de usuario desde superadmin con email, nombre, rol y contraseña → debe crear usuario en Auth y en profiles
-- [ ] 4.7 Probar login inmediato con el usuario recién creado → debe funcionar
-- [ ] 4.8 Probar creación con email duplicado → debe mostrar error "El email ya existe"
-- [ ] 4.9 Probar creación con contraseña corta (< 6 caracteres) → debe mostrar error de validación
+- [x] 4.4 Probar login con usuario activo → debe funcionar normalmente
+- [x] 4.5 Probar login con usuario inactivo (`is_active = false`) → debe mostrar mensaje "Tu cuenta ha sido desactivada. Contacta al administrador."
+- [x] 4.6 Probar creación de usuario desde superadmin con email, nombre, rol y contraseña → debe crear usuario en Auth y en profiles
+- [x] 4.7 Probar login inmediato con el usuario recién creado → debe funcionar
+- [x] 4.8 Probar creación con email duplicado → debe mostrar error "El email ya existe"
+- [x] 4.9 Probar creación con contraseña corta (< 6 caracteres) → debe mostrar error de validación
