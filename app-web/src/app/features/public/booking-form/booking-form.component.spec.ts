@@ -175,6 +175,27 @@ describe('BookingFormComponent', () => {
 
       expect(component.submitError()).toBe('Error del servidor');
     });
+
+    it('debe permitir envío solo con email sin teléfono', async () => {
+      appointmentServiceMock.create.mockResolvedValue({});
+      await component.ngOnInit();
+      component.bookingForm.patchValue({
+        client_name: 'María',
+        client_phone: '',
+        client_email: 'maria@test.com'
+      });
+
+      await component.onSubmit();
+
+      expect(appointmentServiceMock.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          client_name: 'María',
+          client_phone: undefined,
+          client_email: 'maria@test.com'
+        })
+      );
+      expect(component.success()).toBe(true);
+    });
   });
 
   describe('Formulario', () => {
@@ -193,6 +214,13 @@ describe('BookingFormComponent', () => {
       component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '', client_email: '' });
       component.bookingForm.updateValueAndValidity();
       expect(component.bookingForm.errors?.['noContact']).toBe(true);
+    });
+
+    it('debe permitir reserva solo con email (sin teléfono)', () => {
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '', client_email: 'juan@test.com' });
+      component.bookingForm.updateValueAndValidity();
+      expect(component.bookingForm.errors?.['noContact']).toBeUndefined();
+      expect(component.bookingForm.errors?.['invalidPhone']).toBeUndefined();
     });
   });
 
