@@ -7,6 +7,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
+import { LandingHeaderComponent } from '../../../shared/components/landing-header/landing-header.component';
 import { CompanyService, CompanyWithPlan } from '../../../core/services/company.service';
 import { ServiceService } from '../../../core/services/service.service';
 import { Service } from '../../../core/models/service.model';
@@ -26,6 +27,7 @@ const DEBOUNCE_MS = 300;
     IconFieldModule,
     SkeletonModule,
     ButtonModule,
+    LandingHeaderComponent,
   ],
   templateUrl: './allies.page.html',
   styleUrl: './allies.page.scss',
