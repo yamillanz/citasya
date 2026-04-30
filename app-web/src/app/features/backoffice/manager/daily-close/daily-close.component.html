@@ -35,6 +35,16 @@
           </div>
         </div>
 
+        <p-button
+          icon="pi pi-refresh"
+          [loading]="loading()"
+          (onClick)="refreshData()"
+          styleClass="refresh-btn"
+          [outlined]="true"
+          pTooltip="Actualizar datos"
+          tooltipPosition="bottom">
+        </p-button>
+
         <p-button 
           icon="pi pi-chevron-right"
           (onClick)="navigateToNextDay()"

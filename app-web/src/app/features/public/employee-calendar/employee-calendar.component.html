@@ -159,6 +159,15 @@
             <i class="pi pi-calendar"></i>
             <span>{{ formatDate(selectedDate()) }}</span>
           </div>
+          <p-button
+            icon="pi pi-refresh"
+            [loading]="loading()"
+            (onClick)="refreshSlots()"
+            styleClass="refresh-btn"
+            [outlined]="true"
+            pTooltip="Actualizar horarios"
+            tooltipPosition="bottom">
+          </p-button>
         </div>
         
           @if (availableSlots().length > 0) {

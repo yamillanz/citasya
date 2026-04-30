@@ -9,6 +9,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
+import { TooltipModule } from 'primeng/tooltip';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
@@ -26,7 +27,8 @@ import { calculateTotalDuration, calculateTotalPrice, formatServicesList } from 
     FullCalendarModule,
     RouterLink,
     ButtonModule,
-    AvatarModule
+    AvatarModule,
+    TooltipModule
   ],
   templateUrl: './employee-calendar.component.html',
   styleUrl: './employee-calendar.component.scss'
@@ -211,6 +213,17 @@ export class EmployeeCalendarComponent implements OnInit {
         serviceIds: serviceIds.join(',') // Pass as comma-separated string
       }
     });
+  }
+
+  async refreshSlots() {
+    if (this.selectedDate() && this.selectedServiceIds().length > 0) {
+      this.loading.set(true);
+      try {
+        await this.loadAvailableSlots();
+      } finally {
+        this.loading.set(false);
+      }
+    }
   }
 
   formatDate(dateStr: string): string {

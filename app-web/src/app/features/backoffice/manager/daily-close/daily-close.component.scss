@@ -732,6 +732,16 @@
 }
 
 :host ::ng-deep {
+  .refresh-btn {
+    padding: var(--space-xs) !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    
+    .p-button-icon {
+      font-size: 0.875rem;
+    }
+  }
+  
   .nav-btn {
     padding: var(--space-sm) !important;
     min-width: 40px !important;

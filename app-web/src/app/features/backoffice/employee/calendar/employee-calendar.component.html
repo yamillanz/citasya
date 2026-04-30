@@ -4,15 +4,26 @@
       <h1>Mi Calendario</h1>
       <p class="subtitle">Consulta tus citas programadas</p>
     </div>
-    <p-button
-      label="Tu link"
-      icon="pi pi-copy"
-      [loading]="copying()"
-      (onClick)="copyBookingLink()"
-      styleClass="booking-link-btn"
-      pTooltip="Copiar enlace de reserva"
-      tooltipPosition="left">
-    </p-button>
+    <div class="header-actions">
+      <p-button
+        icon="pi pi-refresh"
+        [loading]="loading()"
+        (onClick)="refreshData()"
+        styleClass="refresh-btn"
+        [outlined]="true"
+        pTooltip="Actualizar datos"
+        tooltipPosition="bottom">
+      </p-button>
+      <p-button
+        label="Tu link"
+        icon="pi pi-copy"
+        [loading]="copying()"
+        (onClick)="copyBookingLink()"
+        styleClass="booking-link-btn"
+        pTooltip="Copiar enlace de reserva"
+        tooltipPosition="left">
+      </p-button>
+    </div>
   </div>
 
   @if (loading()) {

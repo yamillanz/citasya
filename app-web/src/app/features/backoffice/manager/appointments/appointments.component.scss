@@ -555,6 +555,16 @@
    Button Overrides
    ================================ */
 :host ::ng-deep {
+  .refresh-btn {
+    padding: var(--space-xs) !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    
+    .p-button-icon {
+      font-size: 0.875rem;
+    }
+  }
+  
   .btn-primary {
     background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
     border: none !important;

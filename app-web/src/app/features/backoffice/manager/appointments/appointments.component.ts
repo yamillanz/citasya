@@ -7,6 +7,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DrawerModule } from 'primeng/drawer';
 import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
@@ -35,7 +36,8 @@ interface DateGroup {
     DatePickerModule,
     InputNumberModule,
     DrawerModule,
-    ToastModule
+    ToastModule,
+    TooltipModule
   ],
   providers: [MessageService],
   templateUrl: './appointments.component.html',
@@ -141,6 +143,7 @@ export class AppointmentsComponent implements OnInit {
   async loadData() {
     if (!this.companyId()) return;
     
+    this.loading.set(true);
     try {
       const [appointments, employees] = await Promise.all([
         this.appointmentService.getByCompany(this.companyId()!),
@@ -155,7 +158,13 @@ export class AppointmentsComponent implements OnInit {
         summary: 'Error',
         detail: 'No se pudieron cargar los datos'
       });
+    } finally {
+      this.loading.set(false);
     }
+  }
+
+  async refreshData() {
+    await this.loadData();
   }
 
   onSearch(event: Event) {

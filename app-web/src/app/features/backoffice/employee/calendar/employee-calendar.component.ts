@@ -55,12 +55,19 @@ export class EmployeeCalendarComponent implements OnInit {
     const user = this.user();
     if (!user) return;
 
+    this.loading.set(true);
     try {
       const appointments = await this.appointmentService.getByEmployeeAll(user.id);
       this.appointments.set(appointments as AppointmentWithService[]);
     } catch (err) {
       this.error.set('Error al cargar las citas');
+    } finally {
+      this.loading.set(false);
     }
+  }
+
+  async refreshData() {
+    await this.loadAppointments();
   }
 
   onAppointmentClick(apt: AppointmentWithService) {

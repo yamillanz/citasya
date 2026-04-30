@@ -464,6 +464,10 @@
    Time Slots
    ================================ */
 .slots-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
   margin-bottom: var(--space-md);
   width: 100%;
   max-width: 600px;
@@ -671,6 +675,18 @@
   
   &:hover i {
     transform: translateX(4px);
+  }
+}
+
+:host ::ng-deep {
+  .refresh-btn {
+    padding: var(--space-xs) !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    
+    .p-button-icon {
+      font-size: 0.875rem;
+    }
   }
 }
 
