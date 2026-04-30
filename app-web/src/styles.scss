@@ -942,6 +942,7 @@ a {
         &:hover:not(.p-disabled):not(.p-highlight) {
           background: var(--color-sage-pale) !important;
           color: var(--color-sage-dark) !important;
+          transform: scale(1.08) !important;
         }
 
         &.p-highlight {
@@ -966,19 +967,21 @@ a {
 
       /* Today indicator */
       &.p-datepicker-today > span {
-        background: transparent !important;
+        background: rgba(157, 193, 131, 0.12) !important;
         color: var(--color-sage-dark) !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
         border: 2px solid var(--color-sage) !important;
+        box-shadow: 0 0 0 2px rgba(157, 193, 131, 0.15) !important;
 
         &:hover:not(.p-disabled):not(.p-highlight) {
-          background: var(--color-sage-pale) !important;
+          background: rgba(157, 193, 131, 0.22) !important;
         }
 
         &.p-highlight {
           background: var(--color-sage) !important;
           color: white !important;
           border-color: var(--color-sage) !important;
+          box-shadow: 0 2px 8px rgba(157, 193, 131, 0.4) !important;
         }
       }
     }
@@ -1027,22 +1030,33 @@ a {
       flex: 1 !important;
       justify-content: center !important;
       background: transparent !important;
-      border: 1px solid var(--color-border) !important;
+      border: none !important;
       color: var(--color-text-secondary) !important;
       border-radius: var(--radius-md) !important;
       padding: var(--space-sm) var(--space-md) !important;
-      font-size: 0.875rem !important;
-      font-weight: 500 !important;
+      font-size: 0.8125rem !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.04em !important;
       transition: all var(--duration-fast) ease !important;
 
       &:hover {
         background: var(--color-sage-pale) !important;
-        border-color: var(--color-sage) !important;
         color: var(--color-sage-dark) !important;
       }
 
       &:focus {
         box-shadow: 0 0 0 2px var(--color-sage-pale) !important;
+      }
+
+      /* Secondary button (Clear) - subtle */
+      &.p-button-secondary {
+        color: var(--color-text-muted) !important;
+
+        &:hover {
+          background: var(--color-linen) !important;
+          color: var(--color-text-secondary) !important;
+        }
       }
     }
   }
