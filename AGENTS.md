@@ -80,6 +80,30 @@
 - ❌ NO usar: `<div class="card">`
 - ✅ USAR: `<p-card>`
 
+### Estilización de componentes PrimeNG - REGLA CRÍTICA
+
+**⚠️ ALGUNOS componentes PrimeNG (como `p-drawer`, `p-dialog`, `p-toast`) se renderizan en el `<body>` del documento, FUERA del árbol de componentes Angular.**
+
+Por lo tanto:
+- ❌ **NUNCA** usar `:host ::ng-deep` en el archivo `.scss` del componente para estilizar estos elementos. Los estilos no aplicarán porque el componente no es ancestro en el DOM real.
+- ✅ **SIEMPRE** agregar los overrides en `app-web/src/styles.scss` (estilos globales), usando selectores de clase específicos (ej: `.status-drawer .p-drawer-header`).
+
+**Componentes afectados comunes:**
+- `p-drawer` → renderiza en body
+- `p-dialog` → renderiza en body
+- `p-toast` → renderiza en body
+- `p-confirmDialog` → renderiza en body
+
+**Patrón correcto:**
+```scss
+// En styles.scss - NO en el componente
+.my-custom-drawer .p-drawer-header {
+  background: var(--color-linen) !important;
+}
+```
+
+> Referencia: ver `.amount-drawer` en `styles.scss` como ejemplo implementado.
+
 ---
 
 ## Guía de Estilos
