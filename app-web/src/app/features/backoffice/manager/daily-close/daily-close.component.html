@@ -6,6 +6,15 @@
         <h1>Cierre Diario</h1>
         <p>Panel de control para gestionar y cerrar citas del día</p>
       </div>
+      <p-button
+        icon="pi pi-refresh"
+        [loading]="loading()"
+        (onClick)="refreshData()"
+        styleClass="refresh-btn"
+        [outlined]="true"
+        pTooltip="Actualizar datos"
+        tooltipPosition="left">
+      </p-button>
     </div>
   </header>
 
@@ -34,16 +43,6 @@
             <span class="date-value">{{ formatDate(selectedDate()) }}</span>
           </div>
         </div>
-
-        <p-button
-          icon="pi pi-refresh"
-          [loading]="loading()"
-          (onClick)="refreshData()"
-          styleClass="refresh-btn"
-          [outlined]="true"
-          pTooltip="Actualizar datos"
-          tooltipPosition="bottom">
-        </p-button>
 
         <p-button 
           icon="pi pi-chevron-right"
