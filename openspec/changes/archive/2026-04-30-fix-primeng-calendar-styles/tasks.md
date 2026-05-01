@@ -15,5 +15,5 @@
 ## 3. Verification
 
 - [x] 3.1 Build the app and verify no SCSS compilation errors
-- [ ] 3.2 Verify the datepicker renders correctly on Daily Close page
-- [ ] 3.3 Verify other datepickers in the app are also styled correctly
+- [x] 3.2 Verify the datepicker renders correctly on Daily Close page
+- [x] 3.3 Verify other datepickers in the app are also styled correctly
