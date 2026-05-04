@@ -6,7 +6,9 @@ import { ServiceService } from '../../../core/services/service.service';
 import { AppointmentService } from '../../../core/services/appointment.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { of } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { Appointment } from '../../../core/models/appointment.model';
 
 describe('EmployeeCalendarComponent (Public)', () => {
   let component: EmployeeCalendarComponent;
@@ -17,6 +19,8 @@ describe('EmployeeCalendarComponent (Public)', () => {
   let appointmentServiceMock: jest.Mocked<AppointmentService>;
   let authServiceMock: jest.Mocked<AuthService>;
   let routerMock: jest.Mocked<Router>;
+  let confirmationService: ConfirmationService;
+  let messageService: MessageService;
 
   const mockCompany = {
     id: 'company-1', name: 'Peluquería Juan', slug: 'peluqueria-juan',
@@ -34,13 +38,36 @@ describe('EmployeeCalendarComponent (Public)', () => {
       company_id: 'company-1', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
   ];
 
+  const mockPendingAppointments: Appointment[] = [
+    {
+      id: 'apt-1', company_id: 'company-1', employee_id: 'employee-1',
+      service_id: 'service-1', client_name: 'María García', client_phone: '555-0101',
+      client_email: 'maria@test.com', appointment_date: '2026-05-10',
+      appointment_time: '10:00:00', status: 'pending', notes: 'Prefiere pelo corto',
+      created_at: '2026-05-01T00:00:00Z', updated_at: '2026-05-01T00:00:00Z'
+    },
+    {
+      id: 'apt-2', company_id: 'company-1', employee_id: 'employee-1',
+      service_id: 'service-2', client_name: 'Carlos López', client_phone: '555-0202',
+      appointment_date: '2026-05-12', appointment_time: '14:30:00',
+      status: 'pending', created_at: '2026-05-02T00:00:00Z', updated_at: '2026-05-02T00:00:00Z'
+    },
+    {
+      id: 'apt-3', company_id: 'company-1', employee_id: 'employee-1',
+      service_id: 'service-1', client_name: 'Ana Ruiz', client_phone: '555-0303',
+      appointment_date: '2026-05-15', appointment_time: '09:00:00',
+      status: 'completed', amount_collected: 25,
+      created_at: '2026-04-28T00:00:00Z', updated_at: '2026-04-28T00:00:00Z'
+    }
+  ];
+
   beforeEach(async () => {
     companyServiceMock = { getBySlug: jest.fn().mockResolvedValue(mockCompany) } as any;
     userServiceMock = { getById: jest.fn().mockResolvedValue(mockEmployee) } as any;
     serviceServiceMock = { getByEmployee: jest.fn().mockResolvedValue(mockServices) } as any;
     appointmentServiceMock = { getAvailableSlots: jest.fn().mockResolvedValue(['09:00', '09:30', '10:00']), getByEmployeeAll: jest.fn().mockResolvedValue([]) } as any;
     authServiceMock = { getCurrentUser: jest.fn().mockResolvedValue(null) } as any;
-    routerMock = { navigate: jest.fn().mockReturnValue(Promise.resolve(true)) } as any;
+    routerMock = { navigate: jest.fn().mockReturnValue(Promise.resolve(true)), createUrlTree: jest.fn().mockReturnValue({}), serializeUrl: jest.fn().mockReturnValue(''), events: of(null) } as any;
 
     await TestBed.configureTestingModule({
       imports: [EmployeeCalendarComponent],
@@ -59,6 +86,8 @@ describe('EmployeeCalendarComponent (Public)', () => {
 
     fixture = TestBed.createComponent(EmployeeCalendarComponent);
     component = fixture.componentInstance;
+    confirmationService = TestBed.inject(ConfirmationService);
+    messageService = TestBed.inject(MessageService);
   });
 
   describe('Inicialización', () => {
@@ -265,6 +294,270 @@ describe('EmployeeCalendarComponent (Public)', () => {
       await component.ngOnInit();
 
       expect(component.selectedServiceIds()).toHaveLength(1);
+    });
+  });
+
+  describe('Carga de citas pendientes', () => {
+    it('debe llamar getByEmployeeAll al inicializar', async () => {
+      await component.ngOnInit();
+
+      expect(appointmentServiceMock.getByEmployeeAll).toHaveBeenCalledWith('employee-1');
+    });
+
+    it('debe filtrar solo citas con status pending', async () => {
+      appointmentServiceMock.getByEmployeeAll = jest.fn().mockResolvedValue(mockPendingAppointments);
+
+      await component.ngOnInit();
+
+      expect(component.pendingAppointments()).toHaveLength(2);
+      expect(component.pendingAppointments().every(a => a.status === 'pending')).toBe(true);
+      expect(component.pendingAppointments().find(a => a.id === 'apt-3')).toBeUndefined();
+    });
+
+    it('debe llamar authService.getCurrentUser al inicializar', async () => {
+      await component.ngOnInit();
+
+      expect(authServiceMock.getCurrentUser).toHaveBeenCalled();
+    });
+  });
+
+  describe('canCancel (control de acceso)', () => {
+    beforeEach(async () => {
+      await component.ngOnInit();
+    });
+
+    it('debe ser false cuando no hay usuario autenticado', () => {
+      component.currentUser.set(null);
+
+      expect(component.canCancel()).toBe(false);
+    });
+
+    it('debe ser true cuando el usuario autenticado es el empleado', () => {
+      component.currentUser.set({
+        id: 'employee-1', email: 'emp@test.com', full_name: 'Juan Empleado',
+        role: 'employee', company_id: 'company-1', is_active: true,
+        created_at: '', updated_at: ''
+      });
+
+      expect(component.canCancel()).toBe(true);
+    });
+
+    it('debe ser true cuando el usuario es manager de la misma empresa', () => {
+      component.currentUser.set({
+        id: 'manager-1', email: 'manager@test.com', full_name: 'Manager Uno',
+        role: 'manager', company_id: 'company-1', is_active: true,
+        created_at: '', updated_at: ''
+      });
+
+      expect(component.canCancel()).toBe(true);
+    });
+
+    it('debe ser false cuando el usuario es manager de otra empresa', () => {
+      component.currentUser.set({
+        id: 'manager-2', email: 'other@test.com', full_name: 'Other Manager',
+        role: 'manager', company_id: 'company-99', is_active: true,
+        created_at: '', updated_at: ''
+      });
+
+      expect(component.canCancel()).toBe(false);
+    });
+
+    it('debe ser false cuando el usuario es un empleado diferente', () => {
+      component.currentUser.set({
+        id: 'employee-99', email: 'other-emp@test.com', full_name: 'Other Employee',
+        role: 'employee', company_id: 'company-1', is_active: true,
+        created_at: '', updated_at: ''
+      });
+
+      expect(component.canCancel()).toBe(false);
+    });
+  });
+
+  describe('buildEvents', () => {
+    beforeEach(async () => {
+      appointmentServiceMock.getByEmployeeAll = jest.fn().mockResolvedValue(mockPendingAppointments);
+      await component.ngOnInit();
+    });
+
+    it('debe mapear citas pendientes a EventInput con id, title, start', () => {
+      const events = component.buildEvents();
+
+      expect(events).toHaveLength(2);
+
+      const firstEvent = events.find(e => e.id === 'apt-1')!;
+      expect(firstEvent.title).toBe('10:00 - María García');
+      expect(firstEvent.start).toBe('2026-05-10T10:00:00');
+
+      const secondEvent = events.find(e => e.id === 'apt-2')!;
+      expect(secondEvent.title).toBe('14:30 - Carlos López');
+      expect(secondEvent.start).toBe('2026-05-12T14:30:00');
+    });
+
+    it('debe usar color amarillo (#F4D03F) para citas pendientes', () => {
+      const events = component.buildEvents();
+
+      events.forEach(event => {
+        expect(event.backgroundColor).toBe('#F4D03F');
+        expect(event.borderColor).toBe('#F4D03F');
+      });
+    });
+
+    it('debe incluir datos del cliente en extendedProps', () => {
+      const events = component.buildEvents();
+      const event = events.find(e => e.id === 'apt-1')!;
+
+      expect(event.extendedProps).toEqual({
+        clientName: 'María García',
+        clientPhone: '555-0101',
+        clientEmail: 'maria@test.com',
+        status: 'pending',
+        amount: undefined
+      });
+    });
+  });
+
+  describe('handleEventClick', () => {
+    beforeEach(async () => {
+      appointmentServiceMock.getByEmployeeAll = jest.fn().mockResolvedValue(mockPendingAppointments);
+      await component.ngOnInit();
+    });
+
+    it('debe abrir el diálogo con la cita correcta al hacer clic en un evento', () => {
+      const spy = jest.spyOn(component.dialogVisible, 'set');
+
+      component.handleEventClick({ event: { id: 'apt-1' } });
+
+      expect(component.selectedAppointment()).toEqual(
+        expect.objectContaining({ id: 'apt-1', client_name: 'María García' })
+      );
+      expect(spy).toHaveBeenCalledWith(true);
+    });
+
+    it('no debe abrir el diálogo si el id del evento no coincide con ninguna cita', () => {
+      const spy = jest.spyOn(component.dialogVisible, 'set');
+
+      component.handleEventClick({ event: { id: 'non-existent' } });
+
+      expect(component.selectedAppointment()).toBeNull();
+      expect(spy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('closeDialog', () => {
+    it('debe cerrar el diálogo y limpiar la cita seleccionada', () => {
+      component.dialogVisible.set(true);
+      component.selectedAppointment.set(mockPendingAppointments[0]);
+
+      component.closeDialog();
+
+      expect(component.dialogVisible()).toBe(false);
+      expect(component.selectedAppointment()).toBeNull();
+    });
+  });
+
+  describe('handleCancelAppointment', () => {
+    let confirmSpy: jest.SpyInstance;
+    let messageSpy: jest.SpyInstance;
+
+    beforeEach(async () => {
+      appointmentServiceMock.getByEmployeeAll = jest.fn().mockResolvedValue(mockPendingAppointments);
+      appointmentServiceMock.cancel = jest.fn().mockResolvedValue(undefined);
+      await component.ngOnInit();
+
+      confirmSpy = jest.spyOn(confirmationService, 'confirm');
+      messageSpy = jest.spyOn(messageService, 'add');
+    });
+
+    it('no debe hacer nada si no hay cita seleccionada', async () => {
+      component.selectedAppointment.set(null);
+
+      await component.handleCancelAppointment();
+
+      expect(confirmSpy).not.toHaveBeenCalled();
+      expect(appointmentServiceMock.cancel).not.toHaveBeenCalled();
+    });
+
+    it('debe mostrar diálogo de confirmación con los parámetros correctos', async () => {
+      component.selectedAppointment.set(mockPendingAppointments[0]);
+      confirmSpy.mockImplementation((config: any) => {
+        config.reject();
+      });
+
+      await component.handleCancelAppointment();
+
+      expect(confirmSpy).toHaveBeenCalledTimes(1);
+      const confirmArgs = confirmSpy.mock.calls[0][0];
+      expect(confirmArgs.message).toBe('¿Cancelar esta cita?');
+      expect(confirmArgs.header).toBe('Confirmar cancelación');
+      expect(confirmArgs.acceptLabel).toBe('Sí, cancelar');
+      expect(confirmArgs.rejectLabel).toBe('No');
+      expect(confirmArgs.acceptButtonStyleClass).toBe('p-button-danger');
+    });
+
+    it('no debe cancelar la cita si el usuario rechaza la confirmación', async () => {
+      component.selectedAppointment.set(mockPendingAppointments[0]);
+      confirmSpy.mockImplementation((config: any) => {
+        config.reject();
+      });
+
+      await component.handleCancelAppointment();
+
+      expect(appointmentServiceMock.cancel).not.toHaveBeenCalled();
+    });
+
+    it('debe llamar appointmentService.cancel si el usuario confirma', async () => {
+      component.selectedAppointment.set(mockPendingAppointments[0]);
+      confirmSpy.mockImplementation((config: any) => {
+        config.accept();
+      });
+
+      await component.handleCancelAppointment();
+
+      expect(appointmentServiceMock.cancel).toHaveBeenCalledWith('apt-1');
+    });
+
+    it('debe mostrar toast de éxito y cerrar el diálogo tras cancelar exitosamente', async () => {
+      component.selectedAppointment.set(mockPendingAppointments[0]);
+      component.dialogVisible.set(true);
+      confirmSpy.mockImplementation((config: any) => {
+        config.accept();
+      });
+
+      await component.handleCancelAppointment();
+
+      expect(messageSpy).toHaveBeenCalledWith({
+        severity: 'success', summary: 'Éxito', detail: 'Cita cancelada correctamente'
+      });
+      expect(appointmentServiceMock.getByEmployeeAll).toHaveBeenCalled();
+      expect(component.dialogVisible()).toBe(false);
+      expect(component.selectedAppointment()).toBeNull();
+    });
+
+    it('debe mostrar toast de error si falla la cancelación', async () => {
+      component.selectedAppointment.set(mockPendingAppointments[0]);
+      confirmSpy.mockImplementation((config: any) => {
+        config.accept();
+      });
+      appointmentServiceMock.cancel = jest.fn().mockRejectedValue(new Error('Error de red'));
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      await component.handleCancelAppointment();
+
+      expect(messageSpy).toHaveBeenCalledWith({
+        severity: 'error', summary: 'Error', detail: 'Error de red'
+      });
+    });
+
+    it('debe dejar cancellingAppointment en false al terminar la operación', async () => {
+      component.selectedAppointment.set(mockPendingAppointments[0]);
+      confirmSpy.mockImplementation((config: any) => {
+        config.accept();
+      });
+
+      expect(component.cancellingAppointment()).toBe(false);
+      await component.handleCancelAppointment();
+      expect(component.cancellingAppointment()).toBe(false);
+      expect(appointmentServiceMock.cancel).toHaveBeenCalled();
     });
   });
 });

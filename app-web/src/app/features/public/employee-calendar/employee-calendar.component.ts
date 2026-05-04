@@ -36,7 +36,6 @@ import { AppointmentDetailDialogComponent } from '../../backoffice/employee/hist
     ToastModule,
     AppointmentDetailDialogComponent
   ],
-  providers: [MessageService],
   templateUrl: './employee-calendar.component.html',
   styleUrl: './employee-calendar.component.scss'
 })
