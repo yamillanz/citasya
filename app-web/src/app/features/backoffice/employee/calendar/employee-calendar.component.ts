@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { TagModule } from 'primeng/tag';
@@ -49,6 +49,15 @@ export class EmployeeCalendarComponent implements OnInit {
   selectedAppointment = signal<Appointment | null>(null);
   cancellingAppointment = signal(false);
   showCreateDialog = signal(false);
+  selectedDate = signal<Date | null>(null);
+
+  createButtonLabel = computed(() => {
+    const date = this.selectedDate();
+    if (!date) return 'Selecciona un día';
+    const day = date.getDate();
+    const month = date.toLocaleDateString('es-ES', { month: 'short' });
+    return `Nueva Cita — ${day} ${month}`;
+  });
 
   async ngOnInit() {
     const user = await this.authService.getCurrentUser();
@@ -87,6 +96,10 @@ export class EmployeeCalendarComponent implements OnInit {
   onAppointmentClick(apt: AppointmentWithService) {
     this.selectedAppointment.set(apt as unknown as Appointment);
     this.showDetailsDialog.set(true);
+  }
+
+  onDateClick(date: Date) {
+    this.selectedDate.set(date);
   }
 
   closeDetailsDialog() {

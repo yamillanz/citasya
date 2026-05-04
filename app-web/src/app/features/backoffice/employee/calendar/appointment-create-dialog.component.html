@@ -66,17 +66,14 @@
       </div>
 
       <div class="form-field">
-        <label class="field-label" for="appointment_date">Fecha <span class="required">*</span></label>
-        <p-datepicker
-          id="appointment_date"
-          formControlName="appointment_date"
-          [minDate]="minDate()"
-          dateFormat="dd/mm/yy"
-          [showIcon]="true"
-          styleClass="w-full">
-        </p-datepicker>
-        @if (form.get('appointment_date')?.touched && form.get('appointment_date')?.invalid) {
-          <small class="field-error">La fecha es obligatoria</small>
+        <label class="field-label">Fecha</label>
+        @if (date(); as selectedDate) {
+          <div class="selected-date-display">
+            <i class="pi pi-calendar"></i>
+            <span>{{ formattedDate() }}</span>
+          </div>
+        } @else {
+          <p class="no-date">No se ha seleccionado una fecha</p>
         }
       </div>
 
@@ -87,12 +84,12 @@
             <i class="pi pi-spin pi-spinner"></i>
             <span>Buscando horarios...</span>
           </div>
-        } @else if (!form.get('appointment_date')?.value || totalDuration() === 0) {
+        } @else if (!date() || totalDuration() === 0) {
           <p-select
             id="appointment_time"
             formControlName="appointment_time"
             [options]="[]"
-            placeholder="Selecciona fecha y servicios"
+            placeholder="Selecciona servicios"
             styleClass="w-full"
             [disabled]="true">
           </p-select>
@@ -132,7 +129,7 @@
       <p-button
         label="Crear Cita"
         [loading]="submitting()"
-        [disabled]="form.invalid || submitting()"
+        [disabled]="!date() || form.invalid || submitting()"
         (onClick)="submit()">
       </p-button>
     </div>

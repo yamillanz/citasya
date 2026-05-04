@@ -132,6 +132,9 @@ describe('AppointmentCreateDialogComponent', () => {
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     beforeEach(() => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      fixture.componentRef.setInput('date', tomorrow);
       fixture.componentRef.setInput('companyId', 'co-1');
       fixture.componentRef.setInput('employeeId', 'emp-1');
       component.employeeServices.set(mockServices.slice(0, 1));
@@ -158,26 +161,25 @@ describe('AppointmentCreateDialogComponent', () => {
     });
 
     it('debe ser válido con todos los campos requeridos completos', () => {
+      const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+      fixture.componentRef.setInput('date', tomorrow);
+      component.employeeServices.set(mockServices.slice(0, 1));
       fixture.componentRef.setInput('companyId', 'co-1');
       fixture.componentRef.setInput('employeeId', 'emp-1');
-      component.employeeServices.set(mockServices.slice(0, 1));
       component.toggleService('svc-1');
       component.form.get('client_name')?.setValue('Juan Pérez');
-      const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-      component.form.get('appointment_date')?.setValue(tomorrow);
       component.form.get('appointment_time')?.setValue('10:00');
       fixture.detectChanges();
 
       expect(component.form.get('client_name')?.valid).toBe(true);
-      expect(component.form.get('appointment_date')?.valid).toBe(true);
       expect(component.form.get('appointment_time')?.valid).toBe(true);
       expect(component.form.get('service_ids')?.valid).toBe(true);
     });
 
     it('debe ser inválido sin servicios seleccionados', () => {
-      component.form.get('client_name')?.setValue('Juan');
       const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-      component.form.get('appointment_date')?.setValue(tomorrow);
+      fixture.componentRef.setInput('date', tomorrow);
+      component.form.get('client_name')?.setValue('Juan');
       component.form.get('appointment_time')?.setValue('10:00');
       fixture.detectChanges();
 
@@ -190,12 +192,12 @@ describe('AppointmentCreateDialogComponent', () => {
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     beforeEach(() => {
+      fixture.componentRef.setInput('date', tomorrow);
       fixture.componentRef.setInput('companyId', 'co-1');
       fixture.componentRef.setInput('employeeId', 'emp-1');
       component.employeeServices.set(mockServices.slice(0, 1));
       component.toggleService('svc-1');
       component.form.get('client_name')?.setValue('Juan Pérez');
-      component.form.get('appointment_date')?.setValue(tomorrow);
       component.form.get('appointment_time')?.setValue('10:00');
       fixture.detectChanges();
     });
@@ -273,6 +275,22 @@ describe('AppointmentCreateDialogComponent', () => {
       component.employeeServices.set(mockServices);
       fixture.detectChanges();
       expect(component.needsScroll()).toBe(true);
+    });
+  });
+
+  describe('formattedDate', () => {
+    it('debe retornar string vacío si no hay fecha', () => {
+      expect(component.formattedDate()).toBe('');
+    });
+
+    it('debe formatear la fecha correctamente en español', () => {
+      const date = new Date(2026, 4, 15); // May 15, 2026
+      fixture.componentRef.setInput('date', date);
+      fixture.detectChanges();
+
+      expect(component.formattedDate()).toContain('mayo');
+      expect(component.formattedDate()).toContain('15');
+      expect(component.formattedDate()).toContain('2026');
     });
   });
 });

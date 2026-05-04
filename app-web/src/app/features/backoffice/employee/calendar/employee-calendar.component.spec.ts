@@ -567,11 +567,31 @@ describe('EmployeeCalendarComponent', () => {
   describe('create appointment integration', () => {
     beforeEach(async () => {
       await component.ngOnInit();
-      fixture.detectChanges();
     });
 
-    it('debe tener una señal showCreateDialog que inicia en false', () => {
-      expect(component.showCreateDialog()).toBe(false);
+    it('selectedDate debe iniciar en null', () => {
+      expect(component.selectedDate()).toBeNull();
+    });
+
+    describe('onDateClick', () => {
+      it('debe establecer la fecha seleccionada', () => {
+        const date = new Date(2026, 4, 15);
+        component.onDateClick(date);
+        expect(component.selectedDate()).toEqual(date);
+      });
+    });
+
+    describe('createButtonLabel', () => {
+      it('debe mostrar mensaje por defecto cuando no hay fecha', () => {
+        expect(component.createButtonLabel()).toBe('Selecciona un día');
+      });
+
+      it('debe mostrar la fecha formateada cuando hay fecha seleccionada', () => {
+        component.selectedDate.set(new Date(2026, 4, 15));
+        fixture.detectChanges();
+        expect(component.createButtonLabel()).toContain('Nueva Cita');
+        expect(component.createButtonLabel()).toContain('15');
+      });
     });
 
     describe('openCreateDialog', () => {

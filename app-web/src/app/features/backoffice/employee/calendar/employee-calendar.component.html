@@ -6,11 +6,12 @@
     </div>
     <div class="header-actions">
       <p-button
-        label="Nueva Cita"
+        [label]="createButtonLabel()"
         icon="pi pi-plus"
+        [disabled]="!selectedDate()"
         (onClick)="openCreateDialog()"
         styleClass="new-appointment-btn"
-        pTooltip="Agregar una nueva cita"
+        [pTooltip]="selectedDate() ? 'Agregar una nueva cita' : 'Selecciona un día en el calendario'"
         tooltipPosition="bottom">
       </p-button>
       <p-button
@@ -49,6 +50,7 @@
       [appointments]="calendarAppointments"
       [initialView]="'dayGridMonth'"
       (appointmentClicked)="onAppointmentClick($event)"
+      (dateClicked)="onDateClick($event)"
     />
   }
 </div>
@@ -68,6 +70,7 @@
   [visible]="showCreateDialog()"
   [employeeId]="user()?.id ?? ''"
   [companyId]="user()?.company_id ?? ''"
+  [date]="selectedDate()"
   (onClose)="showCreateDialog.set(false)"
   (onCreated)="handleAppointmentCreated()">
 </app-appointment-create-dialog>

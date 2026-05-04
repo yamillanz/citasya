@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ToastModule } from 'primeng/toast';
@@ -24,7 +23,6 @@ import { ServiceService } from '../../../../core/services/service.service';
     DialogModule,
     ButtonModule,
     InputTextModule,
-    DatePickerModule,
     SelectModule,
     CheckboxModule,
     ToastModule
@@ -42,6 +40,7 @@ export class AppointmentCreateDialogComponent {
   visible = input(false);
   employeeId = input('');
   companyId = input('');
+  date = input<Date | null>(null);
 
   onClose = output<void>();
   onCreated = output<void>();
@@ -51,7 +50,6 @@ export class AppointmentCreateDialogComponent {
     client_name: ['', Validators.required],
     client_phone: [''],
     client_email: ['', Validators.email],
-    appointment_date: [null as Date | null, Validators.required],
     appointment_time: [null as string | null, Validators.required]
   });
 
@@ -63,6 +61,12 @@ export class AppointmentCreateDialogComponent {
 
   needsScroll = computed(() => this.employeeServices().length > 4);
 
+  formattedDate = computed(() => {
+    const d = this.date();
+    if (!d) return '';
+    return d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  });
+
   selectedServiceIds = model<string[]>([]);
 
   totalDuration = computed(() => {
@@ -70,18 +74,6 @@ export class AppointmentCreateDialogComponent {
     if (ids.length === 0) return 0;
     const services = this.employeeServices().filter(s => ids.includes(s.id));
     return calculateTotalDuration(services);
-  });
-
-  private today = computed(() => {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    return now;
-  });
-
-  minDate = computed(() => {
-    const tomorrow = new Date(this.today());
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow;
   });
 
   constructor() {
@@ -92,7 +84,7 @@ export class AppointmentCreateDialogComponent {
     });
 
     effect(() => {
-      const date = this.form.get('appointment_date')?.value;
+      const date = this.date();
       const duration = this.totalDuration();
       if (date && duration > 0 && this.companyId() && this.employeeId()) {
         this.loadSlots(date, duration);
@@ -162,7 +154,9 @@ export class AppointmentCreateDialogComponent {
       return;
     }
 
-    const date: Date = this.form.get('appointment_date')?.value;
+    const date = this.date();
+    if (!date) return;
+
     const time: string = this.form.get('appointment_time')?.value;
 
     this.submitting.set(true);
@@ -207,7 +201,6 @@ export class AppointmentCreateDialogComponent {
       client_name: '',
       client_phone: '',
       client_email: '',
-      appointment_date: null,
       appointment_time: null
     });
     this.selectedServiceIds.set([]);
