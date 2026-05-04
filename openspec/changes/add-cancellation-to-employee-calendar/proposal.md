@@ -1,32 +1,31 @@
 ## Why
 
-Employees and managers currently have no way to cancel a pending appointment from the public employee calendar view. If a client cancels by phone or in person, the employee/manager must navigate to the backoffice daily-close workbench to cancel it. Adding cancellation directly to the employee calendar streamlines the workflow, allowing authenticated users (the employee themselves or a manager of the company) to cancel pending appointments in one click from the same calendar they use for booking.
+Employees using the backoffice employee calendar (`/emp/calendar`) had no way to cancel pending appointments from within their own calendar view. The existing appointment detail dialog (a simple inline `p-dialog`) only showed basic info (date, time, client, status) with a single "Cerrar" button. Employees had to navigate to a different view (daily close) to cancel appointments, disrupting their workflow.
 
 ## What Changes
 
-- Load and display **pending** appointments as events on the FullCalendar in the public employee calendar page (`/c/:companySlug/e/:employeeId`)
-- Clicking a pending appointment event opens the existing `AppointmentDetailDialogComponent` with the appointment details
-- Add a "Cancelar Cita" button to the dialog footer, visible only when the user is authenticated AND is the employee or a manager of the same company
+- Replace the simple inline `p-dialog` in the **backoffice employee calendar** with the reusable `AppointmentDetailDialogComponent` already used in the employee history page
+- The reusable dialog now shows full appointment details (client info, services, duration, price, status, amount, notes)
+- Add a "Cancelar" button to the dialog footer, visible when the appointment status is `pending` (the employee is always authorized since they own the calendar)
 - The cancel button shows a PrimeNG confirmation dialog before proceeding
 - On confirmation, calls `appointmentService.cancel(id)`, refreshes the calendar, and shows a success toast
-- The `AppointmentDetailDialogComponent` is extended with a new `canCancel` input and `onCancelAppointment` output (no breaking changes to existing consumers)
+- The `AppointmentDetailDialogComponent` is extended with `canCancel` input, `canEdit` input (to optionally hide service editing), and `onCancelAppointment` output — all opt-in, no breaking changes to existing consumers
 
 ## Capabilities
 
 ### New Capabilities
-- `appointment-cancellation-public`: Allows authenticated employees and managers to cancel pending appointments from the public employee calendar, with role verification and confirmation dialog.
+- `appointment-cancellation-backoffice`: Allows authenticated employees to cancel their own pending appointments from the backoffice employee calendar (`/emp/calendar`), with confirmation dialog and full appointment detail display.
 
 ### Modified Capabilities
-- `appointment-detail-dialog`: Extended with cancel button support (opt-in via `canCancel` input)
-- `employee-calendar`: Now shows pending appointments as calendar events and integrates the detail dialog for viewing and cancelling
+- `appointment-detail-dialog`: Extended with `canCancel` input, `canEdit` input, `onCancelAppointment` output, and cancel button in footer (all opt-in, defaults preserve existing behavior)
 
 ## Impact
 
 - **Components modified**:
-  - `app-web/src/app/features/backoffice/employee/history/appointment-detail-dialog.component.ts` — add `canCancel` input, `onCancelAppointment` output, `cancellingAppointment` signal
-  - `app-web/src/app/features/backoffice/employee/history/appointment-detail-dialog.component.html` — add "Cancelar Cita" button in footer
-  - `app-web/src/app/features/public/employee-calendar/employee-calendar.component.ts` — load pending appointments, integrate dialog, handle cancellation, convert calendarOptions to computed()
-  - `app-web/src/app/features/public/employee-calendar/employee-calendar.component.html` — add dialog and toast components
+  - `app-web/src/app/features/backoffice/employee/calendar/employee-calendar.component.ts` — replace inline dialog with `AppointmentDetailDialogComponent`, add cancel handler
+  - `app-web/src/app/features/backoffice/employee/calendar/employee-calendar.component.html` — replace inline `p-dialog` with `<app-appointment-detail-dialog>`, add `<p-toast>`
+  - `app-web/src/app/features/backoffice/employee/history/appointment-detail-dialog.component.ts` — add `canCancel`, `canEdit` inputs and `onCancelAppointment` output
+  - `app-web/src/app/features/backoffice/employee/history/appointment-detail-dialog.component.html` — add "Cancelar" button in footer
 - **No API changes**: Reuses existing `appointmentService.cancel()` and `getByEmployeeAll()`
 - **No new dependencies**: Uses already-provided `ConfirmationService`, `ConfirmDialogModule`, `ToastModule`
-- **No breaking changes**: `AppointmentDetailDialogComponent` changes are purely additive (new optional input/output)
+- **No breaking changes**: `AppointmentDetailDialogComponent` changes are purely additive (new optional inputs/outputs with safe defaults)
