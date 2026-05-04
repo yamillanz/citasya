@@ -145,7 +145,7 @@
         
         <div class="calendar-wrapper">
           <div class="calendar-card">
-            <full-calendar [options]="calendarOptions"></full-calendar>
+            <full-calendar [options]="calendarOptions()"></full-calendar>
           </div>
         </div>
       </section>
@@ -234,3 +234,13 @@
     }
   }
 </div>
+
+<p-toast position="bottom-right"></p-toast>
+
+<app-appointment-detail-dialog
+  [appointment]="selectedAppointment()"
+  [visible]="dialogVisible()"
+  [canCancel]="canCancel()"
+  (onClose)="closeDialog()"
+  (onCancelAppointment)="handleCancelAppointment()">
+</app-appointment-detail-dialog>

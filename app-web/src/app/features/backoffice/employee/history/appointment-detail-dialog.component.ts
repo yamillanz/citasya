@@ -44,15 +44,19 @@ export class AppointmentDetailDialogComponent {
   hasPrevious = input(false);
   hasNext = input(false);
 
+  canCancel = input(false);
+
   onClose = output<void>();
   onPrevious = output<void>();
   onNext = output<void>();
   onServicesUpdated = output<void>();
+  onCancelAppointment = output<void>();
 
   availableServices = signal<Service[]>([]);
   isEditingServices = signal(false);
   editedServiceIds = signal<string[]>([]);
   savingServices = signal(false);
+  cancellingAppointment = signal(false);
 
   totalDuration = computed(() => {
     const apt = this.appointment();

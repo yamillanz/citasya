@@ -164,6 +164,16 @@
             (onClick)="saveServices()">
           </p-button>
         }
+        @if (!isEditingServices() && canCancel() && appointment()?.status === 'pending') {
+          <p-button 
+            label="Cancelar Cita"
+            icon="pi pi-ban"
+            severity="danger"
+            [outlined]="true"
+            [loading]="cancellingAppointment()"
+            (onClick)="onCancelAppointment.emit()">
+          </p-button>
+        }
         @if (!isEditingServices()) {
           <p-button 
             label="Cerrar"

@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions } from '@fullcalendar/core';
+import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -10,14 +10,18 @@ import esLocale from '@fullcalendar/core/locales/es';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { TooltipModule } from 'primeng/tooltip';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
 import { AppointmentService } from '../../../core/services/appointment.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Company } from '../../../core/models/company.model';
 import { User } from '../../../core/models/user.model';
 import { Service } from '../../../core/models/service.model';
-import { calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../core/models/appointment.model';
+import { Appointment, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../core/models/appointment.model';
+import { AppointmentDetailDialogComponent } from '../../backoffice/employee/history/appointment-detail-dialog.component';
 
 @Component({
   selector: 'app-employee-calendar',
@@ -28,8 +32,11 @@ import { calculateTotalDuration, calculateTotalPrice, formatServicesList } from 
     RouterLink,
     ButtonModule,
     AvatarModule,
-    TooltipModule
+    TooltipModule,
+    ToastModule,
+    AppointmentDetailDialogComponent
   ],
+  providers: [MessageService],
   templateUrl: './employee-calendar.component.html',
   styleUrl: './employee-calendar.component.scss'
 })
@@ -40,16 +47,38 @@ export class EmployeeCalendarComponent implements OnInit {
   private userService = inject(UserService);
   private serviceService = inject(ServiceService);
   private appointmentService = inject(AppointmentService);
+  private authService = inject(AuthService);
+  private confirmationService = inject(ConfirmationService);
+  private messageService = inject(MessageService);
 
   company = signal<Company | null>(null);
   employee = signal<User | null>(null);
   services = signal<Service[]>([]);
   selectedDate = signal('');
   availableSlots = signal<string[]>([]);
-  selectedServiceIds = signal<string[]>([]); // Changed from single service to multiple
+  selectedServiceIds = signal<string[]>([]);
   selectedTime = signal('');
   loading = signal(true);
   error = signal('');
+
+  pendingAppointments = signal<Appointment[]>([]);
+  selectedAppointment = signal<Appointment | null>(null);
+  dialogVisible = signal(false);
+  cancellingAppointment = signal(false);
+  currentUser = signal<User | null>(null);
+
+  canCancel = computed(() => {
+    const user = this.currentUser();
+    const comp = this.company();
+    const emp = this.employee();
+
+    if (!user || !comp || !emp) return false;
+
+    const isEmployee = user.id === emp.id;
+    const isManager = user.role === 'manager' && user.company_id === comp.id;
+
+    return isEmployee || isManager;
+  });
 
   // Computed signals for totals
   selectedServices = computed(() => {
@@ -64,7 +93,7 @@ export class EmployeeCalendarComponent implements OnInit {
 
   selectedServicesText = computed(() => formatServicesList(this.selectedServices()));
 
-  calendarOptions: CalendarOptions = {
+  calendarOptions = computed<CalendarOptions>(() => ({
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
     initialView: 'dayGridMonth',
     headerToolbar: {
@@ -80,15 +109,42 @@ export class EmployeeCalendarComponent implements OnInit {
     dayMaxEvents: true,
     select: this.handleDateSelect.bind(this),
     dateClick: this.handleDateClick.bind(this),
+    eventClick: this.handleEventClick.bind(this),
     unselectAuto: false,
-    events: [],
+    events: this.buildEvents(),
     locale: esLocale,
     buttonText: {
       today: 'Hoy',
       month: 'Mes',
       week: 'Semana'
     }
-  };
+  }));
+
+  buildEvents(): EventInput[] {
+    return this.pendingAppointments().map(apt => ({
+      id: apt.id,
+      title: `${apt.appointment_time.substring(0, 5)} - ${apt.client_name}`,
+      start: `${apt.appointment_date}T${apt.appointment_time}`,
+      backgroundColor: '#F4D03F',
+      borderColor: '#F4D03F',
+      textColor: '#1a1a1a',
+      extendedProps: {
+        clientName: apt.client_name,
+        clientPhone: apt.client_phone,
+        clientEmail: apt.client_email || '',
+        status: apt.status,
+        amount: apt.amount_collected
+      }
+    }));
+  }
+
+  handleEventClick(arg: any): void {
+    const apt = this.pendingAppointments().find(a => a.id === arg.event.id);
+    if (apt) {
+      this.selectedAppointment.set(apt);
+      this.dialogVisible.set(true);
+    }
+  }
 
   async ngOnInit() {
     const slug = this.route.snapshot.paramMap.get('companySlug');
@@ -120,6 +176,8 @@ export class EmployeeCalendarComponent implements OnInit {
       const services = await this.serviceService.getByEmployee(employeeId);
       this.services.set(services);
 
+      this.currentUser.set(await this.authService.getCurrentUser());
+
       const serviceId = this.route.snapshot.queryParamMap.get('serviceId');
       if (serviceId && services.some(s => s.id === serviceId)) {
         this.selectedServiceIds.update(ids => {
@@ -127,10 +185,24 @@ export class EmployeeCalendarComponent implements OnInit {
           return [...ids, serviceId];
         });
       }
+
+      await this.loadPendingAppointments();
     } catch (err) {
       this.error.set('Error al cargar los datos');
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  async loadPendingAppointments() {
+    const emp = this.employee();
+    if (!emp) return;
+
+    try {
+      const appointments = await this.appointmentService.getByEmployeeAll(emp.id);
+      this.pendingAppointments.set(appointments.filter(a => a.status === 'pending'));
+    } catch {
+      // silently fail — appointments are optional
     }
   }
 
@@ -223,6 +295,44 @@ export class EmployeeCalendarComponent implements OnInit {
       } finally {
         this.loading.set(false);
       }
+    }
+  }
+
+  closeDialog() {
+    this.dialogVisible.set(false);
+    this.selectedAppointment.set(null);
+  }
+
+  async handleCancelAppointment() {
+    const apt = this.selectedAppointment();
+    if (!apt) return;
+
+    const confirmed = await new Promise<boolean>(resolve => {
+      this.confirmationService.confirm({
+        message: '¿Cancelar esta cita?',
+        header: 'Confirmar cancelación',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Sí, cancelar',
+        rejectLabel: 'No',
+        acceptButtonStyleClass: 'p-button-danger',
+        accept: () => resolve(true),
+        reject: () => resolve(false)
+      });
+    });
+
+    if (!confirmed) return;
+
+    this.cancellingAppointment.set(true);
+    try {
+      await this.appointmentService.cancel(apt.id);
+      this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Cita cancelada correctamente' });
+      await this.loadPendingAppointments();
+      this.dialogVisible.set(false);
+      this.selectedAppointment.set(null);
+    } catch (error: any) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message || 'No se pudo cancelar la cita' });
+    } finally {
+      this.cancellingAppointment.set(false);
     }
   }
 

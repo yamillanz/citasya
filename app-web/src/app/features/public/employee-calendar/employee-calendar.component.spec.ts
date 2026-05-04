@@ -4,7 +4,9 @@ import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
 import { AppointmentService } from '../../../core/services/appointment.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 describe('EmployeeCalendarComponent (Public)', () => {
   let component: EmployeeCalendarComponent;
@@ -13,6 +15,7 @@ describe('EmployeeCalendarComponent (Public)', () => {
   let userServiceMock: jest.Mocked<UserService>;
   let serviceServiceMock: jest.Mocked<ServiceService>;
   let appointmentServiceMock: jest.Mocked<AppointmentService>;
+  let authServiceMock: jest.Mocked<AuthService>;
   let routerMock: jest.Mocked<Router>;
 
   const mockCompany = {
@@ -35,7 +38,8 @@ describe('EmployeeCalendarComponent (Public)', () => {
     companyServiceMock = { getBySlug: jest.fn().mockResolvedValue(mockCompany) } as any;
     userServiceMock = { getById: jest.fn().mockResolvedValue(mockEmployee) } as any;
     serviceServiceMock = { getByEmployee: jest.fn().mockResolvedValue(mockServices) } as any;
-    appointmentServiceMock = { getAvailableSlots: jest.fn().mockResolvedValue(['09:00', '09:30', '10:00']) } as any;
+    appointmentServiceMock = { getAvailableSlots: jest.fn().mockResolvedValue(['09:00', '09:30', '10:00']), getByEmployeeAll: jest.fn().mockResolvedValue([]) } as any;
+    authServiceMock = { getCurrentUser: jest.fn().mockResolvedValue(null) } as any;
     routerMock = { navigate: jest.fn().mockReturnValue(Promise.resolve(true)) } as any;
 
     await TestBed.configureTestingModule({
@@ -45,8 +49,11 @@ describe('EmployeeCalendarComponent (Public)', () => {
         { provide: UserService, useValue: userServiceMock },
         { provide: ServiceService, useValue: serviceServiceMock },
         { provide: AppointmentService, useValue: appointmentServiceMock },
+        { provide: AuthService, useValue: authServiceMock },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: (k: string) => k === 'companySlug' ? 'peluqueria-juan' : k === 'employeeId' ? 'employee-1' : null }, queryParamMap: { get: jest.fn().mockReturnValue(null) } } } },
-        { provide: Router, useValue: routerMock }
+        { provide: Router, useValue: routerMock },
+        ConfirmationService,
+        MessageService
       ]
     }).compileComponents();
 
