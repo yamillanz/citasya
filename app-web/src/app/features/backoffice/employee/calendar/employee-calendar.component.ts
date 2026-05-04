@@ -4,12 +4,15 @@ import { DialogModule } from 'primeng/dialog';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
 import { CompanyService } from '../../../../core/services/company.service';
 import { User } from '../../../../core/models/user.model';
+import { Appointment } from '../../../../core/models/appointment.model';
 import { SharedCalendarComponent, AppointmentWithService } from '../../../../shared/components/calendar/calendar.component';
+import { AppointmentDetailDialogComponent } from '../../../backoffice/employee/history/appointment-detail-dialog.component';
 
 @Component({
   selector: 'app-employee-calendar',
@@ -20,7 +23,9 @@ import { SharedCalendarComponent, AppointmentWithService } from '../../../../sha
     TagModule,
     ButtonModule,
     TooltipModule,
-    SharedCalendarComponent
+    ToastModule,
+    SharedCalendarComponent,
+    AppointmentDetailDialogComponent
   ],
   templateUrl: './employee-calendar.component.html',
   styleUrl: './employee-calendar.component.scss'
@@ -30,15 +35,17 @@ export class EmployeeCalendarComponent implements OnInit {
   private appointmentService = inject(AppointmentService);
   private companyService = inject(CompanyService);
   private messageService = inject(MessageService);
+  private confirmationService = inject(ConfirmationService);
 
   user = signal<User | null>(null);
-  appointments = signal<AppointmentWithService[]>([]);
+  appointments = signal<Appointment[]>([]);
   loading = signal(true);
   error = signal('');
   copying = signal(false);
 
   showDetailsDialog = signal(false);
-  selectedAppointment = signal<AppointmentWithService | null>(null);
+  selectedAppointment = signal<Appointment | null>(null);
+  cancellingAppointment = signal(false);
 
   async ngOnInit() {
     const user = await this.authService.getCurrentUser();
@@ -58,7 +65,7 @@ export class EmployeeCalendarComponent implements OnInit {
     this.loading.set(true);
     try {
       const appointments = await this.appointmentService.getByEmployeeAll(user.id);
-      this.appointments.set(appointments as AppointmentWithService[]);
+      this.appointments.set(appointments);
     } catch (err) {
       this.error.set('Error al cargar las citas');
     } finally {
@@ -66,13 +73,54 @@ export class EmployeeCalendarComponent implements OnInit {
     }
   }
 
+  get calendarAppointments(): AppointmentWithService[] {
+    return this.appointments() as AppointmentWithService[];
+  }
+
   async refreshData() {
     await this.loadAppointments();
   }
 
   onAppointmentClick(apt: AppointmentWithService) {
-    this.selectedAppointment.set(apt);
+    this.selectedAppointment.set(apt as unknown as Appointment);
     this.showDetailsDialog.set(true);
+  }
+
+  closeDetailsDialog() {
+    this.showDetailsDialog.set(false);
+    this.selectedAppointment.set(null);
+  }
+
+  async handleCancelAppointment() {
+    const apt = this.selectedAppointment();
+    if (!apt) return;
+
+    const confirmed = await new Promise<boolean>(resolve => {
+      this.confirmationService.confirm({
+        message: '¿Cancelar esta cita?',
+        header: 'Confirmar cancelación',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Sí, cancelar',
+        rejectLabel: 'No',
+        acceptButtonStyleClass: 'p-button-danger',
+        accept: () => resolve(true),
+        reject: () => resolve(false)
+      });
+    });
+
+    if (!confirmed) return;
+
+    this.cancellingAppointment.set(true);
+    try {
+      await this.appointmentService.cancel(apt.id);
+      this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Cita cancelada correctamente' });
+      await this.loadAppointments();
+      this.closeDetailsDialog();
+    } catch (error: any) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message || 'No se pudo cancelar la cita' });
+    } finally {
+      this.cancellingAppointment.set(false);
+    }
   }
 
   getStatusLabel(status: string): string {

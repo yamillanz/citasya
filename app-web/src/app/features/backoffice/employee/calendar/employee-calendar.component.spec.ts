@@ -4,7 +4,7 @@ import { EmployeeCalendarComponent } from './employee-calendar.component';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
 import { CompanyService } from '../../../../core/services/company.service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 describe('EmployeeCalendarComponent', () => {
   let component: EmployeeCalendarComponent;
@@ -94,6 +94,7 @@ describe('EmployeeCalendarComponent', () => {
         { provide: AppointmentService, useValue: appointmentServiceMock },
         { provide: CompanyService, useValue: companyServiceMock },
         { provide: MessageService, useValue: messageServiceMock },
+        ConfirmationService,
         provideNoopAnimations()
       ]
     }).compileComponents();
