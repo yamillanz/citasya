@@ -45,6 +45,7 @@ export class AppointmentDetailDialogComponent {
   hasNext = input(false);
 
   canCancel = input(false);
+  canEdit = input(true);
 
   onClose = output<void>();
   onPrevious = output<void>();
@@ -70,7 +71,7 @@ export class AppointmentDetailDialogComponent {
 
   canEditServices = computed(() => {
     const apt = this.appointment();
-    return apt?.status === 'pending';
+    return this.canEdit() && apt?.status === 'pending';
   });
 
   async startEditServices() {

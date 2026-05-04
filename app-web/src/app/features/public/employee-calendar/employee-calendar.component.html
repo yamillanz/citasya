@@ -241,6 +241,7 @@
   [appointment]="selectedAppointment()"
   [visible]="dialogVisible()"
   [canCancel]="canCancel()"
+  [canEdit]="false"
   (onClose)="closeDialog()"
   (onCancelAppointment)="handleCancelAppointment()">
 </app-appointment-detail-dialog>

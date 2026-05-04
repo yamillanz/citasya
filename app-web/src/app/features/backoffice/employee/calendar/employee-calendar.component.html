@@ -51,6 +51,7 @@
   [appointment]="$any(selectedAppointment())"
   [visible]="showDetailsDialog()"
   [canCancel]="true"
+  [canEdit]="false"
   (onClose)="closeDetailsDialog()"
   (onCancelAppointment)="handleCancelAppointment()">
 </app-appointment-detail-dialog>
