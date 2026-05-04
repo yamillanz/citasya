@@ -48,7 +48,7 @@ export class AppointmentCreateDialogComponent {
   form: FormGroup = this.fb.group({
     service_ids: [[], Validators.required],
     client_name: ['', Validators.required],
-    client_phone: [''],
+    client_phone: ['', Validators.required],
     client_email: ['', Validators.email],
     appointment_time: [null as string | null, Validators.required]
   });

@@ -53,8 +53,11 @@
       </div>
 
       <div class="form-field">
-        <label class="field-label" for="client_phone">Teléfono</label>
-        <input pInputText id="client_phone" formControlName="client_phone" class="w-full" autocomplete="off" placeholder="Opcional">
+        <label class="field-label" for="client_phone">Teléfono <span class="required">*</span></label>
+        <input pInputText id="client_phone" formControlName="client_phone" class="w-full" autocomplete="off">
+        @if (form.get('client_phone')?.touched && form.get('client_phone')?.invalid) {
+          <small class="field-error">El teléfono es obligatorio</small>
+        }
       </div>
 
       <div class="form-field">

@@ -168,10 +168,12 @@ describe('AppointmentCreateDialogComponent', () => {
       fixture.componentRef.setInput('employeeId', 'emp-1');
       component.toggleService('svc-1');
       component.form.get('client_name')?.setValue('Juan Pérez');
+      component.form.get('client_phone')?.setValue('555-1234');
       component.form.get('appointment_time')?.setValue('10:00');
       fixture.detectChanges();
 
       expect(component.form.get('client_name')?.valid).toBe(true);
+      expect(component.form.get('client_phone')?.valid).toBe(true);
       expect(component.form.get('appointment_time')?.valid).toBe(true);
       expect(component.form.get('service_ids')?.valid).toBe(true);
     });
@@ -180,6 +182,7 @@ describe('AppointmentCreateDialogComponent', () => {
       const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
       fixture.componentRef.setInput('date', tomorrow);
       component.form.get('client_name')?.setValue('Juan');
+      component.form.get('client_phone')?.setValue('555-1234');
       component.form.get('appointment_time')?.setValue('10:00');
       fixture.detectChanges();
 
@@ -198,6 +201,7 @@ describe('AppointmentCreateDialogComponent', () => {
       component.employeeServices.set(mockServices.slice(0, 1));
       component.toggleService('svc-1');
       component.form.get('client_name')?.setValue('Juan Pérez');
+      component.form.get('client_phone')?.setValue('555-1234');
       component.form.get('appointment_time')?.setValue('10:00');
       fixture.detectChanges();
     });
@@ -221,7 +225,7 @@ describe('AppointmentCreateDialogComponent', () => {
         employee_id: 'emp-1',
         service_ids: ['svc-1'],
         client_name: 'Juan Pérez',
-        client_phone: undefined,
+        client_phone: '555-1234',
         client_email: undefined,
         appointment_date: dateStr,
         appointment_time: '10:00'
