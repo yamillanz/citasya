@@ -1,0 +1,142 @@
+<p-dialog
+  header="Nueva Cita"
+  [modal]="true"
+  [visible]="visible()"
+  [draggable]="false"
+  styleClass="create-appointment-dialog"
+  (onHide)="close()">
+
+  <ng-template pTemplate="content">
+    <form [formGroup]="form" class="create-form">
+      <div class="form-field">
+        <label class="field-label">Servicios <span class="required">*</span></label>
+        @if (loadingServices()) {
+          <div class="loading-services">
+            <i class="pi pi-spin pi-spinner"></i>
+            <span>Cargando servicios...</span>
+          </div>
+        } @else if (employeeServices().length === 0) {
+          <p class="no-services">No tienes servicios asignados</p>
+        } @else {
+          <div class="services-list" [class.scroll-active]="needsScroll()">
+            @for (service of employeeServices(); track service.id) {
+              <div class="service-item">
+                <p-checkbox
+                  [value]="service.id"
+                  [binary]="true"
+                  [ngModel]="isServiceSelected(service.id)"
+                  (ngModelChange)="toggleService(service.id)"
+                  [ngModelOptions]="{standalone: true}"
+                  inputId="svc_{{ service.id }}">
+                </p-checkbox>
+                <label [for]="'svc_' + service.id" class="service-label">
+                  <span class="service-name">{{ service.name }}</span>
+                  @if (service.duration_minutes) {
+                    <span class="service-duration">{{ service.duration_minutes }} min</span>
+                  }
+                </label>
+              </div>
+            }
+          </div>
+        }
+        @if (form.get('service_ids')?.touched && form.get('service_ids')?.invalid) {
+          <small class="field-error">Selecciona al menos un servicio</small>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="field-label" for="client_name">Nombre del cliente <span class="required">*</span></label>
+        <input pInputText id="client_name" formControlName="client_name" class="w-full" autocomplete="off">
+        @if (form.get('client_name')?.touched && form.get('client_name')?.invalid) {
+          <small class="field-error">El nombre es obligatorio</small>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="field-label" for="client_phone">Teléfono</label>
+        <input pInputText id="client_phone" formControlName="client_phone" class="w-full" autocomplete="off" placeholder="Opcional">
+      </div>
+
+      <div class="form-field">
+        <label class="field-label" for="client_email">Email</label>
+        <input pInputText id="client_email" formControlName="client_email" class="w-full" autocomplete="off" placeholder="Opcional">
+        @if (form.get('client_email')?.touched && form.get('client_email')?.invalid) {
+          <small class="field-error">Email no válido</small>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="field-label" for="appointment_date">Fecha <span class="required">*</span></label>
+        <p-datepicker
+          id="appointment_date"
+          formControlName="appointment_date"
+          [minDate]="minDate()"
+          dateFormat="dd/mm/yy"
+          [showIcon]="true"
+          styleClass="w-full">
+        </p-datepicker>
+        @if (form.get('appointment_date')?.touched && form.get('appointment_date')?.invalid) {
+          <small class="field-error">La fecha es obligatoria</small>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="field-label" for="appointment_time">Hora <span class="required">*</span></label>
+        @if (loadingSlots()) {
+          <div class="loading-slots">
+            <i class="pi pi-spin pi-spinner"></i>
+            <span>Buscando horarios...</span>
+          </div>
+        } @else if (!form.get('appointment_date')?.value || totalDuration() === 0) {
+          <p-select
+            id="appointment_time"
+            formControlName="appointment_time"
+            [options]="[]"
+            placeholder="Selecciona fecha y servicios"
+            styleClass="w-full"
+            [disabled]="true">
+          </p-select>
+        } @else if (availableSlots().length === 0) {
+          <p-select
+            id="appointment_time"
+            formControlName="appointment_time"
+            [options]="[]"
+            placeholder="No hay horarios disponibles"
+            styleClass="w-full"
+            [disabled]="true">
+          </p-select>
+        } @else {
+          <p-select
+            id="appointment_time"
+            formControlName="appointment_time"
+            [options]="availableSlots()"
+            placeholder="Selecciona un horario"
+            styleClass="w-full">
+          </p-select>
+        }
+        @if (form.get('appointment_time')?.touched && form.get('appointment_time')?.invalid) {
+          <small class="field-error">La hora es obligatoria</small>
+        }
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="close()">
+      </p-button>
+      <p-button
+        label="Crear Cita"
+        [loading]="submitting()"
+        [disabled]="form.invalid || submitting()"
+        (onClick)="submit()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<p-toast position="bottom-right"></p-toast>

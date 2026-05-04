@@ -13,6 +13,7 @@ import { User } from '../../../../core/models/user.model';
 import { Appointment } from '../../../../core/models/appointment.model';
 import { SharedCalendarComponent, AppointmentWithService } from '../../../../shared/components/calendar/calendar.component';
 import { AppointmentDetailDialogComponent } from '../../../backoffice/employee/history/appointment-detail-dialog.component';
+import { AppointmentCreateDialogComponent } from './appointment-create-dialog.component';
 
 @Component({
   selector: 'app-employee-calendar',
@@ -25,7 +26,8 @@ import { AppointmentDetailDialogComponent } from '../../../backoffice/employee/h
     TooltipModule,
     ToastModule,
     SharedCalendarComponent,
-    AppointmentDetailDialogComponent
+    AppointmentDetailDialogComponent,
+    AppointmentCreateDialogComponent
   ],
   templateUrl: './employee-calendar.component.html',
   styleUrl: './employee-calendar.component.scss'
@@ -46,6 +48,7 @@ export class EmployeeCalendarComponent implements OnInit {
   showDetailsDialog = signal(false);
   selectedAppointment = signal<Appointment | null>(null);
   cancellingAppointment = signal(false);
+  showCreateDialog = signal(false);
 
   async ngOnInit() {
     const user = await this.authService.getCurrentUser();
@@ -89,6 +92,15 @@ export class EmployeeCalendarComponent implements OnInit {
   closeDetailsDialog() {
     this.showDetailsDialog.set(false);
     this.selectedAppointment.set(null);
+  }
+
+  openCreateDialog() {
+    this.showCreateDialog.set(true);
+  }
+
+  handleAppointmentCreated() {
+    this.showCreateDialog.set(false);
+    this.refreshData();
   }
 
   async handleCancelAppointment() {

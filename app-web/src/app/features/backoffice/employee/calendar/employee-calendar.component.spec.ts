@@ -5,6 +5,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
 import { CompanyService } from '../../../../core/services/company.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { Subject } from 'rxjs';
 
 describe('EmployeeCalendarComponent', () => {
   let component: EmployeeCalendarComponent;
@@ -84,7 +85,9 @@ describe('EmployeeCalendarComponent', () => {
     } as any;
 
     messageServiceMock = {
-      add: jest.fn()
+      add: jest.fn(),
+      messageObserver: new Subject(),
+      clearObserver: new Subject()
     } as any;
 
     await TestBed.configureTestingModule({
@@ -558,6 +561,36 @@ describe('EmployeeCalendarComponent', () => {
       await component.refreshData();
 
       expect(appointmentServiceMock.getByEmployeeAll).toHaveBeenCalledWith(mockUser.id);
+    });
+  });
+
+  describe('create appointment integration', () => {
+    beforeEach(async () => {
+      await component.ngOnInit();
+      fixture.detectChanges();
+    });
+
+    it('debe tener una señal showCreateDialog que inicia en false', () => {
+      expect(component.showCreateDialog()).toBe(false);
+    });
+
+    describe('openCreateDialog', () => {
+      it('debe establecer showCreateDialog en true', () => {
+        component.openCreateDialog();
+        expect(component.showCreateDialog()).toBe(true);
+      });
+    });
+
+    describe('handleAppointmentCreated', () => {
+      it('debe cerrar el diálogo y refrescar las citas', async () => {
+        component.showCreateDialog.set(true);
+        appointmentServiceMock.getByEmployeeAll.mockClear();
+
+        await component.handleAppointmentCreated();
+
+        expect(component.showCreateDialog()).toBe(false);
+        expect(appointmentServiceMock.getByEmployeeAll).toHaveBeenCalledWith(mockUser.id);
+      });
     });
   });
 });

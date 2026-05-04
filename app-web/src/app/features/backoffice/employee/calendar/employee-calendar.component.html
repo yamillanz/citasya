@@ -6,6 +6,14 @@
     </div>
     <div class="header-actions">
       <p-button
+        label="Nueva Cita"
+        icon="pi pi-plus"
+        (onClick)="openCreateDialog()"
+        styleClass="new-appointment-btn"
+        pTooltip="Agregar una nueva cita"
+        tooltipPosition="bottom">
+      </p-button>
+      <p-button
         icon="pi pi-refresh"
         [loading]="loading()"
         (onClick)="refreshData()"
@@ -55,3 +63,11 @@
   (onClose)="closeDetailsDialog()"
   (onCancelAppointment)="handleCancelAppointment()">
 </app-appointment-detail-dialog>
+
+<app-appointment-create-dialog
+  [visible]="showCreateDialog()"
+  [employeeId]="user()?.id ?? ''"
+  [companyId]="user()?.company_id ?? ''"
+  (onClose)="showCreateDialog.set(false)"
+  (onCreated)="handleAppointmentCreated()">
+</app-appointment-create-dialog>
