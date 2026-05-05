@@ -69,14 +69,20 @@
   width: auto;
 }
 
-.desktop-nav {
+.header-right {
   display: none;
-  
+
   @media (min-width: 1024px) {
     display: flex;
     align-items: center;
-    gap: var(--space-xl);
+    gap: var(--space-2xl);
   }
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
 }
 
 .nav-link {
@@ -124,13 +130,9 @@
 }
 
 .auth-buttons {
-  display: none;
-  
-  @media (min-width: 1024px) {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-  }
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
 }
 
 :host ::ng-deep {

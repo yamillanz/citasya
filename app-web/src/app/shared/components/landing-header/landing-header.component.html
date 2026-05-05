@@ -18,32 +18,34 @@
       </svg>
     </a>
 
-    <!-- Desktop Navigation -->
-    <nav class="desktop-nav">
-      @for (item of menuItems; track item.label) {
-        <a
-          [routerLink]="item.routerLink"
-          [fragment]="item.fragment"
-          class="nav-link"
-          [class.active]="isActive(item)"
-        >
-          {{ item.label }}
-        </a>
-      }
-    </nav>
+    <!-- Right side: Navigation + Auth -->
+    <div class="header-right">
+      <nav class="desktop-nav">
+        @for (item of menuItems; track item.label) {
+          <a
+            [routerLink]="item.routerLink"
+            [fragment]="item.fragment"
+            class="nav-link"
+            [class.active]="isActive(item)"
+          >
+            {{ item.label }}
+          </a>
+        }
+      </nav>
 
-    <!-- Auth Buttons -->
-    <div class="auth-buttons">
-      <p-button 
-        label="Iniciar sesión" 
-        styleClass="p-button-text nav-btn-text"
-        routerLink="/login"
-      />
-      <p-button 
-        label="Comenzar" 
-        styleClass="nav-btn-primary"
-        routerLink="/signup"
-      />
+      <!-- Auth Buttons -->
+      <div class="auth-buttons">
+        <p-button
+          label="Iniciar sesión"
+          styleClass="p-button-text nav-btn-text"
+          routerLink="/login"
+        />
+        <p-button
+          label="Comenzar"
+          styleClass="nav-btn-primary"
+          routerLink="/signup"
+        />
+      </div>
     </div>
 
     <!-- Mobile Menu Button -->
