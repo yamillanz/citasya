@@ -11,6 +11,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
+import { EmailNotificationService } from '../../../../core/services/email-notification.service';
 import { UserService } from '../../../../core/services/user.service';
 import { Appointment, AppointmentStatus, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../../core/models/appointment.model';
 import { User } from '../../../../core/models/user.model';
@@ -48,6 +49,7 @@ export class AppointmentsComponent implements OnInit {
   private appointmentService = inject(AppointmentService);
   private userService = inject(UserService);
   private messageService = inject(MessageService);
+  private emailNotificationService = inject(EmailNotificationService);
 
   appointments = signal<Appointment[]>([]);
   employees = signal<User[]>([]);
@@ -251,7 +253,11 @@ export class AppointmentsComponent implements OnInit {
     try {
       const amount = status === 'completed' ? this.amountCollected() : undefined;
       await this.appointmentService.updateStatus(appointment.id, status, amount);
-      
+
+      if (status === 'cancelled' || status === 'no_show') {
+        this.emailNotificationService.notify(appointment.id, status);
+      }
+
       const updated = this.appointments().map(apt => 
         apt.id === appointment.id 
           ? { ...apt, status, amount_collected: amount || apt.amount_collected }

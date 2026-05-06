@@ -16,6 +16,7 @@ import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
 import { AppointmentService } from '../../../core/services/appointment.service';
+import { EmailNotificationService } from '../../../core/services/email-notification.service';
 import { Company } from '../../../core/models/company.model';
 import { User } from '../../../core/models/user.model';
 import { Service } from '../../../core/models/service.model';
@@ -61,6 +62,7 @@ export class BookingFormComponent implements OnInit {
   private userService = inject(UserService);
   private serviceService = inject(ServiceService);
   private appointmentService = inject(AppointmentService);
+  private emailNotificationService = inject(EmailNotificationService);
 
   company = signal<Company | null>(null);
   employee = signal<User | null>(null);
@@ -284,10 +286,10 @@ export class BookingFormComponent implements OnInit {
     }
 
     try {
-      await this.appointmentService.create({
+      const newAppointment = await this.appointmentService.create({
         company_id: comp.id,
         employee_id: emp.id,
-        service_ids: services.map((s) => s.id), // Changed to array
+        service_ids: services.map((s) => s.id),
         client_name: this.bookingForm.value.client_name!,
         client_phone: phone,
         client_email: email,
@@ -298,6 +300,8 @@ export class BookingFormComponent implements OnInit {
 
       this.currentStep.set(3);
       this.success.set(true);
+
+      this.emailNotificationService.notify(newAppointment.id, 'created');
     } catch (err: any) {
       this.submitError.set(err.message || 'Error al crear la reserva');
     } finally {

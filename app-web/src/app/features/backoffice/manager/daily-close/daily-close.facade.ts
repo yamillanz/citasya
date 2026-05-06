@@ -1,6 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Appointment, AppointmentStatus } from '../../../../core/models/appointment.model';
 import { AppointmentService } from '../../../../core/services/appointment.service';
+import { EmailNotificationService } from '../../../../core/services/email-notification.service';
 import { DailyCloseService } from '../../../../core/services/daily-close.service';
 import { CompanyService } from '../../../../core/services/company.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -37,6 +38,7 @@ export class DailyCloseFacade {
   private companyService = inject(CompanyService);
   private authService = inject(AuthService);
   private serviceService = inject(ServiceService);
+  private emailNotificationService = inject(EmailNotificationService);
 
   // State signals
   private readonly _appointments = signal<AppointmentWithRelations[]>([]);
@@ -265,6 +267,8 @@ export class DailyCloseFacade {
     this._appointments.update(apps =>
       apps.map(a => a.id === appointmentId ? { ...a, status: 'no_show' as AppointmentStatus } : a)
     );
+
+    this.emailNotificationService.notify(appointmentId, 'no_show');
   }
 
   async cancelAppointment(appointmentId: string): Promise<void> {
@@ -273,6 +277,8 @@ export class DailyCloseFacade {
     this._appointments.update(apps =>
       apps.map(a => a.id === appointmentId ? { ...a, status: 'cancelled' as AppointmentStatus } : a)
     );
+
+    this.emailNotificationService.notify(appointmentId, 'cancelled');
   }
 
   async generateDailyClose(): Promise<void> {

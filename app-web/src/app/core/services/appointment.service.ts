@@ -137,7 +137,8 @@ export class AppointmentService {
         appointment_date: appointment.appointment_date,
         appointment_time: appointment.appointment_time,
         notes: appointment.notes,
-        status: 'pending'
+        status: 'pending',
+        cancellation_token: crypto.randomUUID()
       })
       .select()
       .single();

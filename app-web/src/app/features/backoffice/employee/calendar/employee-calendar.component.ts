@@ -9,6 +9,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
 import { CompanyService } from '../../../../core/services/company.service';
+import { EmailNotificationService } from '../../../../core/services/email-notification.service';
 import { User } from '../../../../core/models/user.model';
 import { Appointment } from '../../../../core/models/appointment.model';
 import { SharedCalendarComponent, AppointmentWithService } from '../../../../shared/components/calendar/calendar.component';
@@ -38,6 +39,7 @@ export class EmployeeCalendarComponent implements OnInit {
   private companyService = inject(CompanyService);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
+  private emailNotificationService = inject(EmailNotificationService);
 
   user = signal<User | null>(null);
   appointments = signal<Appointment[]>([]);
@@ -138,6 +140,7 @@ export class EmployeeCalendarComponent implements OnInit {
     this.cancellingAppointment.set(true);
     try {
       await this.appointmentService.cancel(apt.id);
+      this.emailNotificationService.notify(apt.id, 'cancelled');
       this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Cita cancelada correctamente' });
       await this.loadAppointments();
       this.closeDetailsDialog();
