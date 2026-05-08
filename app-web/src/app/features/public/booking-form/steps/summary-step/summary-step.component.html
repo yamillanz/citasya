@@ -72,12 +72,12 @@
     
     <div class="step-actions">
       @if (isOpenMode()) {
-        <button type="button" class="btn-secondary" (click)="goBack.emit()" style="margin-right: auto;">
+        <button type="button" class="btn-secondary btn-back" (click)="goBack.emit()">
           <i class="pi pi-arrow-left" aria-hidden="true"></i>
           <span>Volver</span>
         </button>
       }
-      <button class="btn-primary" (click)="continue.emit()" style="margin-left: auto;">
+      <button class="btn-primary btn-continue" (click)="continue.emit()">
         <span>Continuar</span>
         <i class="pi pi-arrow-right"></i>
       </button>

@@ -70,5 +70,9 @@ export class ContactFormStepComponent {
 
     this.isSubmitting = true;
     this.submit.emit();
+
+    setTimeout(() => {
+      this.isSubmitting = false;
+    }, 1000);
   }
 }

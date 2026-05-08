@@ -159,3 +159,35 @@
     opacity: 1;
   }
 }
+
+.step-actions {
+  display: flex;
+  gap: var(--space-md);
+  padding-top: var(--space-sm);
+
+  &.two-buttons {
+    .btn-secondary {
+      flex: 0 0 auto;
+    }
+
+    .btn-primary {
+      flex: 1;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .contact-form {
+    padding: var(--space-lg);
+    gap: var(--space-md);
+  }
+
+  .step-actions.two-buttons {
+    flex-direction: column;
+
+    .btn-secondary,
+    .btn-primary {
+      width: 100%;
+    }
+  }
+}

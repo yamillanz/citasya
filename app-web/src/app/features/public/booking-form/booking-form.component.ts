@@ -89,6 +89,7 @@ export class BookingFormComponent implements OnInit {
   success = signal(false);
   currentStep = signal(0);
   submitError = signal('');
+  initialLoading = signal(true);
 
   totalDuration = computed(() => calculateTotalDuration(this.selectedServices()));
 
@@ -133,6 +134,7 @@ export class BookingFormComponent implements OnInit {
 
     if (!slug || !employeeId) {
       this.error.set('Parámetros incompletos');
+      this.initialLoading.set(false);
       return;
     }
 
@@ -142,6 +144,7 @@ export class BookingFormComponent implements OnInit {
 
       if (!company || !employee) {
         this.error.set('Datos no encontrados');
+        this.initialLoading.set(false);
         return;
       }
 
@@ -162,6 +165,8 @@ export class BookingFormComponent implements OnInit {
       }
     } catch (err) {
       this.error.set('Error al cargar los datos');
+    } finally {
+      this.initialLoading.set(false);
     }
   }
 

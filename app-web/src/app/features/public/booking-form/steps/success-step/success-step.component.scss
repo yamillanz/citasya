@@ -20,6 +20,22 @@
       animation: checkDraw 0.5s ease-out 0.2s both;
     }
   }
+
+  .success-bg {
+    fill: var(--color-sage-pale);
+  }
+
+  .success-ring {
+    stroke: var(--color-sage);
+    stroke-width: 3;
+  }
+
+  .success-check {
+    stroke: var(--color-sage);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
 }
 
 @keyframes checkDraw {
@@ -127,10 +143,10 @@
   justify-content: center;
   gap: var(--space-sm);
   padding: var(--space-md);
-  background: rgba(59, 156, 236, 0.1);
+  background: var(--color-sage-pale);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-xl);
-  color: #3b9df5;
+  color: var(--color-sage-dark);
   font-size: 0.875rem;
   
   i {
@@ -169,5 +185,19 @@
   
   &:hover i {
     transform: translateX(4px);
+  }
+}
+
+@media (max-width: 640px) {
+  .success-card {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .success-card h2 {
+    font-size: 1.25rem;
+  }
+
+  .confirmation-details {
+    padding: var(--space-md);
   }
 }

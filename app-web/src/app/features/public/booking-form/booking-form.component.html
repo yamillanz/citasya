@@ -8,11 +8,18 @@
     <div class="logo">
         <svg width="140" height="36" viewBox="0 0 145 38" fill="none">
           <text x="0" y="28" font-family="'Fraunces', Georgia, serif" font-size="20" font-weight="600" letter-spacing="-0.5">
-            <tspan fill="#9DC183">holacitas</tspan><tspan fill="#5D6D7E">.app</tspan>
+            <tspan class="logo-primary">holacitas</tspan><tspan class="logo-secondary">.app</tspan>
           </text>
         </svg>
     </div>
   </header>
+
+  @if (initialLoading()) {
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando...</p>
+    </div>
+  }
 
   @if (error() && !company()) {
     <div class="error-state">
