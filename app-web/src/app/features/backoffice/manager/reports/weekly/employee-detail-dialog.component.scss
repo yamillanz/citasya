@@ -1,7 +1,15 @@
 .dialog-header {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+
+  .dialog-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
 
   h2 {
     margin: 0;
@@ -14,6 +22,26 @@
   .dialog-subtitle {
     color: var(--color-text-secondary);
     font-size: 0.875rem;
+  }
+
+  .dialog-close-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+    flex-shrink: 0;
+  }
+
+  .dialog-close-btn:hover {
+    background: var(--color-sage-pale);
+    color: var(--color-text-primary);
   }
 }
 

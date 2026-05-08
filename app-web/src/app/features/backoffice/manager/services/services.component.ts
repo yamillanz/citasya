@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
 import { ConfirmationService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
@@ -19,10 +19,8 @@ import { Service } from '../../../../core/models/service.model';
     RouterLink,
     FormsModule,
     ButtonModule,
-    ConfirmDialogModule,
     TooltipModule
   ],
-  providers: [ConfirmationService],
   templateUrl: './services.component.html',
   styleUrl: './services.component.scss'
 })

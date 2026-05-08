@@ -248,7 +248,8 @@
   [(visible)]="showStatusDialog" 
   position="right"
   [style]="{ width: '400px' }"
-  styleClass="status-drawer">
+  styleClass="status-drawer"
+  [closable]="false">
   <ng-template pTemplate="header">
     <div class="drawer-header">
       <div class="drawer-icon" [class]="statusAction()">
@@ -258,6 +259,9 @@
         <h3>{{ getDrawerTitle() }}</h3>
         <p>{{ $any(selectedAppointment())?.client_name }}</p>
       </div>
+      <button class="drawer-close-btn" (click)="closeDrawer()" type="button" aria-label="Cerrar drawer">
+        <i class="pi pi-times"></i>
+      </button>
     </div>
   </ng-template>
   

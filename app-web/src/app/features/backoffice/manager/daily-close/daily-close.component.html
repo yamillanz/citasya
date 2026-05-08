@@ -293,8 +293,15 @@
   [modal]="true"
   position="right"
   styleClass="amount-drawer"
-  [showCloseIcon]="true"
-  header="Completar Cita">
+  [closable]="false">
+  <ng-template pTemplate="header">
+    <div class="drawer-header-with-close">
+      <span class="drawer-title-text">Completar Cita</span>
+      <button class="drawer-close-btn" (click)="closeDrawer()" type="button" aria-label="Cerrar drawer">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </ng-template>
   
   @if (selectedAppointment()) {
     <div class="drawer-content">
@@ -351,5 +358,3 @@
     </div>
   }
 </p-drawer>
-
-<p-confirmDialog header="Confirmar acción" icon="pi pi-exclamation-triangle"></p-confirmDialog>

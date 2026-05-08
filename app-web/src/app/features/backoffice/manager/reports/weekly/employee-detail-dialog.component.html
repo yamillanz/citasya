@@ -4,15 +4,21 @@
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
+  [closable]="false"
   [style]="{ width: '90vw', maxWidth: '900px' }"
   [header]="employeeName + ' — Detalle Semanal'">
 
   <ng-template pTemplate="header">
     <div class="dialog-header">
-      <h2>{{ employeeName }}</h2>
-      <span class="dialog-subtitle">
-        {{ startDate | date:'dd MMM yyyy' }} — {{ endDate | date:'dd MMM yyyy' }}
-      </span>
+      <div class="dialog-header-text">
+        <h2>{{ employeeName }}</h2>
+        <span class="dialog-subtitle">
+          {{ startDate | date:'dd MMM yyyy' }} — {{ endDate | date:'dd MMM yyyy' }}
+        </span>
+      </div>
+      <button class="dialog-close-btn" (click)="closeDialog()" type="button" aria-label="Cerrar dialog">
+        <i class="pi pi-times"></i>
+      </button>
     </div>
   </ng-template>
 

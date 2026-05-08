@@ -1,10 +1,18 @@
 <p-dialog
-  header="Nueva Cita"
   [modal]="true"
   [visible]="visible()"
   [draggable]="false"
+  [closable]="false"
   styleClass="create-appointment-dialog"
   (onHide)="close()">
+  <ng-template pTemplate="header">
+    <div class="dialog-header-with-close">
+      <span class="dialog-title-text">Nueva Cita</span>
+      <button class="dialog-close-btn" (click)="close()" type="button" aria-label="Cerrar dialog">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </ng-template>
 
   <ng-template pTemplate="content">
     <form [formGroup]="form" class="create-form">

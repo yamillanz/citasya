@@ -7,7 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { PlanService } from '../../../../core/services/plan.service';
@@ -26,13 +26,11 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
     InputNumberModule,
     TagModule,
     DialogModule,
-    ConfirmDialogModule,
     SkeletonModule,
     EmptyStateComponent
   ],
   templateUrl: './superadmin-plans.component.html',
   styleUrl: './superadmin-plans.component.scss',
-  providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SuperadminPlansComponent implements OnInit {
