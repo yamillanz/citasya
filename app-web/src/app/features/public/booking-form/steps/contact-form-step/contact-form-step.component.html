@@ -6,11 +6,11 @@
     
     <form [formGroup]="bookingForm()" (ngSubmit)="onSubmit()" class="contact-form">
       <div class="form-field" [class.has-error]="getError('client_name')">
+        <label for="client_name">
+          <i class="pi pi-user" aria-hidden="true"></i>
+          <span>Nombre completo *</span>
+        </label>
         <div class="input-wrapper">
-          <label for="client_name">
-            <i class="pi pi-user" aria-hidden="true"></i>
-            <span>Nombre completo *</span>
-          </label>
           <input 
             id="client_name" 
             type="text" 
@@ -34,11 +34,11 @@
       </div>
 
       <div class="form-field">
+        <label for="client_phone">
+          <i class="pi pi-phone" aria-hidden="true"></i>
+          <span>Teléfono</span>
+        </label>
         <div class="input-wrapper">
-          <label for="client_phone">
-            <i class="pi pi-phone" aria-hidden="true"></i>
-            <span>Teléfono</span>
-          </label>
           <input 
             id="client_phone" 
             type="tel" 
@@ -69,11 +69,11 @@
       }
 
       <div class="form-field">
+        <label for="client_email">
+          <i class="pi pi-envelope" aria-hidden="true"></i>
+          <span>Email</span>
+        </label>
         <div class="input-wrapper">
-          <label for="client_email">
-            <i class="pi pi-envelope" aria-hidden="true"></i>
-            <span>Email</span>
-          </label>
           <input 
             id="client_email" 
             type="email" 

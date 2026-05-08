@@ -1,3 +1,30 @@
+.step-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: var(--space-xl);
+  background: linear-gradient(135deg, rgba(157, 193, 131, 0.08) 0%, rgba(157, 193, 131, 0.02) 100%);
+  border-bottom: 1px solid var(--color-border);
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-xs);
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+}
+
 .selection-content {
   padding: var(--space-xl);
   display: flex;
