@@ -2,17 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ContactFormStepComponent } from './contact-form-step.component';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-
-function atLeastOneContactValidator() {
-  return (control: any) => {
-    const phone = control.get('client_phone')?.value;
-    const email = control.get('client_email')?.value;
-    if (!phone?.trim() && !email?.trim()) return { noContact: true };
-    const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
-    if (cleanPhone && cleanPhone.length < 12) return { invalidPhone: true };
-    return null;
-  };
-}
+import { atLeastOneContactValidator } from '../../booking-form.component';
 
 describe('ContactFormStepComponent', () => {
   let component: ContactFormStepComponent;
@@ -91,7 +81,7 @@ describe('ContactFormStepComponent', () => {
   });
 
   describe('hasInvalidPhoneError', () => {
-    it('debe ser true cuando el teléfono tiene menos de 12 dígitos', () => {
+    it('debe ser true cuando el teléfono tiene menos de 10 dígitos', () => {
       component.bookingForm().patchValue({ client_name: 'Juan', client_phone: '04143333' });
       component.bookingForm().updateValueAndValidity();
       fixture.detectChanges();

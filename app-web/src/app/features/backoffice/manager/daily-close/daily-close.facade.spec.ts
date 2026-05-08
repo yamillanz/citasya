@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { DailyCloseFacade, Employee, AppointmentWithRelations } from './daily-close.facade';
+import { DailyCloseFacade, Employee, AppointmentWithRelations, calculateDayStats, calculateEmployeeStats, DayStats } from './daily-close.facade';
 import { AppointmentService } from '../../../../core/services/appointment.service';
 import { DailyCloseService } from '../../../../core/services/daily-close.service';
 import { CompanyService } from '../../../../core/services/company.service';
@@ -7,6 +7,118 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { ServiceService } from '../../../../core/services/service.service';
 import { User } from '../../../../core/models/user.model';
 import { AppointmentStatus } from '../../../../core/models/appointment.model';
+
+const createMockAppointment = (overrides: Partial<AppointmentWithRelations> = {}): AppointmentWithRelations => ({
+  id: 'apt-1',
+  client_name: 'Cliente Uno',
+  appointment_date: '2026-03-20',
+  appointment_time: '10:00',
+  status: 'completed' as AppointmentStatus,
+  amount_collected: 25,
+  employee_id: 'emp-1',
+  service_id: 'srv-1',
+  company_id: 'company-1',
+  service: { name: 'Corte de cabello' },
+  employee: { full_name: 'Juan Pérez' },
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  notes: '',
+  cancellation_token: '',
+  client_phone: '',
+  client_email: '',
+  ...overrides
+});
+
+describe('Pure Functions', () => {
+  describe('calculateDayStats', () => {
+    it('should return zeros for empty array', () => {
+      const stats = calculateDayStats([]);
+      expect(stats.totalAppointments).toBe(0);
+      expect(stats.totalAmount).toBe(0);
+      expect(stats.completedCount).toBe(0);
+      expect(stats.pendingCount).toBe(0);
+    });
+
+    it('should calculate stats with single pass for mixed appointments', () => {
+      const apps = [
+        createMockAppointment({ status: 'completed', amount_collected: 25 }),
+        createMockAppointment({ status: 'completed', amount_collected: 50 }),
+        createMockAppointment({ status: 'pending' }),
+      ];
+      const stats = calculateDayStats(apps);
+      expect(stats.totalAppointments).toBe(3);
+      expect(stats.completedCount).toBe(2);
+      expect(stats.pendingCount).toBe(1);
+      expect(stats.totalAmount).toBe(75);
+    });
+
+    it('should treat undefined amount_collected as 0', () => {
+      const apps = [
+        createMockAppointment({ status: 'completed', amount_collected: undefined }),
+      ];
+      const stats = calculateDayStats(apps);
+      expect(stats.totalAmount).toBe(0);
+    });
+
+    it('should calculate stats for solo completed appointments', () => {
+      const apps = [
+        createMockAppointment({ status: 'completed', amount_collected: 100 }),
+        createMockAppointment({ status: 'completed', amount_collected: 200 }),
+      ];
+      const stats = calculateDayStats(apps);
+      expect(stats.totalAppointments).toBe(2);
+      expect(stats.completedCount).toBe(2);
+      expect(stats.pendingCount).toBe(0);
+      expect(stats.totalAmount).toBe(300);
+    });
+  });
+
+  describe('calculateEmployeeStats', () => {
+    it('should return empty map for empty array', () => {
+      const stats = calculateEmployeeStats([]);
+      expect(stats.size).toBe(0);
+    });
+
+    it('should calculate stats per employee', () => {
+      const apps = [
+        createMockAppointment({ employee_id: 'emp-1', status: 'completed', amount_collected: 25 }),
+        createMockAppointment({ employee_id: 'emp-2', status: 'completed', amount_collected: 50 }),
+        createMockAppointment({ employee_id: 'emp-1', status: 'pending' }),
+      ];
+      const stats = calculateEmployeeStats(apps);
+      expect(stats.size).toBe(2);
+      expect(stats.get('emp-1')?.totalAppointments).toBe(2);
+      expect(stats.get('emp-1')?.totalAmount).toBe(25);
+      expect(stats.get('emp-1')?.completedCount).toBe(1);
+      expect(stats.get('emp-1')?.pendingCount).toBe(1);
+      expect(stats.get('emp-2')?.totalAmount).toBe(50);
+    });
+
+    it('should treat undefined amount_collected as 0', () => {
+      const apps = [
+        createMockAppointment({ employee_id: 'emp-1', status: 'completed', amount_collected: undefined }),
+      ];
+      const stats = calculateEmployeeStats(apps);
+      expect(stats.get('emp-1')?.totalAmount).toBe(0);
+    });
+
+    it('should handle multiple employees with mixed statuses', () => {
+      const apps = [
+        createMockAppointment({ employee_id: 'emp-1', status: 'completed', amount_collected: 30 }),
+        createMockAppointment({ employee_id: 'emp-1', status: 'completed', amount_collected: 20 }),
+        createMockAppointment({ employee_id: 'emp-2', status: 'pending' }),
+        createMockAppointment({ employee_id: 'emp-2', status: 'no_show' }),
+      ];
+      const stats = calculateEmployeeStats(apps);
+      expect(stats.get('emp-1')?.totalAppointments).toBe(2);
+      expect(stats.get('emp-1')?.completedCount).toBe(2);
+      expect(stats.get('emp-1')?.totalAmount).toBe(50);
+      expect(stats.get('emp-2')?.totalAppointments).toBe(2);
+      expect(stats.get('emp-2')?.pendingCount).toBe(1);
+      expect(stats.get('emp-2')?.totalAmount).toBe(0);
+    });
+  });
+});
 
 describe('DailyCloseFacade', () => {
   let facade: DailyCloseFacade;
@@ -32,27 +144,6 @@ describe('DailyCloseFacade', () => {
     name: 'Peluquería Test',
     slug: 'peluqueria-test'
   };
-
-  const createMockAppointment = (overrides: Partial<AppointmentWithRelations> = {}): AppointmentWithRelations => ({
-    id: 'apt-1',
-    client_name: 'Cliente Uno',
-    appointment_date: '2026-03-20',
-    appointment_time: '10:00',
-    status: 'completed' as AppointmentStatus,
-    amount_collected: 25,
-    employee_id: 'emp-1',
-    service_id: 'srv-1',
-    company_id: 'company-1',
-    service: { name: 'Corte de cabello' },
-    employee: { full_name: 'Juan Pérez' },
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    notes: '',
-    cancellation_token: '',
-    client_phone: '',
-    client_email: '',
-    ...overrides
-  });
 
   const mockAppointments: AppointmentWithRelations[] = [
     createMockAppointment({ id: 'apt-1', status: 'completed', amount_collected: 25, employee_id: 'emp-1', employee: { full_name: 'Juan Pérez' } }),

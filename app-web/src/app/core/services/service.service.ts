@@ -112,4 +112,26 @@ export class ServiceService {
     
     if (error) throw error;
   }
+
+  async syncEmployeeServices(employeeId: string, serviceIds: string[]): Promise<void> {
+    const { error: deleteError } = await this.supabase
+      .from('employee_services')
+      .delete()
+      .eq('employee_id', employeeId);
+
+    if (deleteError) throw deleteError;
+
+    if (serviceIds.length === 0) return;
+
+    const rows = serviceIds.map(service_id => ({
+      employee_id: employeeId,
+      service_id
+    }));
+
+    const { error: insertError } = await this.supabase
+      .from('employee_services')
+      .insert(rows);
+
+    if (insertError) throw insertError;
+  }
 }

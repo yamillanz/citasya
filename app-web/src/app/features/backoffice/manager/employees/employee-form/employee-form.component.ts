@@ -96,7 +96,8 @@ export class EmployeeFormComponent implements OnInit {
           photo_url: employee.photo_url || ''
         });
         this.editingRole.set(employee.role);
-        // TODO: Load assigned services
+        const assignedServices = await this.serviceService.getByEmployee(this.employeeId());
+        this.selectedServices.set(assignedServices.map(s => s.id));
       } else {
         this.messageService.add({
           severity: 'error',
@@ -153,6 +154,7 @@ export class EmployeeFormComponent implements OnInit {
           data.role = role;
         }
         await this.userService.update(this.employeeId(), data);
+        await this.serviceService.syncEmployeeServices(this.employeeId(), this.selectedServices());
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
@@ -161,7 +163,8 @@ export class EmployeeFormComponent implements OnInit {
       } else {
         data.role = 'employee' as UserRole;
         data.company_id = this.companyId();
-        await this.userService.create(data);
+        const newEmployee = await this.userService.create(data);
+        await this.serviceService.syncEmployeeServices(newEmployee.id, this.selectedServices());
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',

@@ -29,7 +29,7 @@ import { SummaryStepComponent } from './steps/summary-step/summary-step.componen
 import { ContactFormStepComponent } from './steps/contact-form-step/contact-form-step.component';
 import { SuccessStepComponent } from './steps/success-step/success-step.component';
 
-function atLeastOneContactValidator(): ValidatorFn {
+export function atLeastOneContactValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const group = control as FormGroup;
     const phone = group.get('client_phone')?.value;
@@ -40,7 +40,7 @@ function atLeastOneContactValidator(): ValidatorFn {
     }
 
     const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
-    if (cleanPhone && cleanPhone.length < 12) {
+    if (cleanPhone && cleanPhone.length < 10) {
       return { invalidPhone: true };
     }
 
@@ -233,12 +233,6 @@ export class BookingFormComponent implements OnInit {
     const phoneRaw = this.bookingForm.value.client_phone?.trim() || '';
     const phone = phoneRaw.replace(/\D/g, '') || undefined;
     const email = this.bookingForm.value.client_email?.trim() || undefined;
-
-    if (!email && phone && phone.length < 12) {
-      this.submitError.set('El teléfono debe tener al menos 12 dígitos si no proporcionas email');
-      this.loading.set(false);
-      return;
-    }
 
     try {
       const newAppointment = await this.appointmentService.create({

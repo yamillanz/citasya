@@ -85,7 +85,9 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
     } as any;
 
     serviceServiceMock = {
-      getByCompany: jest.fn().mockResolvedValue(mockServices)
+      getByCompany: jest.fn().mockResolvedValue(mockServices),
+      getByEmployee: jest.fn().mockResolvedValue(mockServices),
+      syncEmployeeServices: jest.fn().mockResolvedValue(undefined)
     } as any;
   }));
 
@@ -195,6 +197,30 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
 
       expect(router.navigate).toHaveBeenCalledWith(['/bo/employees']);
     });
+
+    it('should sync selected services after creating employee', async () => {
+      component.form.patchValue({
+        email: 'new@test.com',
+        full_name: 'New Employee'
+      });
+      component.onServiceToggle('srv-1');
+      component.onServiceToggle('srv-2');
+
+      await component.onSubmit();
+
+      expect(serviceServiceMock.syncEmployeeServices).toHaveBeenCalledWith('new-emp', ['srv-1', 'srv-2']);
+    });
+
+    it('should sync empty services when none selected on create', async () => {
+      component.form.patchValue({
+        email: 'new@test.com',
+        full_name: 'New Employee'
+      });
+
+      await component.onSubmit();
+
+      expect(serviceServiceMock.syncEmployeeServices).toHaveBeenCalledWith('new-emp', []);
+    });
   });
 
   describe('when editing an existing employee', () => {
@@ -248,6 +274,27 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
       await component.onSubmit();
 
       expect(userServiceMock.update).toHaveBeenCalledWith('emp-1', expect.any(Object));
+    });
+
+    it('should load assigned services when editing employee', async () => {
+      await component.ngOnInit();
+
+      expect(serviceServiceMock.getByEmployee).toHaveBeenCalledWith('emp-1');
+    });
+
+    it('should populate selectedServices from loaded employee services', async () => {
+      await component.ngOnInit();
+
+      expect(component.selectedServices()).toEqual(['srv-1', 'srv-2']);
+    });
+
+    it('should sync selected services after updating employee', async () => {
+      await component.ngOnInit();
+
+      component.onServiceToggle('srv-1');
+      await component.onSubmit();
+
+      expect(serviceServiceMock.syncEmployeeServices).toHaveBeenCalledWith('emp-1', ['srv-2']);
     });
 
     it('should navigate to employees list after update', async () => {
@@ -333,6 +380,21 @@ describe('EmployeeFormComponent - Behavior Driven Tests', () => {
       await component.ngOnInit();
 
       expect(component.editingRole()).toBe('manager');
+    });
+
+    it('should load assigned services for manager with can_be_employee', async () => {
+      await component.ngOnInit();
+
+      expect(serviceServiceMock.getByEmployee).toHaveBeenCalledWith('mgr-1');
+    });
+
+    it('should sync services when updating manager with can_be_employee', async () => {
+      await component.ngOnInit();
+
+      component.onServiceToggle('srv-2');
+      await component.onSubmit();
+
+      expect(serviceServiceMock.syncEmployeeServices).toHaveBeenCalledWith('mgr-1', ['srv-1']);
     });
 
     it('should show manager-specific success message after update', async () => {
