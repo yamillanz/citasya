@@ -545,6 +545,27 @@ a {
   gap: var(--space-md);
 }
 
+.status-drawer .drawer-close-btn {
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+  flex-shrink: 0;
+}
+
+.status-drawer .drawer-close-btn:hover {
+  background: var(--color-sage-pale);
+  color: var(--color-text-primary);
+}
+
 .status-drawer .drawer-icon {
   width: 48px;
   height: 48px;
