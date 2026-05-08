@@ -8,7 +8,7 @@ import { PasswordModule } from 'primeng/password';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
 import { SkeletonModule } from 'primeng/skeleton';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
@@ -38,7 +38,6 @@ interface UserWithCompany extends User {
     TagModule,
     DialogModule,
     SelectModule,
-    ConfirmDialogModule,
     SkeletonModule,
     CheckboxModule,
     TooltipModule,
@@ -46,7 +45,6 @@ interface UserWithCompany extends User {
   ],
   templateUrl: './central-management.component.html',
   styleUrl: './central-management.component.scss',
-  providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CentralManagementComponent implements OnInit {

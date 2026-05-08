@@ -9,7 +9,7 @@ import { MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { DrawerModule } from 'primeng/drawer';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
 import { TooltipModule } from 'primeng/tooltip';
 import { DailyCloseFacade, Employee, AppointmentWithRelations } from './daily-close.facade';
 import { CONFIRMATION_DIALOG } from '../../../../core/tokens/confirmation-dialog.token';
@@ -28,7 +28,6 @@ import { IConfirmationDialog } from '../../../../core/interfaces/confirmation-di
     InputTextModule,
     DrawerModule,
     InputNumberModule,
-    ConfirmDialogModule,
     TooltipModule
   ],
   templateUrl: './daily-close.component.html',
