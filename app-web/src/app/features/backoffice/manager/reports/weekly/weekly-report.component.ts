@@ -9,7 +9,6 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 import { SkeletonModule } from 'primeng/skeleton';
-import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { WeeklyReportService } from '../../../../../core/services/weekly-report.service';
@@ -42,13 +41,11 @@ import { EmployeeDetailDialogComponent } from './employee-detail-dialog.componen
     TagModule,
     DialogModule,
     SkeletonModule,
-    ToastModule,
     EmployeeDetailDialogComponent
   ],
   templateUrl: './weekly-report.component.html',
   styleUrl: './weekly-report.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [MessageService]
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WeeklyReportComponent implements OnInit {
   private authService = inject(AuthService);

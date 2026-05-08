@@ -6,7 +6,6 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { ServiceService } from '../../../../../core/services/service.service';
@@ -21,10 +20,8 @@ import { ServiceService } from '../../../../../core/services/service.service';
     CardModule,
     ButtonModule,
     InputTextModule,
-    InputNumberModule,
-    ToastModule
+    InputNumberModule
   ],
-  providers: [MessageService],
   templateUrl: './service-form.component.html',
   styleUrl: './service-form.component.scss'
 })

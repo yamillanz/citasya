@@ -6,7 +6,6 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
 import { CheckboxModule } from 'primeng/checkbox';
-import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Service } from '../../../../core/models/service.model';
 import { Appointment, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../../core/models/appointment.model';
@@ -25,8 +24,7 @@ type AppointmentWithService = Appointment;
     ButtonModule,
     TagModule,
     CardModule,
-    CheckboxModule,
-    ToastModule
+    CheckboxModule
   ],
   templateUrl: './appointment-detail-dialog.component.html',
   styleUrl: './appointment-detail-dialog.component.scss',

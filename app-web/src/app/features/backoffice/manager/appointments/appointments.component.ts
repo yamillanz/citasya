@@ -6,7 +6,6 @@ import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DrawerModule } from 'primeng/drawer';
-import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -37,10 +36,8 @@ interface DateGroup {
     DatePickerModule,
     InputNumberModule,
     DrawerModule,
-    ToastModule,
     TooltipModule
   ],
-  providers: [MessageService],
   templateUrl: './appointments.component.html',
   styleUrl: './appointments.component.scss'
 })

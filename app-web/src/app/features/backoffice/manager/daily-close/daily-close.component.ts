@@ -5,13 +5,12 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TableModule } from 'primeng/table';
-import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { DrawerModule } from 'primeng/drawer';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
 import { DailyCloseFacade, Employee, AppointmentWithRelations } from './daily-close.facade';
 import { CONFIRMATION_DIALOG } from '../../../../core/tokens/confirmation-dialog.token';
 import { IConfirmationDialog } from '../../../../core/interfaces/confirmation-dialog.interface';
@@ -26,15 +25,11 @@ import { IConfirmationDialog } from '../../../../core/interfaces/confirmation-di
     ButtonModule,
     DatePickerModule,
     TableModule,
-    ToastModule,
     InputTextModule,
     DrawerModule,
     InputNumberModule,
     ConfirmDialogModule,
     TooltipModule
-  ],
-  providers: [
-    MessageService
   ],
   templateUrl: './daily-close.component.html',
   styleUrl: './daily-close.component.scss'

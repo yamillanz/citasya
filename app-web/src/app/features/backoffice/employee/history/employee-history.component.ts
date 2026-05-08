@@ -8,7 +8,6 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { InputTextModule } from 'primeng/inputtext';
-import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
@@ -32,7 +31,6 @@ type AppointmentWithService = Appointment;
     ButtonModule,
     TagModule,
     InputTextModule,
-    ToastModule,
     AppointmentDetailDialogComponent
   ],
   templateUrl: './employee-history.component.html',

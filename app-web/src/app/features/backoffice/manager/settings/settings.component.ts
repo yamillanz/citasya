@@ -4,7 +4,6 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CompanyService } from '../../../../core/services/company.service';
@@ -39,10 +38,8 @@ const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
     FormsModule,
     RouterLink,
     ButtonModule,
-    InputTextModule,
-    ToastModule
+    InputTextModule
   ],
-  providers: [MessageService],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })

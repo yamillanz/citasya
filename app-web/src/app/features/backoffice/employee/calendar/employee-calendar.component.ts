@@ -4,7 +4,6 @@ import { DialogModule } from 'primeng/dialog';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
@@ -25,7 +24,6 @@ import { AppointmentCreateDialogComponent } from './appointment-create-dialog.co
     TagModule,
     ButtonModule,
     TooltipModule,
-    ToastModule,
     SharedCalendarComponent,
     AppointmentDetailDialogComponent,
     AppointmentCreateDialogComponent

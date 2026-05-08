@@ -105,7 +105,7 @@ describe('CentralManagementComponent - Behavior Driven Tests', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).overrideComponent(CentralManagementComponent, {
-      remove: { providers: [MessageService, ConfirmationService] }
+      remove: { providers: [ConfirmationService] }
     }).compileComponents();
 
     fixture = TestBed.createComponent(CentralManagementComponent);

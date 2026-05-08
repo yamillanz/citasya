@@ -6,7 +6,6 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
-import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { UserService } from '../../../../../core/services/user.service';
@@ -25,10 +24,8 @@ import { Service } from '../../../../../core/models/service.model';
     CardModule,
     ButtonModule,
     InputTextModule,
-    CheckboxModule,
-    ToastModule
+    CheckboxModule
   ],
-  providers: [MessageService],
   templateUrl: './employee-form.component.html',
   styleUrl: './employee-form.component.scss'
 })

@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -21,10 +20,9 @@ import { Service } from '../../../../core/models/service.model';
     FormsModule,
     ButtonModule,
     ConfirmDialogModule,
-    ToastModule,
     TooltipModule
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService],
   templateUrl: './services.component.html',
   styleUrl: './services.component.scss'
 })

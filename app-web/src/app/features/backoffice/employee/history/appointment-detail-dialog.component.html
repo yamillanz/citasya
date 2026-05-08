@@ -6,8 +6,6 @@
   [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
   (onHide)="onClose.emit(); isEditingServices.set(false)">
   
-  <p-toast position="top-right"></p-toast>
-
   <ng-template pTemplate="content">
     @if (appointment()) {
       <div class="appointment-detail">

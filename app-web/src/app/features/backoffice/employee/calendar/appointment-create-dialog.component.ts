@@ -6,7 +6,6 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
-import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Service } from '../../../../core/models/service.model';
 import { calculateTotalDuration } from '../../../../core/models/appointment.model';
@@ -24,8 +23,7 @@ import { ServiceService } from '../../../../core/services/service.service';
     ButtonModule,
     InputTextModule,
     SelectModule,
-    CheckboxModule,
-    ToastModule
+    CheckboxModule
   ],
   templateUrl: './appointment-create-dialog.component.html',
   styleUrl: './appointment-create-dialog.component.scss',
