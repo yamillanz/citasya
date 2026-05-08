@@ -1,0 +1,76 @@
+<div class="step-card">
+  <div class="card-header">
+    <h2>Reserva tu cita</h2>
+    <p>Selecciona el servicio, fecha y hora</p>
+  </div>
+  
+  <div class="selection-content" [formGroup]="selectionForm()">
+    <div class="form-field">
+      <label for="service_id">
+        <i class="pi pi-tag" aria-hidden="true"></i>
+        <span>Servicio *</span>
+      </label>
+      <select 
+        id="service_id"
+        formControlName="service_id"
+        class="native-select">
+        <option value="">Selecciona un servicio</option>
+        @for (svc of services(); track svc.id) {
+          <option [value]="svc.id">
+            {{ svc.name }} ({{ svc.duration_minutes }} min)
+          </option>
+        }
+      </select>
+      @if (selectionForm().get('service_id')?.touched && selectionForm().get('service_id')?.invalid) {
+        <small class="field-error">
+          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          Debes seleccionar un servicio
+        </small>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="appointment_date">
+        <i class="pi pi-calendar" aria-hidden="true"></i>
+        <span>Fecha *</span>
+      </label>
+      <input 
+        id="appointment_date" 
+        type="date" 
+        formControlName="appointment_date"
+        [min]="minDate()"
+        class="native-input">
+      @if (selectionForm().get('appointment_date')?.touched && selectionForm().get('appointment_date')?.invalid) {
+        <small class="field-error">
+          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          Debes seleccionar una fecha
+        </small>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="appointment_time">
+        <i class="pi pi-clock" aria-hidden="true"></i>
+        <span>Hora *</span>
+      </label>
+      <input 
+        id="appointment_time" 
+        type="time" 
+        formControlName="appointment_time"
+        class="native-input">
+      @if (selectionForm().get('appointment_time')?.touched && selectionForm().get('appointment_time')?.invalid) {
+        <small class="field-error">
+          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          Debes seleccionar una hora
+        </small>
+      }
+    </div>
+  </div>
+
+  <div class="step-actions">
+    <button class="btn-primary" (click)="onProceed()" [disabled]="!canProceed()">
+      <span>Continuar</span>
+      <i class="pi pi-arrow-right"></i>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,140 @@
+.summary-content {
+  padding: var(--space-lg);
+}
+
+.summary-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--transition-smooth);
+  
+  &:last-of-type {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    background-color: var(--color-sage-pale);
+    border-radius: var(--radius-md);
+    margin: 0 calc(var(--space-md) * -1);
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+  }
+}
+
+.summary-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-sage-pale) 0%, rgba(157, 193, 131, 0.1) 100%);
+  color: var(--color-sage-dark);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  transition: transform var(--transition-smooth);
+  
+  i {
+    font-size: 1.125rem;
+  }
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+  
+  &.employee {
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 1.125rem;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  
+  &.datetime, &.company {
+    i {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+.summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+  
+  .summary-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+  }
+  
+  .summary-value {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: 1rem;
+  }
+  
+  .summary-meta {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+  }
+}
+
+.services-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.service-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  
+  .service-name {
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+  
+  .service-duration {
+    color: var(--color-text-secondary);
+  }
+  
+  .service-price {
+    font-weight: 600;
+    color: var(--color-sage-dark);
+  }
+}
+
+.services-totals {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border);
+  
+  .total-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    
+    i {
+      font-size: 0.75rem;
+      color: var(--color-sage);
+    }
+  }
+}

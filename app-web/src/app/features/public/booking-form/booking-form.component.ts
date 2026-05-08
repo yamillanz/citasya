@@ -10,8 +10,6 @@ import {
   AbstractControl,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
@@ -20,12 +18,16 @@ import { EmailNotificationService } from '../../../core/services/email-notificat
 import { Company } from '../../../core/models/company.model';
 import { User } from '../../../core/models/user.model';
 import { Service } from '../../../core/models/service.model';
-import { fadeInUp, stepComplete, fadeIn, shakeError } from './booking-form.animations';
 import {
   calculateTotalDuration,
   calculateTotalPrice,
   formatServicesList,
 } from '../../../core/models/appointment.model';
+import { fadeInUp } from './booking-form.animations';
+import { SelectionStepComponent } from './steps/selection-step/selection-step.component';
+import { SummaryStepComponent } from './steps/summary-step/summary-step.component';
+import { ContactFormStepComponent } from './steps/contact-form-step/contact-form-step.component';
+import { SuccessStepComponent } from './steps/success-step/success-step.component';
 
 function atLeastOneContactValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -49,10 +51,18 @@ function atLeastOneContactValidator(): ValidatorFn {
 @Component({
   selector: 'app-booking-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, ButtonModule, InputTextModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    SelectionStepComponent,
+    SummaryStepComponent,
+    ContactFormStepComponent,
+    SuccessStepComponent,
+  ],
   templateUrl: './booking-form.component.html',
   styleUrl: './booking-form.component.scss',
-  animations: [fadeInUp, stepComplete, fadeIn, shakeError],
+  animations: [fadeInUp],
 })
 export class BookingFormComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -67,8 +77,8 @@ export class BookingFormComponent implements OnInit {
   company = signal<Company | null>(null);
   employee = signal<User | null>(null);
   selectedServices = signal<Service[]>([]);
-  services = signal<Service[]>([]); // Used in open mode for service selection
-  serviceIds = signal<string[]>([]); // IDs from query params
+  services = signal<Service[]>([]);
+  serviceIds = signal<string[]>([]);
 
   isOpenMode = signal(false);
   selectedDate = '';
@@ -80,7 +90,6 @@ export class BookingFormComponent implements OnInit {
   currentStep = signal(0);
   submitError = signal('');
 
-  // Computed signals for totals
   totalDuration = computed(() => calculateTotalDuration(this.selectedServices()));
 
   totalPrice = computed(() => calculateTotalPrice(this.selectedServices()));
@@ -92,7 +101,7 @@ export class BookingFormComponent implements OnInit {
     return notes ? notes.length : 0;
   });
 
-  minDate = new Date();
+  minDate = this.toDateString(new Date());
 
   selectionForm = this.fb.group({
     service_id: ['', Validators.required],
@@ -109,6 +118,10 @@ export class BookingFormComponent implements OnInit {
     },
     { validators: atLeastOneContactValidator() },
   );
+
+  private toDateString(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
 
   async ngOnInit() {
     const slug = this.route.snapshot.paramMap.get('companySlug');
@@ -141,7 +154,6 @@ export class BookingFormComponent implements OnInit {
         this.selectedDate = date;
         this.selectedTime = time;
 
-        // Load services by IDs
         await this.loadServicesByIds(ids);
         this.currentStep.set(1);
       } else {
@@ -172,41 +184,14 @@ export class BookingFormComponent implements OnInit {
     }
   }
 
-  onServiceChange(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    const serviceId = select.value;
+  onSelectionProceed() {
+    this.selectedDate = this.selectionForm.value.appointment_date!;
+    this.selectedTime = this.selectionForm.value.appointment_time!;
+
+    const serviceId = this.selectionForm.value.service_id;
     const service = this.services().find((s) => s.id === serviceId);
     if (service) {
       this.selectedServices.set([service]);
-    }
-  }
-
-  onDateSelect(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.value) {
-      this.selectedDate = input.value;
-      this.selectionForm.patchValue({ appointment_date: this.selectedDate });
-    }
-  }
-
-  onTimeSelect(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.value) {
-      this.selectedTime = input.value;
-      this.selectionForm.patchValue({ appointment_time: this.selectedTime });
-    }
-  }
-
-  canProceedFromStep0(): boolean {
-    return !!(this.selectionForm.valid && this.selectedDate && this.selectedTime);
-  }
-
-  proceedFromStep0() {
-    if (!this.canProceedFromStep0()) {
-      Object.values(this.selectionForm.controls).forEach((control) => {
-        control.markAsTouched();
-      });
-      return;
     }
 
     this.currentStep.set(1);
@@ -224,46 +209,7 @@ export class BookingFormComponent implements OnInit {
     }
   }
 
-  getError(field: string): string {
-    const control = this.bookingForm.get(field);
-    if (control?.hasError('required') && control?.touched) {
-      return 'Este campo es requerido';
-    }
-    if (control?.hasError('minlength') && control?.touched) {
-      return 'El valor es muy corto';
-    }
-    if (control?.hasError('email') && control?.touched) {
-      return 'El email no es válido';
-    }
-    return '';
-  }
-
-  hasContactError(): boolean {
-    return !!(
-      this.bookingForm.errors?.['noContact'] &&
-      this.bookingForm.get('client_phone')?.touched &&
-      this.bookingForm.get('client_email')?.touched
-    );
-  }
-
-  hasInvalidPhoneError(): boolean {
-    return !!this.bookingForm.errors?.['invalidPhone'];
-  }
-
   async onSubmit() {
-    Object.values(this.bookingForm.controls).forEach((control) => {
-      control.markAsTouched();
-    });
-
-    if (this.bookingForm.errors?.['noContact']) {
-      this.submitError.set('Debes ingresar al menos un teléfono o email');
-      return;
-    }
-
-    if (this.bookingForm.invalid) {
-      return;
-    }
-
     const comp = this.company();
     const emp = this.employee();
     const services = this.selectedServices();
@@ -309,14 +255,7 @@ export class BookingFormComponent implements OnInit {
     }
   }
 
-  formatDate(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('es-ES', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
+  goHome() {
+    this.router.navigate(['/c', this.company()?.slug]);
   }
-
 }

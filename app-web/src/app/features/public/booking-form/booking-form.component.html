@@ -1,5 +1,4 @@
 <div class="booking-page">
-  <!-- Header -->
   <header class="page-header">
     <a [routerLink]="['/c', company()?.slug]" class="back-link">
       <i class="pi pi-arrow-left"></i>
@@ -28,10 +27,8 @@
         <p>Por favor contacta directamente al negocio.</p>
       </div>
     } @else {
-      <!-- Progress Steps -->
       <div class="progress-steps">
         @if (isOpenMode()) {
-          <!-- 4 steps in open mode -->
           <div class="step" [class.active]="currentStep() >= 0" [class.completed]="currentStep() > 0">
             <div class="step-number">
               @if (currentStep() > 0) {
@@ -70,7 +67,6 @@
             <span class="step-label">Confirmación</span>
           </div>
         } @else {
-          <!-- 3 steps in complete mode -->
           <div class="step" [class.active]="currentStep() >= 1" [class.completed]="currentStep() > 1">
             <div class="step-number">
               @if (currentStep() > 1) {
@@ -100,405 +96,55 @@
         }
       </div>
 
-      <!-- Step 0: Service, Date, Time Selection (Open Mode Only) -->
       @if (isOpenMode() && currentStep() === 0) {
         <section class="step-section" @fadeInUp>
-          <div class="step-card">
-            <div class="card-header">
-              <h2>Reserva tu cita</h2>
-              <p>Selecciona el servicio, fecha y hora</p>
-            </div>
-            
-            <div class="selection-content">
-              <!-- Service Selection -->
-              <div class="form-field">
-                <label for="service_id">
-                  <i class="pi pi-tag" aria-hidden="true"></i>
-                  <span>Servicio *</span>
-                </label>
-                <select 
-                  id="service_id"
-                  formControlName="service_id"
-                  [formGroup]="selectionForm"
-                  class="native-select"
-                  (change)="onServiceChange($event)">
-                  <option value="">Selecciona un servicio</option>
-                  @for (svc of services(); track svc.id) {
-                    <option [value]="svc.id">
-                      {{ svc.name }} ({{ svc.duration_minutes }} min)
-                    </option>
-                  }
-                </select>
-                @if (selectionForm.get('service_id')?.touched && selectionForm.get('service_id')?.invalid) {
-                  <small class="field-error">
-                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-                    Debes seleccionar un servicio
-                  </small>
-                }
-              </div>
-
-              <!-- Date Selection -->
-              <div class="form-field">
-                <label for="appointment_date">
-                  <i class="pi pi-calendar" aria-hidden="true"></i>
-                  <span>Fecha *</span>
-                </label>
-                <input 
-                  id="appointment_date" 
-                  type="date" 
-                  formControlName="appointment_date"
-                  [formGroup]="selectionForm"
-                  [min]="minDate | date:'yyyy-MM-dd'"
-                  class="native-input"
-                  (change)="onDateSelect($event)">
-                @if (selectionForm.get('appointment_date')?.touched && selectionForm.get('appointment_date')?.invalid) {
-                  <small class="field-error">
-                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-                    Debes seleccionar una fecha
-                  </small>
-                }
-              </div>
-
-              <!-- Time Selection -->
-              <div class="form-field">
-                <label for="appointment_time">
-                  <i class="pi pi-clock" aria-hidden="true"></i>
-                  <span>Hora *</span>
-                </label>
-                <input 
-                  id="appointment_time" 
-                  type="time" 
-                  formControlName="appointment_time"
-                  [formGroup]="selectionForm"
-                  class="native-input"
-                  (change)="onTimeSelect($event)">
-                @if (selectionForm.get('appointment_time')?.touched && selectionForm.get('appointment_time')?.invalid) {
-                  <small class="field-error">
-                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-                    Debes seleccionar una hora
-                  </small>
-                }
-              </div>
-            </div>
-
-            <div class="step-actions">
-              <button class="btn-primary" (click)="proceedFromStep0()" [disabled]="!canProceedFromStep0()">
-                <span>Continuar</span>
-                <i class="pi pi-arrow-right"></i>
-              </button>
-            </div>
-          </div>
+          <app-selection-step
+            [services]="services()"
+            [selectionForm]="selectionForm"
+            [minDate]="minDate"
+            (proceed)="onSelectionProceed()" />
         </section>
       }
 
-      <!-- Step 1: Summary -->
       @if (currentStep() === 1 && selectedServices().length > 0) {
         <section class="step-section" @fadeInUp>
-          <div class="step-card">
-            <div class="card-header">
-              <h2>Resumen de tu cita</h2>
-              <p>Verifica que todo esté correcto</p>
-            </div>
-            
-            <div class="summary-content">
-              <!-- Services Info -->
-              <div class="summary-section">
-                <div class="summary-icon">
-                  <i class="pi pi-tag"></i>
-                </div>
-                <div class="summary-details">
-                  <span class="summary-label">Servicios ({{ selectedServices().length }})</span>
-                  <div class="services-list">
-                    @for (service of selectedServices(); track service.id) {
-                      <div class="service-item">
-                        <span class="service-name">{{ service.name }}</span>
-                        <span class="service-duration">{{ service.duration_minutes }} min</span>
-                        @if (service.price) {
-                          <span class="service-price">${{ service.price | number:'1.2-2' }}</span>
-                        }
-                      </div>
-                    }
-                  </div>
-                  <div class="services-totals">
-                    <span class="total-item"><i class="pi pi-clock"></i> {{ totalDuration() }} min</span>
-                    @if (totalPrice() > 0) {
-                      <span class="total-item"><i class="pi pi-dollar"></i> ${{ totalPrice() | number:'1.2-2' }}</span>
-                    }
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Employee Info -->
-              <div class="summary-section">
-                <div class="summary-icon employee">
-                  @if (employee()?.photo_url) {
-                    <img [src]="employee()?.photo_url" [alt]="employee()?.full_name">
-                  } @else {
-                    {{ employee()?.full_name?.charAt(0) }}
-                  }
-                </div>
-                <div class="summary-details">
-                  <span class="summary-label">Profesional</span>
-                  <span class="summary-value">{{ employee()?.full_name }}</span>
-                </div>
-              </div>
-              
-              <!-- Date & Time -->
-              <div class="summary-section">
-                <div class="summary-icon datetime">
-                  <i class="pi pi-calendar"></i>
-                </div>
-                <div class="summary-details">
-                  <span class="summary-label">Fecha y hora</span>
-                  <span class="summary-value">{{ formatDate(selectedDate) }}</span>
-                  <span class="summary-meta">{{ selectedTime }}</span>
-                </div>
-              </div>
-              
-              <!-- Company -->
-              <div class="summary-section">
-                <div class="summary-icon company">
-                  <i class="pi pi-building"></i>
-                </div>
-                <div class="summary-details">
-                  <span class="summary-label">Negocio</span>
-                  <span class="summary-value">{{ company()?.name }}</span>
-                  @if (company()?.address) {
-                    <span class="summary-meta">{{ company()?.address }}</span>
-                  }
-                </div>
-              </div>
-            </div>
-            
-            <div class="step-actions">
-              @if (isOpenMode()) {
-                <button type="button" class="btn-secondary" (click)="prevStep()" style="margin-right: auto;">
-                  <i class="pi pi-arrow-left" aria-hidden="true"></i>
-                  <span>Volver</span>
-                </button>
-              }
-              <button class="btn-primary" (click)="nextStep()" style="margin-left: auto;">
-                <span>Continuar</span>
-                <i class="pi pi-arrow-right"></i>
-              </button>
-            </div>
-          </div>
+          <app-summary-step
+            [selectedServices]="selectedServices()"
+            [employee]="employee()"
+            [company]="company()"
+            [selectedDate]="selectedDate"
+            [selectedTime]="selectedTime"
+            [totalDuration]="totalDuration()"
+            [totalPrice]="totalPrice()"
+            [isOpenMode]="isOpenMode()"
+            (continue)="nextStep()"
+            (goBack)="prevStep()" />
         </section>
       }
 
-      <!-- Step 2: Contact Form -->
       @if (currentStep() === 2) {
         <section class="step-section" @fadeInUp>
-          <div class="step-card">
-            <div class="card-header">
-              <h2>Tus datos de contacto</h2>
-              <p>Ingresa al menos un teléfono o email para contactarte</p>
-            </div>
-            
-            <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="contact-form">
-              <!-- Name -->
-              <div class="form-field" [class.has-error]="getError('client_name')">
-                <div class="input-wrapper">
-                  <label for="client_name">
-                    <i class="pi pi-user" aria-hidden="true"></i>
-                    <span>Nombre completo *</span>
-                  </label>
-                  <input 
-                    id="client_name" 
-                    type="text" 
-                    pInputText 
-                    formControlName="client_name"
-                    placeholder="Ej: María García"
-                    [class.ng-invalid]="bookingForm.get('client_name')?.touched && bookingForm.get('client_name')?.invalid"
-                    [class.ng-dirty]="bookingForm.get('client_name')?.touched">
-                  <div class="validation-icon">
-                    @if (bookingForm.get('client_name')?.touched && bookingForm.get('client_name')?.valid) {
-                      <i class="pi pi-check" aria-hidden="true"></i>
-                    }
-                  </div>
-                </div>
-                @if (getError('client_name')) {
-                  <small class="field-error">
-                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-                    {{ getError('client_name') }}
-                  </small>
-                }
-              </div>
-
-              <!-- Phone -->
-              <div class="form-field">
-                <div class="input-wrapper">
-                  <label for="client_phone">
-                    <i class="pi pi-phone" aria-hidden="true"></i>
-                    <span>Teléfono</span>
-                  </label>
-                  <input 
-                    id="client_phone" 
-                    type="tel" 
-                    pInputText 
-                    formControlName="client_phone"
-                    placeholder="Ej: 5512345678"
-                    [class.ng-invalid]="bookingForm.get('client_phone')?.touched && bookingForm.get('client_phone')?.invalid"
-                    [class.ng-dirty]="bookingForm.get('client_phone')?.touched">
-                  <div class="validation-icon">
-                    @if (bookingForm.get('client_phone')?.touched && bookingForm.get('client_phone')?.valid) {
-                      <i class="pi pi-check" aria-hidden="true"></i>
-                    }
-                  </div>
-                </div>
-                @if (getError('client_phone')) {
-                  <small class="field-error">
-                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-                    {{ getError('client_phone') }}
-                  </small>
-                }
-              </div>
-
-              @if (hasInvalidPhoneError()) {
-                <div class="field-error group-error">
-                  <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-                  El teléfono debe tener al menos 12 dígitos
-                </div>
-              }
-
-              <!-- Email -->
-              <div class="form-field">
-                <div class="input-wrapper">
-                  <label for="client_email">
-                    <i class="pi pi-envelope" aria-hidden="true"></i>
-                    <span>Email</span>
-                  </label>
-                  <input 
-                    id="client_email" 
-                    type="email" 
-                    pInputText 
-                    formControlName="client_email"
-                    placeholder="tu@email.com"
-                    [class.ng-invalid]="bookingForm.get('client_email')?.touched && bookingForm.get('client_email')?.invalid"
-                    [class.ng-dirty]="bookingForm.get('client_email')?.touched">
-                  <div class="validation-icon">
-                    @if (bookingForm.get('client_email')?.touched && bookingForm.get('client_email')?.valid && bookingForm.get('client_email')?.value) {
-                      <i class="pi pi-check" aria-hidden="true"></i>
-                    }
-                  </div>
-                </div>
-                @if (bookingForm.get('client_email')?.touched && bookingForm.get('client_email')?.invalid) {
-                  <small class="field-error">
-                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-                    El email no es válido
-                  </small>
-                }
-              </div>
-
-              <!-- Contact validation error -->
-              @if (hasContactError()) {
-                <div class="field-error group-error">
-                  <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-                  Debes ingresar al menos un teléfono o email
-                </div>
-              }
-
-              <!-- Notes -->
-              <div class="form-field">
-                <label for="notes">
-                  <i class="pi pi-comment" aria-hidden="true"></i>
-                  <span>Notas (opcional)</span>
-                </label>
-                <textarea 
-                  id="notes" 
-                  formControlName="notes"
-                  rows="3"
-                  placeholder="Alguna información adicional para el profesional"></textarea>
-                <div class="char-counter">{{ notesLength() }}/500 caracteres</div>
-              </div>
-
-              @if (submitError()) {
-                <div class="submit-error" @shakeError>
-                  <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
-                  {{ submitError() }}
-                </div>
-              }
-
-              <div class="step-actions two-buttons">
-                <button type="button" class="btn-secondary" (click)="prevStep()">
-                  <i class="pi pi-arrow-left" aria-hidden="true"></i>
-                  <span>Volver</span>
-                </button>
-                <button type="submit" class="btn-primary" [disabled]="loading()">
-                  @if (loading()) {
-                    <span>Guardando...</span>
-                  } @else {
-                    <span>Confirmar Reserva</span>
-                    <i class="pi pi-check" aria-hidden="true"></i>
-                  }
-                </button>
-              </div>
-            </form>
-          </div>
+          <app-contact-form-step
+            [bookingForm]="bookingForm"
+            [submitError]="submitError()"
+            [loading]="loading()"
+            [notesLength]="notesLength()"
+            (submit)="onSubmit()"
+            (goBack)="prevStep()" />
         </section>
       }
 
-      <!-- Step 3: Success -->
       @if (currentStep() === 3) {
         <section class="step-section" @fadeInUp>
-          <div class="success-card">
-            <div class="success-icon" @stepComplete>
-              <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-                <circle cx="40" cy="40" r="40" fill="#E8F0E0"/>
-                <circle cx="40" cy="40" r="30" stroke="#9DC183" stroke-width="3"/>
-                <path d="M28 40L36 48L52 32" stroke="#9DC183" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            
-            <h2>¡Reserva Confirmada!</h2>
-            <p>Te hemos enviado un mensaje de confirmación.</p>
-            
-            <div class="confirmation-details">
-              <div class="detail-row">
-                <span class="detail-label">Servicios:</span>
-                <div class="detail-services">
-                  @for (service of selectedServices(); track service.id) {
-                    <div class="detail-service-item">
-                      <span>{{ service.name }}</span>
-                      <span class="detail-service-duration">{{ service.duration_minutes }} min</span>
-                    </div>
-                  }
-                </div>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Duración total:</span>
-                <span class="detail-value">{{ totalDuration() }} min</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Profesional:</span>
-                <span class="detail-value">{{ employee()?.full_name }}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Fecha:</span>
-                <span class="detail-value">{{ formatDate(selectedDate) }}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Hora:</span>
-                <span class="detail-value">{{ selectedTime }}</span>
-              </div>
-              @if (totalPrice() > 0) {
-                <div class="detail-row price-row">
-                  <span class="detail-label">Total:</span>
-                  <span class="detail-value">${{ totalPrice() | number:'1.2-2' }}</span>
-                </div>
-              }
-            </div>
-            
-            <div class="reminder-box">
-              <i class="pi pi-info-circle" aria-hidden="true"></i>
-              <span>Recuerda llegar 5 minutos antes de tu cita</span>
-            </div>
-            
-            <a [routerLink]="['/c', company()?.slug]" class="btn-primary home-btn">
-              <span>Volver al inicio</span>
-              <i class="pi pi-home" aria-hidden="true"></i>
-            </a>
-          </div>
+          <app-success-step
+            [selectedServices]="selectedServices()"
+            [employee]="employee()"
+            [company]="company()"
+            [selectedDate]="selectedDate"
+            [selectedTime]="selectedTime"
+            [totalDuration]="totalDuration()"
+            [totalPrice]="totalPrice()"
+            (goHome)="goHome()" />
         </section>
       }
     }
