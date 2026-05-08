@@ -227,7 +227,7 @@ describe('BookingFormComponent', () => {
       expect(component.bookingForm.get('client_name')?.hasError('required')).toBe(true);
     });
 
-    it('debe validar teléfono con mínimo 12 dígitos', () => {
+    it('debe validar teléfono con mínimo 10 dígitos', () => {
       component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '04143333' });
       component.bookingForm.updateValueAndValidity();
       expect(component.bookingForm.errors?.['invalidPhone']).toBe(true);
