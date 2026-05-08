@@ -4,6 +4,7 @@ import { AppointmentService } from '../../../core/services/appointment.service';
 import { CompanyService } from '../../../core/services/company.service';
 import { UserService } from '../../../core/services/user.service';
 import { ServiceService } from '../../../core/services/service.service';
+import { EmailNotificationService } from '../../../core/services/email-notification.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 describe('BookingFormComponent', () => {
@@ -11,6 +12,7 @@ describe('BookingFormComponent', () => {
   let fixture: ComponentFixture<BookingFormComponent>;
   let appointmentServiceMock: jest.Mocked<AppointmentService>;
   let serviceServiceMock: jest.Mocked<ServiceService>;
+  let emailNotificationMock: jest.Mocked<EmailNotificationService>;
   let activatedRouteMock: any;
 
   const mockCompany = { id: 'company-1', name: 'Peluquería Juan', slug: 'peluqueria-juan' };
@@ -23,6 +25,7 @@ describe('BookingFormComponent', () => {
   beforeEach(async () => {
     appointmentServiceMock = { create: jest.fn().mockResolvedValue({}) } as any;
     serviceServiceMock = { getByEmployee: jest.fn().mockResolvedValue(mockServices) } as any;
+    emailNotificationMock = { notify: jest.fn() } as any;
     activatedRouteMock = {
       snapshot: {
         paramMap: { get: jest.fn().mockImplementation((k: string) => k === 'companySlug' ? 'peluqueria-juan' : k === 'employeeId' ? 'employee-1' : null) },
@@ -37,6 +40,7 @@ describe('BookingFormComponent', () => {
         { provide: CompanyService, useValue: { getBySlug: jest.fn().mockResolvedValue(mockCompany) } },
         { provide: UserService, useValue: { getById: jest.fn().mockResolvedValue(mockEmployee) } },
         { provide: ServiceService, useValue: serviceServiceMock },
+        { provide: EmailNotificationService, useValue: emailNotificationMock },
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         { provide: Router, useValue: { navigate: jest.fn().mockReturnValue(Promise.resolve(true)) } }
       ]
@@ -142,16 +146,6 @@ describe('BookingFormComponent', () => {
       );
     });
 
-    it('debe marcar campos como tocados si el formulario es inválido', async () => {
-      await component.ngOnInit();
-      component.bookingForm.patchValue({ client_name: '', client_phone: '' });
-
-      await component.onSubmit();
-
-      expect(component.bookingForm.get('client_name')?.touched).toBe(true);
-      expect(component.bookingForm.get('client_phone')?.touched).toBe(true);
-    });
-
     it('debe establecer loading durante el envío', async () => {
       let resolvePromise: () => void;
       appointmentServiceMock.create.mockImplementation(() => new Promise(r => { resolvePromise = r; }));
@@ -164,6 +158,24 @@ describe('BookingFormComponent', () => {
       resolvePromise!();
       await promise;
       expect(component.loading()).toBe(false);
+    });
+
+    it('no debe crear duplicados si onSubmit se llama mientras ya está cargando', async () => {
+      let resolvePromise: () => void;
+      appointmentServiceMock.create.mockImplementation(() => new Promise(r => { resolvePromise = r; }));
+      await component.ngOnInit();
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-456789' });
+
+      const firstPromise = component.onSubmit();
+      expect(component.loading()).toBe(true);
+
+      const secondPromise = component.onSubmit();
+
+      resolvePromise!();
+      await firstPromise;
+      await secondPromise;
+
+      expect(appointmentServiceMock.create).toHaveBeenCalledTimes(1);
     });
 
     it('debe establecer submitError cuando el servidor falla', async () => {
@@ -195,6 +207,17 @@ describe('BookingFormComponent', () => {
         })
       );
       expect(component.success()).toBe(true);
+    });
+
+    it('debe enviar notificación de email después de crear cita', async () => {
+      const mockAppointment = { id: 'appt-1' };
+      appointmentServiceMock.create.mockResolvedValue(mockAppointment);
+      await component.ngOnInit();
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-456789' });
+
+      await component.onSubmit();
+
+      expect(emailNotificationMock.notify).toHaveBeenCalledWith('appt-1', 'created');
     });
   });
 
@@ -230,35 +253,68 @@ describe('BookingFormComponent', () => {
       await component.ngOnInit();
     });
 
-    it('debe avanzar al paso 1 con proceedFromStep0 válido', () => {
+    it('debe avanzar al paso 1 con onSelectionProceed', () => {
       component.selectionForm.patchValue({ service_id: 'service-1', appointment_date: '2026-04-10', appointment_time: '10:00' });
-      component.selectedDate = '2026-04-10';
-      component.selectedTime = '10:00';
 
-      component.proceedFromStep0();
+      component.onSelectionProceed();
+
+      expect(component.currentStep()).toBe(1);
+      expect(component.selectedDate).toBe('2026-04-10');
+      expect(component.selectedTime).toBe('10:00');
+    });
+
+    it('debe establecer selectedServices al seleccionar un servicio', () => {
+      component.selectionForm.patchValue({ service_id: 'service-1', appointment_date: '2026-04-10', appointment_time: '10:00' });
+
+      component.onSelectionProceed();
+
+      expect(component.selectedServices()).toEqual([mockServices[0]]);
+    });
+
+    it('debe retroceder al paso 0 desde paso 1 en modo abierto', () => {
+      component.currentStep.set(1);
+
+      component.prevStep();
+
+      expect(component.currentStep()).toBe(0);
+    });
+
+    it('debe avanzar al paso 2 desde paso 1 con nextStep', () => {
+      component.currentStep.set(1);
+
+      component.nextStep();
+
+      expect(component.currentStep()).toBe(2);
+    });
+
+    it('debe retroceder al paso 1 desde paso 2', () => {
+      component.currentStep.set(2);
+
+      component.prevStep();
 
       expect(component.currentStep()).toBe(1);
     });
-
-    it('no debe avanzar si selectionForm es inválido', () => {
-      component.selectionForm.patchValue({ service_id: '', appointment_date: '', appointment_time: '' });
-
-      component.proceedFromStep0();
-
-      expect(component.currentStep()).toBe(0);
-      expect(component.selectionForm.get('service_id')?.touched).toBe(true);
-    });
   });
 
-  describe('onServiceChange (modo abierto)', () => {
-    it('debe establecer el servicio en selectedServices array', async () => {
-      activatedRouteMock.snapshot.queryParamMap.get.mockReturnValue(null);
+  describe('Computed signals', () => {
+    beforeEach(async () => {
+      activatedRouteMock.snapshot.queryParamMap.get.mockImplementation((k: string) =>
+        k === 'serviceIds' ? 'service-1,service-2' : k === 'date' ? '2026-03-20' : k === 'time' ? '10:00' : null
+      );
       await component.ngOnInit();
+    });
 
-      const event = { target: { value: 'service-1' } } as any;
-      component.onServiceChange(event);
+    it('debe calcular duración total correctamente', () => {
+      expect(component.totalDuration()).toBe(90);
+    });
 
-      expect(component.selectedServices()).toEqual([mockServices[0]]);
+    it('debe calcular precio total correctamente', () => {
+      expect(component.totalPrice()).toBe(75);
+    });
+
+    it('debe formatear lista de servicios', () => {
+      expect(component.selectedServicesText()).toContain('Corte de cabello');
+      expect(component.selectedServicesText()).toContain('Tinte');
     });
   });
 });

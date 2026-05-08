@@ -1,0 +1,85 @@
+<div class="step-card">
+    <div class="card-header">
+      <h2>Resumen de tu cita</h2>
+      <p>Verifica que todo esté correcto</p>
+    </div>
+    
+    <div class="summary-content">
+      <div class="summary-section">
+        <div class="summary-icon">
+          <i class="pi pi-tag"></i>
+        </div>
+        <div class="summary-details">
+          <span class="summary-label">Servicios ({{ selectedServices().length }})</span>
+          <div class="services-list">
+            @for (service of selectedServices(); track service.id) {
+              <div class="service-item">
+                <span class="service-name">{{ service.name }}</span>
+                <span class="service-duration">{{ service.duration_minutes }} min</span>
+                @if (service.price) {
+                  <span class="service-price">${{ service.price | number:'1.2-2' }}</span>
+                }
+              </div>
+            }
+          </div>
+          <div class="services-totals">
+            <span class="total-item"><i class="pi pi-clock"></i> {{ totalDuration() }} min</span>
+            @if (totalPrice() > 0) {
+              <span class="total-item"><i class="pi pi-dollar"></i> ${{ totalPrice() | number:'1.2-2' }}</span>
+            }
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary-section">
+        <div class="summary-icon employee">
+          @if (employee()?.photo_url) {
+            <img [src]="employee()?.photo_url" [alt]="employee()?.full_name">
+          } @else {
+            {{ employee()?.full_name?.charAt(0) }}
+          }
+        </div>
+        <div class="summary-details">
+          <span class="summary-label">Profesional</span>
+          <span class="summary-value">{{ employee()?.full_name }}</span>
+        </div>
+      </div>
+      
+      <div class="summary-section">
+        <div class="summary-icon datetime">
+          <i class="pi pi-calendar"></i>
+        </div>
+        <div class="summary-details">
+          <span class="summary-label">Fecha y hora</span>
+          <span class="summary-value">{{ formatDate(selectedDate()) }}</span>
+          <span class="summary-meta">{{ selectedTime() }}</span>
+        </div>
+      </div>
+      
+      <div class="summary-section">
+        <div class="summary-icon company">
+          <i class="pi pi-building"></i>
+        </div>
+        <div class="summary-details">
+          <span class="summary-label">Negocio</span>
+          <span class="summary-value">{{ company()?.name }}</span>
+          @if (company()?.address) {
+            <span class="summary-meta">{{ company()?.address }}</span>
+          }
+        </div>
+      </div>
+    </div>
+    
+    <div class="step-actions">
+      @if (isOpenMode()) {
+        <button type="button" class="btn-secondary btn-back" (click)="goBack.emit()">
+          <i class="pi pi-arrow-left" aria-hidden="true"></i>
+          <span>Volver</span>
+        </button>
+      }
+      <button class="btn-primary btn-continue" (click)="continue.emit()">
+        <span>Continuar</span>
+        <i class="pi pi-arrow-right"></i>
+      </button>
+    </div>
+  </div>

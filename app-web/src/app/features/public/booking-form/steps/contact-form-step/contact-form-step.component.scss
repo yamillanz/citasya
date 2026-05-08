@@ -1,0 +1,220 @@
+.step-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: var(--space-xl);
+  background: linear-gradient(135deg, rgba(157, 193, 131, 0.08) 0%, rgba(157, 193, 131, 0.02) 100%);
+  border-bottom: 1px solid var(--color-border);
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-xs);
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+}
+
+.contact-form {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  
+  &.has-error {
+    .input-wrapper input {
+      border-color: #ef4444;
+      
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+      }
+    }
+  }
+  
+  > label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+    
+    i {
+      font-size: 0.875rem;
+      color: var(--color-sage);
+    }
+  }
+  
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    
+    input {
+      flex: 1;
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: 0.9375rem;
+      background: white;
+      transition: all var(--transition-smooth);
+      font-family: var(--font-body);
+      
+      &::placeholder {
+        color: var(--color-text-muted);
+      }
+      
+      &:focus {
+        outline: none;
+        border-color: var(--color-sage);
+        box-shadow: 0 0 0 3px var(--color-sage-pale);
+      }
+      
+      &.ng-invalid.ng-touched {
+        border-color: #ef4444;
+        
+        &:focus {
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+      }
+      
+      &.ng-valid.ng-touched {
+        border-color: var(--color-sage);
+      }
+    }
+    
+    .validation-icon {
+      position: absolute;
+      right: var(--space-md);
+      color: var(--color-sage);
+      
+      i {
+        font-size: 0.875rem;
+      }
+    }
+  }
+  
+  textarea {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    background: white;
+    transition: all var(--transition-smooth);
+    font-family: var(--font-body);
+    resize: vertical;
+    min-height: 80px;
+    
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: var(--color-sage);
+      box-shadow: 0 0 0 3px var(--color-sage-pale);
+    }
+  }
+  
+  .char-counter {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-align: right;
+    margin-top: var(--space-xs);
+  }
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: #ef4444;
+  font-size: 0.8125rem;
+  animation: fadeIn 0.3s ease-in;
+  
+  i {
+    font-size: 0.75rem;
+  }
+}
+
+.group-error {
+  margin-top: var(--space-sm);
+  padding: var(--space-md);
+  background: rgba(239, 68, 68, 0.05);
+  border-radius: var(--radius-md);
+}
+
+.submit-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-md);
+  color: #dc2626;
+  font-size: 0.875rem;
+  
+  i {
+    font-size: 1rem;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.step-actions {
+  display: flex;
+  gap: var(--space-md);
+  padding-top: var(--space-sm);
+
+  &.two-buttons {
+    .btn-secondary {
+      flex: 0 0 auto;
+    }
+
+    .btn-primary {
+      flex: 1;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .contact-form {
+    padding: var(--space-lg);
+    gap: var(--space-md);
+  }
+
+  .step-actions.two-buttons {
+    flex-direction: column;
+
+    .btn-secondary,
+    .btn-primary {
+      width: 100%;
+    }
+  }
+}

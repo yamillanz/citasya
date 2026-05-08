@@ -1,4 +1,3 @@
-// Design Tokens for Enhanced Booking Form
 :host {
   --shadow-soft: 0 4px 20px rgba(44, 62, 80, 0.08);
   --shadow-card: 0 8px 30px rgba(157, 193, 131, 0.12);
@@ -16,9 +15,6 @@
   padding-bottom: var(--space-3xl);
 }
 
-/* ================================
-   Header
-   ================================ */
 .page-header {
   display: flex;
   align-items: center;
@@ -50,11 +46,16 @@
 
 .logo {
   flex-shrink: 0;
+
+  .logo-primary {
+    fill: var(--color-sage);
+  }
+
+  .logo-secondary {
+    fill: var(--color-text-secondary);
+  }
 }
 
-/* ================================
-   Progress Steps
-   ================================ */
 .progress-steps {
   display: flex;
   align-items: center;
@@ -140,9 +141,6 @@
   }
 }
 
-/* ================================
-   Error State
-   ================================ */
 .error-state {
   display: flex;
   flex-direction: column;
@@ -158,18 +156,40 @@
   }
 }
 
-/* ================================
-   Step Section
-   ================================ */
-.step-section {
-  padding: var(--space-xl) var(--space-lg);
-  max-width: 500px;
-  margin: 0 auto;
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: var(--space-md);
+  
+  p {
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+  }
 }
 
-/* ================================
-   Step Card
-   ================================ */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-sage-pale);
+  border-top-color: var(--color-sage);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.step-section {
+  padding: var(--space-xl) var(--space-lg);
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 .step-card {
   background: white;
   border-radius: var(--radius-xl);
@@ -202,139 +222,6 @@
   }
 }
 
-/* ================================
-   Summary Content
-   ================================ */
-.summary-content {
-  padding: var(--space-lg);
-}
-
-.summary-section {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-md) 0;
-  border-bottom: 1px solid var(--color-border);
-  transition: background-color var(--transition-smooth);
-  
-  &:last-of-type {
-    border-bottom: none;
-  }
-  
-  &:hover {
-    background-color: var(--color-sage-pale);
-    border-radius: var(--radius-md);
-    margin: 0 calc(var(--space-md) * -1);
-    padding-left: var(--space-md);
-    padding-right: var(--space-md);
-  }
-}
-
-.summary-icon {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--color-sage-pale) 0%, rgba(157, 193, 131, 0.1) 100%);
-  color: var(--color-sage-dark);
-  border-radius: var(--radius-md);
-  flex-shrink: 0;
-  transition: transform var(--transition-smooth);
-  
-  i {
-    font-size: 1.125rem;
-  }
-  
-  &:hover {
-    transform: scale(1.05);
-  }
-  
-  &.employee {
-    overflow: hidden;
-    background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
-    color: white;
-    font-weight: 600;
-    font-size: 1.125rem;
-    
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-  
-  &.datetime, &.company {
-    i {
-      font-size: 1.25rem;
-    }
-  }
-}
-
-.summary-details {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  flex: 1;
-  
-  .summary-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-muted);
-  }
-  
-  .summary-value {
-    font-weight: 600;
-    color: var(--color-text-primary);
-    font-size: 1rem;
-  }
-  
-  .summary-meta {
-    font-size: 0.8125rem;
-    color: var(--color-text-secondary);
-  }
-  
-  .summary-badge {
-    display: inline-block;
-    padding: 0.125rem 0.5rem;
-    background: var(--color-sage-pale);
-    color: var(--color-sage-dark);
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: var(--radius-full);
-    width: fit-content;
-  }
-}
-
-.price-total {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: var(--space-lg);
-  padding: var(--space-md) var(--space-lg);
-  background: linear-gradient(135deg, var(--color-sage-pale) 0%, rgba(157, 193, 131, 0.15) 100%);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(157, 193, 131, 0.2);
-  
-  .price-label {
-    font-weight: 600;
-    color: var(--color-text-primary);
-    font-size: 1rem;
-  }
-  
-  .price-value {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--color-sage-dark);
-  }
-}
-
-/* ================================
-   Step Actions
-   ================================ */
 .step-actions {
   padding: var(--space-lg);
   border-top: 1px solid var(--color-border);
@@ -351,279 +238,6 @@
   }
 }
 
-/* ================================
-   Contact Form
-   ================================ */
-.contact-form {
-  padding: var(--space-xl);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  
-  &.has-error {
-    .input-wrapper input {
-      border-color: #ef4444;
-      
-      &:focus {
-        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-      }
-    }
-  }
-  
-  label {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: var(--color-text-primary);
-    
-    i {
-      font-size: 0.875rem;
-      color: var(--color-sage);
-    }
-  }
-  
-  .input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    
-    input {
-      flex: 1;
-      width: 100%;
-      padding: var(--space-sm) var(--space-md);
-      border: 1.5px solid var(--color-border);
-      border-radius: var(--radius-md);
-      font-size: 0.9375rem;
-      background: white;
-      transition: all var(--transition-smooth);
-      font-family: var(--font-body);
-      
-      &::placeholder {
-        color: var(--color-text-muted);
-      }
-      
-      &:focus {
-        outline: none;
-        border-color: var(--color-sage);
-        box-shadow: 0 0 0 3px var(--color-sage-pale);
-      }
-      
-      &.ng-invalid.ng-touched {
-        border-color: #ef4444;
-        
-        &:focus {
-          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-        }
-      }
-      
-      &.ng-valid.ng-touched {
-        border-color: var(--color-sage);
-      }
-    }
-    
-    .validation-icon {
-      position: absolute;
-      right: var(--space-md);
-      color: var(--color-sage);
-      
-      i {
-        font-size: 0.875rem;
-      }
-    }
-  }
-  
-  textarea {
-    width: 100%;
-    padding: var(--space-sm) var(--space-md);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-md);
-    font-size: 0.9375rem;
-    background: white;
-    transition: all var(--transition-smooth);
-    font-family: var(--font-body);
-    resize: vertical;
-    min-height: 80px;
-    
-    &::placeholder {
-      color: var(--color-text-muted);
-    }
-    
-    &:focus {
-      outline: none;
-      border-color: var(--color-sage);
-      box-shadow: 0 0 0 3px var(--color-sage-pale);
-    }
-  }
-  
-  .char-counter {
-    font-size: 0.75rem;
-    color: var(--color-text-muted);
-    text-align: right;
-    margin-top: var(--space-xs);
-  }
-}
-
-.field-error {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  color: #ef4444;
-  font-size: 0.8125rem;
-  animation: fadeIn 0.3s ease-in;
-  
-  i {
-    font-size: 0.75rem;
-  }
-}
-
-.submit-error {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-md);
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: var(--radius-md);
-  color: #dc2626;
-  font-size: 0.875rem;
-  
-  i {
-    font-size: 1rem;
-  }
-}
-
-/* ================================
-   Success Card
-   ================================ */
-.success-card {
-  background: white;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-card);
-  padding: var(--space-2xl);
-  text-align: center;
-  animation: fadeInUp 0.5s ease-out;
-}
-
-.success-icon {
-  margin-bottom: var(--space-xl);
-  animation: checkDraw 0.6s ease-out;
-  
-  svg {
-    circle {
-      animation: circleGrow 0.4s ease-out;
-    }
-    
-    path {
-      animation: checkDraw 0.5s ease-out 0.2s both;
-    }
-  }
-}
-
-@keyframes checkDraw {
-  from {
-    stroke-dasharray: 0 100;
-  }
-  to {
-    stroke-dasharray: 100 0;
-  }
-}
-
-@keyframes circleGrow {
-  from {
-    transform: scale(0.8);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-.success-card h2 {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  margin-bottom: var(--space-sm);
-}
-
-.success-card > p {
-  font-size: 0.9375rem;
-  color: var(--color-text-secondary);
-  margin-bottom: var(--space-xl);
-}
-
-.confirmation-details {
-  background: linear-gradient(135deg, var(--color-sage-pale) 0%, rgba(157, 193, 131, 0.1) 100%);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  margin-bottom: var(--space-xl);
-  text-align: left;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--space-sm) 0;
-  border-bottom: 1px solid rgba(157, 193, 131, 0.3);
-  
-  &:last-child {
-    border-bottom: none;
-  }
-  
-  .detail-label {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-  }
-  
-  .detail-value {
-    font-weight: 600;
-    color: var(--color-text-primary);
-  }
-  
-  &.price-row {
-    margin-top: var(--space-sm);
-    padding-top: var(--space-md);
-    border-top: 2px solid rgba(157, 193, 131, 0.5);
-    
-    .detail-value {
-      font-size: 1.125rem;
-      color: var(--color-sage-dark);
-    }
-  }
-}
-
-.reminder-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
-  padding: var(--space-md);
-  background: rgba(59, 156, 236, 0.1);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-xl);
-  color: #3b9df5;
-  font-size: 0.875rem;
-  
-  i {
-    font-size: 1rem;
-  }
-}
-
-.home-btn {
-  width: 100%;
-  margin-top: var(--space-md);
-}
-
-/* ================================
-   Buttons
-   ================================ */
 .btn-primary {
   display: flex;
   align-items: center;
@@ -701,20 +315,25 @@
   }
 }
 
-/* ================================
-   Responsive
-   ================================ */
 @media (max-width: 640px) {
   .progress-steps {
     padding: var(--space-lg) var(--space-md);
   }
   
   .step-line {
-    width: 30px;
+    width: 24px;
   }
   
-  .step-label {
-    font-size: 0.75rem;
+  .step {
+    .step-number {
+      width: 36px;
+      height: 36px;
+      font-size: 0.875rem;
+    }
+    
+    .step-label {
+      font-size: 0.6875rem;
+    }
   }
   
   .step-section {
@@ -724,143 +343,35 @@
   .card-header {
     padding: var(--space-lg);
   }
-  
-  .contact-form {
-    padding: var(--space-lg);
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    padding: var(--space-md);
   }
-  
-  .success-card {
-    padding: var(--space-xl) var(--space-md);
+
+  .logo svg {
+    width: 120px;
+    height: 30px;
   }
-  
-  .summary-section {
-    &:hover {
-      background-color: transparent;
-      border-radius: 0;
-      margin: 0;
-      padding-left: 0;
-      padding-right: 0;
+
+  .progress-steps {
+    padding: var(--space-md);
+  }
+
+  .step-line {
+    width: 16px;
+  }
+
+  .step {
+    .step-number {
+      width: 32px;
+      height: 32px;
+      font-size: 0.8125rem;
+    }
+
+    .step-label {
+      font-size: 0.625rem;
     }
   }
-  
-  .detail-row {
-    flex-direction: column;
-    gap: var(--space-xs);
-    
-    .detail-label {
-      font-size: 0.75rem;
-    }
-    
-    .detail-value {
-      font-size: 0.9375rem;
-    }
-  }
-}
-
-/* ================================
-   Animations
-   ================================ */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ================================
-   Selection Form (Open Mode Step 0)
-   ================================ */
-.selection-content {
-  padding: var(--space-xl);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-
-.group-error {
-  margin-top: var(--space-sm);
-  padding: var(--space-md);
-  background: rgba(239, 68, 68, 0.05);
-  border-radius: var(--radius-md);
-}
-
-.w-full {
-  width: 100%;
-  
-  :host ::ng-deep .p-dropdown,
-  :host ::ng-deep .p-calendar {
-    width: 100%;
-  }
-}
-
-.service-option {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  
-  .service-name {
-    font-weight: 500;
-    color: var(--color-text-primary);
-  }
-  
-  .service-meta {
-    font-size: 0.8125rem;
-    color: var(--color-text-secondary);
-  }
-}
-
-/* ================================
-   Native Form Inputs
-   ================================ */
-.native-select,
-.native-input {
-  width: 100%;
-  padding: var(--space-sm) var(--space-md);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: 0.9375rem;
-  background: white;
-  font-family: var(--font-body);
-  appearance: none;
-  cursor: pointer;
-  transition: all var(--transition-smooth);
-  
-  &:focus {
-    outline: none;
-    border-color: var(--color-sage);
-    box-shadow: 0 0 0 3px var(--color-sage-pale);
-  }
-  
-  &.ng-invalid.ng-touched {
-    border-color: #ef4444;
-    
-    &:focus {
-      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-    }
-  }
-  
-  &.ng-valid.ng-touched {
-    border-color: var(--color-sage);
-  }
-}
-
-.native-select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235D6D7E' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right var(--space-md) center;
-  padding-right: calc(var(--space-md) * 2 + 12px);
 }
