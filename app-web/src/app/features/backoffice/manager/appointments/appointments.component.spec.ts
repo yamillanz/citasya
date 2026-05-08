@@ -29,6 +29,7 @@ describe('AppointmentsComponent (Manager)', () => {
     const filterStatus = signal('');
     const selectedAppointment = signal<Appointment | null>(null);
     const showStatusDialog = signal(false);
+    const statusAction = signal<'completed' | 'cancelled' | 'no_show' | null>(null);
 
     const filteredAppointments = computed(() =>
       appointments().filter(apt => {
@@ -48,7 +49,52 @@ describe('AppointmentsComponent (Manager)', () => {
     const getServicesNames = (apt: Appointment | null) => !apt?.services?.length ? 'N/A' : apt.services.map(s => s.name).join(', ');
     const getTotalPrice = (apt: Appointment | null) => apt?.services?.reduce((s, svc) => s + svc.price, 0) || 0;
 
-    return { appointments, employees, loading, filterEmployee, filterStatus, selectedAppointment, showStatusDialog, filteredAppointments, employeeOptions, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice };
+    const openStatusDialog = (appointment: Appointment, status: 'completed' | 'cancelled' | 'no_show') => {
+      selectedAppointment.set(appointment);
+      statusAction.set(status);
+      showStatusDialog.set(true);
+    };
+
+    const closeDrawer = () => {
+      showStatusDialog.set(false);
+      selectedAppointment.set(null);
+      statusAction.set(null);
+    };
+
+    const getDrawerTitle = () => {
+      switch (statusAction()) {
+        case 'completed': return 'Completar Cita';
+        case 'cancelled': return 'Cancelar Cita';
+        case 'no_show': return 'Marcar como No Asistió';
+        default: return 'Actualizar Estado';
+      }
+    };
+
+    const getActionLabel = () => {
+      switch (statusAction()) {
+        case 'completed': return 'Confirmar y Completar';
+        case 'cancelled': return 'Sí, Cancelar';
+        case 'no_show': return 'Sí, No Asistió';
+        default: return 'Aceptar';
+      }
+    };
+
+    const getActionSeverity = () => {
+      switch (statusAction()) {
+        case 'completed': return 'success';
+        case 'cancelled':
+        case 'no_show': return 'danger';
+        default: return 'secondary';
+      }
+    };
+
+    return {
+      appointments, employees, loading, filterEmployee, filterStatus,
+      selectedAppointment, showStatusDialog, statusAction, filteredAppointments,
+      employeeOptions, getStatusSeverity, getStatusLabel, getServicesNames,
+      getTotalPrice, openStatusDialog, closeDrawer, getDrawerTitle,
+      getActionLabel, getActionSeverity
+    };
   };
 
   describe('filtrado de citas', () => {
@@ -118,17 +164,96 @@ describe('AppointmentsComponent (Manager)', () => {
     });
   });
 
-  describe('actualización de estado', () => {
-    it('debe trackear cita seleccionada para cambio de estado', () => {
+  describe('confirmación de acciones destructivas', () => {
+    it('debe abrir drawer de confirmación al hacer click en "Cancelar"', () => {
       const comp = createMock();
-      comp.selectedAppointment.set(mockAppointments[0]);
+      comp.appointments.set(mockAppointments);
+
+      comp.openStatusDialog(mockAppointments[0], 'cancelled');
+
       expect(comp.selectedAppointment()?.id).toBe('apt-1');
+      expect(comp.statusAction()).toBe('cancelled');
+      expect(comp.showStatusDialog()).toBe(true);
     });
 
-    it('debe mostrar diálogo de estado', () => {
+    it('debe abrir drawer de confirmación al hacer click en "No asistió"', () => {
       const comp = createMock();
-      comp.showStatusDialog.set(true);
+      comp.appointments.set(mockAppointments);
+
+      comp.openStatusDialog(mockAppointments[0], 'no_show');
+
+      expect(comp.selectedAppointment()?.id).toBe('apt-1');
+      expect(comp.statusAction()).toBe('no_show');
       expect(comp.showStatusDialog()).toBe(true);
+    });
+
+    it('debe abrir drawer de confirmación al hacer click en "Completar"', () => {
+      const comp = createMock();
+      comp.appointments.set(mockAppointments);
+
+      comp.openStatusDialog(mockAppointments[0], 'completed');
+
+      expect(comp.selectedAppointment()?.id).toBe('apt-1');
+      expect(comp.statusAction()).toBe('completed');
+      expect(comp.showStatusDialog()).toBe(true);
+    });
+
+    it('debe mostrar título correcto para cancelar en el drawer', () => {
+      const comp = createMock();
+      comp.openStatusDialog(mockAppointments[0], 'cancelled');
+
+      expect(comp.getDrawerTitle()).toBe('Cancelar Cita');
+    });
+
+    it('debe mostrar título correcto para no_show en el drawer', () => {
+      const comp = createMock();
+      comp.openStatusDialog(mockAppointments[0], 'no_show');
+
+      expect(comp.getDrawerTitle()).toBe('Marcar como No Asistió');
+    });
+
+    it('debe mostrar label de acción correcto para cancelar', () => {
+      const comp = createMock();
+      comp.openStatusDialog(mockAppointments[0], 'cancelled');
+
+      expect(comp.getActionLabel()).toBe('Sí, Cancelar');
+    });
+
+    it('debe mostrar label de acción correcto para no_show', () => {
+      const comp = createMock();
+      comp.openStatusDialog(mockAppointments[0], 'no_show');
+
+      expect(comp.getActionLabel()).toBe('Sí, No Asistió');
+    });
+
+    it('debe mostrar severity danger para cancelar y no_show', () => {
+      const comp = createMock();
+
+      comp.statusAction.set('cancelled');
+      expect(comp.getActionSeverity()).toBe('danger');
+
+      comp.statusAction.set('no_show');
+      expect(comp.getActionSeverity()).toBe('danger');
+    });
+
+    it('debe mostrar severity success para completar', () => {
+      const comp = createMock();
+      comp.statusAction.set('completed');
+      expect(comp.getActionSeverity()).toBe('success');
+    });
+
+    it('debe cerrar drawer y limpiar estado al descartar', () => {
+      const comp = createMock();
+      comp.appointments.set(mockAppointments);
+
+      comp.openStatusDialog(mockAppointments[0], 'cancelled');
+      expect(comp.showStatusDialog()).toBe(true);
+
+      comp.closeDrawer();
+
+      expect(comp.showStatusDialog()).toBe(false);
+      expect(comp.selectedAppointment()).toBeNull();
+      expect(comp.statusAction()).toBeNull();
     });
   });
 });

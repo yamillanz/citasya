@@ -208,6 +208,49 @@ The appointment management interface SHALL display services appropriately on dif
 - **THEN** services are displayed as comma-separated text
 - **AND** total duration and price are included
 
+### Requirement: Confirm destructive appointment status changes
+
+The appointment management system SHALL require explicit confirmation before executing destructive status changes (cancel or mark as no-show) on an appointment in the manager appointments list page.
+
+#### Scenario: Cancel appointment with confirmation
+- **WHEN** a manager clicks the "Cancelar" button on a pending appointment
+- **THEN** the system opens the status change drawer with cancellation confirmation UI
+- **AND** the appointment status is NOT changed until the manager confirms in the drawer
+
+#### Scenario: Confirm cancellation in drawer
+- **WHEN** the status change drawer is open for cancellation
+- **THEN** the drawer displays a warning message asking "¿Estás seguro de marcar esta cita como cancelada?"
+- **AND** the drawer has a "Cancelar" button to dismiss and a "Sí, Cancelar" button to confirm
+- **WHEN** the manager clicks "Sí, Cancelar"
+- **THEN** the system updates the appointment status to `cancelled`
+- **AND** sends an email notification
+- **AND** displays a success toast message
+
+#### Scenario: Mark as no-show with confirmation
+- **WHEN** a manager clicks the "No asistió" button on a pending appointment
+- **THEN** the system opens the status change drawer with no-show confirmation UI
+- **AND** the appointment status is NOT changed until the manager confirms in the drawer
+
+#### Scenario: Confirm no-show in drawer
+- **WHEN** the status change drawer is open for no-show
+- **THEN** the drawer displays a warning message asking "¿Estás seguro de marcar esta cita como no asistida?"
+- **AND** the drawer has a "Cancelar" button to dismiss and a "Sí, No Asistió" button to confirm
+- **WHEN** the manager clicks "Sí, No Asistió"
+- **THEN** the system updates the appointment status to `no_show`
+- **AND** sends an email notification
+- **AND** displays a success toast message
+
+#### Scenario: Dismiss drawer without confirming
+- **WHEN** the status change drawer is open for cancel or no-show
+- **AND** the manager clicks the dismiss "Cancelar" button or closes the drawer
+- **THEN** the appointment status remains unchanged
+- **AND** no email notification is sent
+
+#### Scenario: Complete appointment unchanged
+- **WHEN** a manager clicks the "Completar" button on a pending appointment
+- **THEN** the system opens the status change drawer with the amount input (existing behavior)
+- **AND** this flow remains unchanged from the current implementation
+
 ### Requirement: Aggregate appointment queries by employee
 
 The appointment service SHALL support querying appointments grouped by employee for a given date range and company.

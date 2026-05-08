@@ -191,7 +191,7 @@
                     severity="danger"
                     size="small"
                     [outlined]="true"
-                    (onClick)="updateStatus(apt, 'cancelled')"
+                    (onClick)="openStatusDialog(apt, 'cancelled')"
                     styleClass="btn-danger-outline">
                   </p-button>
                   <p-button 
@@ -200,7 +200,7 @@
                     severity="secondary"
                     size="small"
                     [outlined]="true"
-                    (onClick)="updateStatus(apt, 'no_show')"
+                    (onClick)="openStatusDialog(apt, 'no_show')"
                     styleClass="btn-secondary-outline">
                   </p-button>
                 </div>
