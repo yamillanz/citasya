@@ -160,6 +160,24 @@ describe('BookingFormComponent', () => {
       expect(component.loading()).toBe(false);
     });
 
+    it('no debe crear duplicados si onSubmit se llama mientras ya está cargando', async () => {
+      let resolvePromise: () => void;
+      appointmentServiceMock.create.mockImplementation(() => new Promise(r => { resolvePromise = r; }));
+      await component.ngOnInit();
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '555-123-456789' });
+
+      const firstPromise = component.onSubmit();
+      expect(component.loading()).toBe(true);
+
+      const secondPromise = component.onSubmit();
+
+      resolvePromise!();
+      await firstPromise;
+      await secondPromise;
+
+      expect(appointmentServiceMock.create).toHaveBeenCalledTimes(1);
+    });
+
     it('debe establecer submitError cuando el servidor falla', async () => {
       appointmentServiceMock.create.mockRejectedValue(new Error('Error del servidor'));
       await component.ngOnInit();

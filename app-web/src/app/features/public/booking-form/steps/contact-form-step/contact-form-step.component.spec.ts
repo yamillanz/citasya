@@ -155,6 +155,36 @@ describe('ContactFormStepComponent', () => {
 
       expect(submitSpy).toHaveBeenCalledTimes(1);
     });
+
+    it('no debe emitir submit si loading es true', () => {
+      const submitSpy = jest.fn();
+      component.submit.subscribe(submitSpy);
+      fixture.componentRef.setInput('loading', true);
+
+      component.bookingForm().patchValue({
+        client_name: 'Juan Pérez',
+        client_phone: '555123456789',
+      });
+
+      component.onSubmit();
+
+      expect(submitSpy).not.toHaveBeenCalled();
+    });
+
+    it('no debe emitir submit dos veces si onSubmit se llama rápidamente', () => {
+      const submitSpy = jest.fn();
+      component.submit.subscribe(submitSpy);
+
+      component.bookingForm().patchValue({
+        client_name: 'Juan Pérez',
+        client_phone: '555123456789',
+      });
+
+      component.onSubmit();
+      component.onSubmit();
+
+      expect(submitSpy).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('goBack', () => {

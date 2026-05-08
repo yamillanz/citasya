@@ -22,6 +22,8 @@ export class ContactFormStepComponent {
   submit = output<void>();
   goBack = output<void>();
 
+  isSubmitting = false;
+
   hasContactError = computed(() => {
     const form = this.bookingForm();
     return !!(
@@ -50,6 +52,10 @@ export class ContactFormStepComponent {
   }
 
   onSubmit() {
+    if (this.loading() || this.isSubmitting) {
+      return;
+    }
+
     Object.values(this.bookingForm().controls).forEach((control) => {
       control.markAsTouched();
     });
@@ -62,6 +68,7 @@ export class ContactFormStepComponent {
       return;
     }
 
+    this.isSubmitting = true;
     this.submit.emit();
   }
 }

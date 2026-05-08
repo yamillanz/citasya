@@ -210,6 +210,10 @@ export class BookingFormComponent implements OnInit {
   }
 
   async onSubmit() {
+    if (this.loading()) {
+      return;
+    }
+
     const comp = this.company();
     const emp = this.employee();
     const services = this.selectedServices();
