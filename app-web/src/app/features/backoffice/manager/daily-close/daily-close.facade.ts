@@ -31,6 +31,48 @@ export interface AppointmentWithRelations extends Appointment {
   service?: { name: string };
 }
 
+export function calculateEmployeeStats(appointments: AppointmentWithRelations[]): Map<string, EmployeeStats> {
+  const stats = new Map<string, EmployeeStats>();
+  for (const apt of appointments) {
+    const empId = apt.employee_id;
+    const existing = stats.get(empId);
+    if (existing) {
+      const updated: EmployeeStats = {
+        totalAmount: existing.totalAmount + (apt.status === 'completed' ? (apt.amount_collected || 0) : 0),
+        totalAppointments: existing.totalAppointments + 1,
+        completedCount: existing.completedCount + (apt.status === 'completed' ? 1 : 0),
+        pendingCount: existing.pendingCount + (apt.status === 'pending' ? 1 : 0)
+      };
+      stats.set(empId, updated);
+    } else {
+      stats.set(empId, {
+        totalAmount: apt.status === 'completed' ? (apt.amount_collected || 0) : 0,
+        totalAppointments: 1,
+        completedCount: apt.status === 'completed' ? 1 : 0,
+        pendingCount: apt.status === 'pending' ? 1 : 0
+      });
+    }
+  }
+  return stats;
+}
+
+export function calculateDayStats(appointments: AppointmentWithRelations[]): DayStats {
+  let totalAmount = 0;
+  let totalAppointments = 0;
+  let completedCount = 0;
+  let pendingCount = 0;
+  for (const apt of appointments) {
+    totalAppointments++;
+    if (apt.status === 'completed') {
+      completedCount++;
+      totalAmount += apt.amount_collected || 0;
+    } else if (apt.status === 'pending') {
+      pendingCount++;
+    }
+  }
+  return { totalAmount, totalAppointments, completedCount, pendingCount };
+}
+
 @Injectable()
 export class DailyCloseFacade {
   private appointmentService = inject(AppointmentService);
@@ -62,8 +104,17 @@ export class DailyCloseFacade {
   readonly alreadyClosed = this._alreadyClosed.asReadonly();
   readonly amountInput = this._amountInput.asReadonly();
 
-  // Computed signals
-  readonly employees = computed(() => {
+  // Computed signals (wrappers)
+  readonly employees = computed(() => this.#buildEmployees());
+  readonly filteredAppointments = computed(() => this.#buildFilteredAppointments());
+  readonly employeeStats = computed(() => calculateEmployeeStats(this._appointments()));
+  readonly dayStats = computed(() => calculateDayStats(this._appointments()));
+  readonly completedAppointments = computed(() => this.#getCompletedAppointments());
+  readonly canNavigateNext = computed(() => this.#checkCanNavigateNext());
+  readonly isToday = computed(() => this.#checkIsToday());
+
+  // Private methods
+  #buildEmployees(): Employee[] {
     const empMap = new Map<string, Employee>();
     this._appointments().forEach(apt => {
       if (!empMap.has(apt.employee_id)) {
@@ -74,66 +125,32 @@ export class DailyCloseFacade {
       }
     });
     return Array.from(empMap.values());
-  });
+  }
 
-  readonly filteredAppointments = computed(() => {
+  #buildFilteredAppointments(): AppointmentWithRelations[] {
     const empId = this._selectedEmployee()?.id;
     if (!empId) return [];
     return this._appointments()
       .filter(apt => apt.employee_id === empId)
       .sort((a, b) => a.appointment_time.localeCompare(b.appointment_time));
-  });
+  }
 
-  readonly employeeStats = computed(() => {
-    const stats = new Map<string, EmployeeStats>();
-    this._appointments().forEach(apt => {
-      const empId = apt.employee_id;
-      if (!stats.has(empId)) {
-        stats.set(empId, {
-          totalAmount: 0,
-          totalAppointments: 0,
-          completedCount: 0,
-          pendingCount: 0
-        });
-      }
-      const empStats = stats.get(empId)!;
-      empStats.totalAppointments++;
-      if (apt.status === 'completed') {
-        empStats.completedCount++;
-        empStats.totalAmount += apt.amount_collected || 0;
-      } else if (apt.status === 'pending') {
-        empStats.pendingCount++;
-      }
-    });
-    return stats;
-  });
+  #getCompletedAppointments(): AppointmentWithRelations[] {
+    return this._appointments().filter(apt => apt.status === 'completed');
+  }
 
-  readonly dayStats = computed<DayStats>(() => {
-    const apps = this._appointments();
-    return {
-      totalAmount: apps.reduce((sum, apt) => sum + (apt.status === 'completed' ? (apt.amount_collected || 0) : 0), 0),
-      totalAppointments: apps.length,
-      completedCount: apps.filter(apt => apt.status === 'completed').length,
-      pendingCount: apps.filter(apt => apt.status === 'pending').length
-    };
-  });
-
-  readonly completedAppointments = computed(() =>
-    this._appointments().filter(apt => apt.status === 'completed')
-  );
-
-  readonly canNavigateNext = computed(() => {
+  #checkCanNavigateNext(): boolean {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const selected = new Date(this._selectedDate());
     selected.setHours(0, 0, 0, 0);
     return selected < today;
-  });
+  }
 
-  readonly isToday = computed(() => {
+  #checkIsToday(): boolean {
     const today = new Date();
     return this._selectedDate().toDateString() === today.toDateString();
-  });
+  }
 
   async initialize(): Promise<void> {
     const user = await this.authService.getCurrentUser();
