@@ -252,6 +252,15 @@
       .fc-more-link {
         display: none !important;
       }
+
+      .fc-scroller {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
     }
 
     @media (min-width: 769px) {
