@@ -61,26 +61,31 @@ export class SharedCalendarComponent {
     );
   });
 
-  calendarOptions = computed<CalendarOptions>(() => ({
-    plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-    initialView: this.currentView(),
-    locale: esLocale,
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,timeGridWeek'
-    },
-    slotMinTime: '08:00:00',
-    slotMaxTime: '20:00:00',
-    weekends: true,
-    selectable: true,
-    dayMaxEvents: false,
-    events: this.buildEvents(),
-    eventClassNames: () => ['calendar-event'],
-    dayCellClassNames: (arg) => this.getDayCellClassNames(arg),
-    dateClick: this.handleDateClick.bind(this),
-    eventClick: this.handleEventClick.bind(this)
-  }));
+  calendarOptions = computed<CalendarOptions>(() => {
+    // Force re-render when selected date changes so dayCellClassNames is re-evaluated
+    const _selectedDate = this.selectedDate();
+
+    return {
+      plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+      initialView: this.currentView(),
+      locale: esLocale,
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek'
+      },
+      slotMinTime: '08:00:00',
+      slotMaxTime: '20:00:00',
+      weekends: true,
+      selectable: true,
+      dayMaxEvents: false,
+      events: this.buildEvents(),
+      eventClassNames: () => ['calendar-event'],
+      dayCellClassNames: (arg) => this.getDayCellClassNames(arg),
+      dateClick: this.handleDateClick.bind(this),
+      eventClick: this.handleEventClick.bind(this)
+    };
+  });
 
   buildEvents(): EventInput[] {
     return this.appointments().map(apt => ({
@@ -118,10 +123,20 @@ export class SharedCalendarComponent {
   getDayCellClassNames(arg: any): string[] {
     const classes: string[] = [];
     const dateStr = this.formatDateISO(arg.date);
+
     const hasAppointment = this.appointments().some(apt => apt.appointment_date === dateStr);
     if (hasAppointment) {
       classes.push('has-apt');
     }
+
+    const selected = this.selectedDate();
+    if (selected) {
+      const selectedStr = this.formatDateISO(selected);
+      if (dateStr === selectedStr) {
+        classes.push('selected-day');
+      }
+    }
+
     return classes;
   }
 

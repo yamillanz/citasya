@@ -241,6 +241,11 @@
         background: rgba(110, 140, 90, 0.45) !important;
       }
 
+      .fc-daygrid-day.selected-day .fc-daygrid-day-frame {
+        box-shadow: inset 0 0 0 2px var(--color-sage) !important;
+        border-radius: var(--radius-md);
+      }
+
       .fc-daygrid-event {
         display: none !important;
       }
