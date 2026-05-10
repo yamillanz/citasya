@@ -30,6 +30,12 @@
   flex-wrap: wrap;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
 .header-text {
   .header-badge {
     display: inline-block;
@@ -555,6 +561,24 @@
    Button Overrides
    ================================ */
 :host ::ng-deep {
+  .btn-new-appointment {
+    background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
+    border: none !important;
+    padding: var(--space-sm) var(--space-lg) !important;
+    font-weight: 600 !important;
+    border-radius: var(--radius-lg) !important;
+    transition: all var(--duration-fast) ease !important;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(157, 193, 131, 0.4) !important;
+    }
+
+    .p-button-icon {
+      font-size: 0.875rem;
+    }
+  }
+
   .refresh-btn {
     padding: var(--space-xs) !important;
     min-width: 36px !important;

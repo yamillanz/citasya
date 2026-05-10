@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -14,6 +14,7 @@ import { EmailNotificationService } from '../../../../core/services/email-notifi
 import { UserService } from '../../../../core/services/user.service';
 import { Appointment, AppointmentStatus, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../../core/models/appointment.model';
 import { User } from '../../../../core/models/user.model';
+import { ManagerAppointmentCreateDialogComponent } from './manager-appointment-create-dialog.component';
 
 interface FilterOption {
   label: string;
@@ -36,10 +37,12 @@ interface DateGroup {
     DatePickerModule,
     InputNumberModule,
     DrawerModule,
-    TooltipModule
+    TooltipModule,
+    ManagerAppointmentCreateDialogComponent
   ],
   templateUrl: './appointments.component.html',
-  styleUrl: './appointments.component.scss'
+  styleUrl: './appointments.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppointmentsComponent implements OnInit {
   private authService = inject(AuthService);
@@ -62,6 +65,7 @@ export class AppointmentsComponent implements OnInit {
 
   // Drawer state
   showStatusDialog = signal(false);
+  showCreateDialog = signal(false);
   selectedAppointment = signal<Appointment | null>(null);
   statusAction = signal<'completed' | 'cancelled' | 'no_show' | null>(null);
   amountCollected = signal<number>(0);
@@ -150,7 +154,7 @@ export class AppointmentsComponent implements OnInit {
       ]);
       
       this.appointments.set(appointments);
-      this.employees.set(employees.filter(e => e.role === 'employee'));
+      this.employees.set(employees.filter(e => e.role === 'employee' || (e.role === 'manager' && e.can_be_employee)));
     } catch (error: any) {
       this.messageService.add({
         severity: 'error',
@@ -163,6 +167,15 @@ export class AppointmentsComponent implements OnInit {
   }
 
   async refreshData() {
+    await this.loadData();
+  }
+
+  openCreateDialog() {
+    this.showCreateDialog.set(true);
+  }
+
+  async handleAppointmentCreated() {
+    this.showCreateDialog.set(false);
     await this.loadData();
   }
 
