@@ -106,6 +106,35 @@ Por lo tanto:
 
 ---
 
+## PrimeNG DatePicker + OnPush — BUG CONOCIDO
+
+**⚠️ `p-datepicker` con `formControlName` y `ChangeDetectionStrategy.OnPush` REQUIERE DOBLE CLICK para propagar el valor al FormControl.**
+
+### Solución: Usar signal + ngModel en lugar de formControlName
+
+```typescript
+// ❌ ROTO: formControlName con p-datepicker
+appointment_date: [null, Validators.required]
+// <p-datepicker formControlName="appointment_date">
+
+// ✅ CORRECTO: Signal separado + ngModel standalone
+selectedDate = signal<Date | null>(null);
+dateTouched = signal(false);
+dateInvalid = computed(() => this.dateTouched() && !this.selectedDate());
+// <p-datepicker [ngModel]="selectedDate()" (onSelect)="onDateSelect($event)"
+//   [ngModelOptions]="{standalone: true}">
+```
+
+### También: `p-select` dentro de `p-dialog` con scroll tiene problemas de posicionamiento
+
+Usar **grid de botones** para selects de opciones pequeñas (horarios, etc.) en vez de `p-select` dentro de dialogs con scroll.
+
+**Spec completo:** `openspec/specs/primeng-datepicker-onpush-bug/spec.md`
+
+> Referencia: ver `.amount-drawer` en `styles.scss` como ejemplo implementado.
+
+---
+
 ## Guía de Estilos
 
 **⚠️ ANTES de crear cualquier componente o modificar UI, leer `STYLES.MD` en la raíz del proyecto.**

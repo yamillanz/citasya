@@ -7,15 +7,23 @@
         <h1>Citas</h1>
         <p>Gestiona y controla todas las citas</p>
       </div>
-      <p-button
-        icon="pi pi-refresh"
-        [loading]="loading()"
-        (onClick)="refreshData()"
-        styleClass="refresh-btn"
-        [outlined]="true"
-        pTooltip="Actualizar datos"
-        tooltipPosition="left">
-      </p-button>
+      <div class="header-actions">
+        <p-button
+          label="Nueva Cita"
+          icon="pi pi-plus"
+          (onClick)="openCreateDialog()"
+          styleClass="btn-new-appointment">
+        </p-button>
+        <p-button
+          icon="pi pi-refresh"
+          [loading]="loading()"
+          (onClick)="refreshData()"
+          styleClass="refresh-btn"
+          [outlined]="true"
+          pTooltip="Actualizar datos"
+          tooltipPosition="left">
+        </p-button>
+      </div>
     </div>
   </header>
 
@@ -305,5 +313,13 @@
     </div>
   </ng-template>
 </p-drawer>
+
+<app-manager-appointment-create-dialog
+  [visible]="showCreateDialog()"
+  [companyId]="companyId() ?? ''"
+  [employees]="employees()"
+  (onClose)="showCreateDialog.set(false)"
+  (onCreated)="handleAppointmentCreated()">
+</app-manager-appointment-create-dialog>
 
 
