@@ -64,7 +64,8 @@ export class AppointmentService {
   }
 
   async getAvailableSlots(companyId: string, employeeId: string, date: string, durationMinutes: number): Promise<string[]> {
-    const dayOfWeek = new Date(date).getDay();
+    const [year, month, day] = date.split('-').map(Number);
+    const dayOfWeek = new Date(year, month - 1, day).getDay();
     
     const schedules = await this.scheduleService.getByCompany(companyId);
     const daySchedule = schedules.find(s => s.day_of_week === dayOfWeek);

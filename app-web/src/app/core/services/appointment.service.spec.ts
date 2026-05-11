@@ -174,7 +174,7 @@ describe('AppointmentService', () => {
           services: [{ id: 's1', name: 'Corte', duration_minutes: 30, price: 25 }] } as any
       ]);
       scheduleServiceMock.getByCompany.mockResolvedValueOnce([
-        { day_of_week: 4, start_time: '09:00:00', end_time: '11:00:00' }
+        { day_of_week: 5, start_time: '09:00:00', end_time: '11:00:00' }
       ]);
 
       const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 30);
@@ -189,7 +189,7 @@ describe('AppointmentService', () => {
           services: [{ id: 's1', name: 'Tinte', duration_minutes: 60, price: 50 }] } as any
       ]);
       scheduleServiceMock.getByCompany.mockResolvedValueOnce([
-        { day_of_week: 4, start_time: '09:00:00', end_time: '12:00:00' }
+        { day_of_week: 5, start_time: '09:00:00', end_time: '12:00:00' }
       ]);
 
       const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 30);
@@ -214,7 +214,7 @@ describe('AppointmentService', () => {
     it('debe retornar vacío si el servicio no cabe en el horario', async () => {
       jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([]);
       scheduleServiceMock.getByCompany.mockResolvedValueOnce([
-        { day_of_week: 4, start_time: '09:00:00', end_time: '10:00:00' }
+        { day_of_week: 5, start_time: '09:00:00', end_time: '10:00:00' }
       ]);
 
       const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 90);

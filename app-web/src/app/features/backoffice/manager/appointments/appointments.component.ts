@@ -109,7 +109,8 @@ export class AppointmentsComponent implements OnInit {
       if (this.filterEmployee() && apt.employee_id !== this.filterEmployee()) return false;
       if (this.filterStatus() && apt.status !== this.filterStatus()) return false;
       if (this.filterDate()) {
-        const filterDateStr = this.filterDate()!.toISOString().split('T')[0];
+        const fd = this.filterDate()!;
+        const filterDateStr = `${fd.getFullYear()}-${String(fd.getMonth() + 1).padStart(2, '0')}-${String(fd.getDate()).padStart(2, '0')}`;
         if (apt.appointment_date !== filterDateStr) return false;
       }
       const query = this.searchQuery().toLowerCase().trim();
