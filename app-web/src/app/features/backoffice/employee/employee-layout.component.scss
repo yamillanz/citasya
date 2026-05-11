@@ -37,10 +37,30 @@
   padding: var(--space-lg);
   border-bottom: 1px solid var(--color-sand);
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 72px;
+}
+
+.sidebar-header-row {
+  display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   gap: var(--space-sm);
-  min-height: 72px;
+}
+
+.company-name {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .sidebar-logo {
@@ -249,6 +269,23 @@
   }
 }
 
+.mobile-header-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.mobile-company-name {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .mobile-logo {
   display: block;
   
@@ -307,11 +344,19 @@
   padding: var(--space-lg);
   border-bottom: 1px solid var(--color-sand);
   background: var(--color-linen);
+  text-align: center;
 
   svg {
     height: 34px;
     width: auto;
   }
+}
+
+.mobile-sidebar-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
 .mobile-sidebar-nav {

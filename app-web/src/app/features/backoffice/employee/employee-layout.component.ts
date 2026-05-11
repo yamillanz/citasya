@@ -35,6 +35,7 @@ export class EmployeeLayoutComponent implements OnInit {
   private router = inject(Router);
 
   user = signal<User | null>(null);
+  companyName = signal('');
   sidebarVisible = signal(false);
   copying = signal(false);
 
@@ -44,7 +45,14 @@ export class EmployeeLayoutComponent implements OnInit {
   ];
 
   async ngOnInit() {
-    this.user.set(await this.authService.getCurrentUser());
+    const user = await this.authService.getCurrentUser();
+    this.user.set(user);
+    if (user?.company_id) {
+      const company = await this.companyService.getById(user.company_id);
+      if (company) {
+        this.companyName.set(company.name);
+      }
+    }
   }
 
   async logout() {

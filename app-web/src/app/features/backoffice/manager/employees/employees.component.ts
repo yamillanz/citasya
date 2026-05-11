@@ -8,6 +8,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
+import { CompanyService } from '../../../../core/services/company.service';
 import { UserService } from '../../../../core/services/user.service';
 import { User } from '../../../../core/models/user.model';
 
@@ -28,12 +29,14 @@ import { User } from '../../../../core/models/user.model';
 })
 export class EmployeesComponent implements OnInit {
   private authService = inject(AuthService);
+  private companyService = inject(CompanyService);
   private userService = inject(UserService);
   private messageService = inject(MessageService);
 
   employees = signal<User[]>([]);
   loading = signal(true);
   companyId = signal<string | null>(null);
+  companyName = signal('');
   searchQuery = signal('');
   statusFilter = signal<'all' | 'active' | 'inactive'>('all');
 
@@ -65,6 +68,10 @@ export class EmployeesComponent implements OnInit {
     const user = await this.authService.getCurrentUser();
     if (user?.company_id) {
       this.companyId.set(user.company_id);
+      const company = await this.companyService.getById(user.company_id);
+      if (company) {
+        this.companyName.set(company.name);
+      }
       await this.loadEmployees();
     }
     this.loading.set(false);
