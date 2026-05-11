@@ -5,6 +5,9 @@
         <div class="header-badge">Cierre Diario</div>
         <h1>Cierre Diario</h1>
         <p>Panel de control para gestionar y cerrar citas del día</p>
+        @if (companyName()) {
+          <span class="company-context">{{ companyName() }}</span>
+        }
       </div>
       <p-button
         icon="pi pi-refresh"

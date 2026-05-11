@@ -10,7 +10,7 @@
       <div class="header-content">
         <div class="welcome-section">
           <div class="welcome-badge">Panel de Control</div>
-          <h1>Buenos días, {{ user()?.full_name?.split(' ')?.[0] || 'Usuario' }}</h1>
+          <h1>Buenos días, {{ user()?.full_name?.split(' ')?.[0] || 'Usuario' }} <span class="company-name-inline">— {{ companyName() }}</span></h1>
           <p>Aquí está el resumen de tu negocio hoy {{ todayFormatted }}</p>
         </div>
         <div class="header-actions">

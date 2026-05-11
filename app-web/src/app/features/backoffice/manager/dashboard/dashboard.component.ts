@@ -41,6 +41,7 @@ export class DashboardComponent implements OnInit {
   loading = signal(true);
   copying = signal(false);
   companySlug = signal('');
+  companyName = signal('');
 
   todayFormatted = new Date().toLocaleDateString('es-ES', {
     weekday: 'long',
@@ -75,8 +76,9 @@ export class DashboardComponent implements OnInit {
     if (this.user()?.company_id) {
       await this.loadTodayAppointments();
       const company = await this.companyService.getById(this.user()!.company_id!);
-      if (company?.slug) {
+      if (company) {
         this.companySlug.set(company.slug);
+        this.companyName.set(company.name);
       }
     }
     this.loading.set(false);
