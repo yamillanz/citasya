@@ -3,6 +3,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { EmployeesComponent } from './employees.component';
 import { AuthService } from '../../../../core/services/auth.service';
+import { CompanyService } from '../../../../core/services/company.service';
 import { UserService } from '../../../../core/services/user.service';
 import { MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
@@ -75,11 +76,16 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
       update: jest.fn().mockResolvedValue({ ...mockEmployees[0], is_active: false })
     } as any;
 
+    const companyServiceMock = {
+      getById: jest.fn().mockResolvedValue({ id: 'company-1', name: 'Test Company', slug: 'test-company', is_active: true, created_at: '', updated_at: '' })
+    } as any;
+
     await TestBed.configureTestingModule({
       imports: [EmployeesComponent, RouterTestingModule, TooltipModule],
       providers: [
         { provide: AuthService, useValue: authServiceMock },
         { provide: UserService, useValue: userServiceMock },
+        { provide: CompanyService, useValue: companyServiceMock },
         MessageService,
         provideNoopAnimations()
       ],
