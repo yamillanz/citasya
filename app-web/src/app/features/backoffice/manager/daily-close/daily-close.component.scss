@@ -966,6 +966,31 @@
   }
 }
 
+.amount-input-section {
+  textarea {
+    width: 100%;
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    font-size: 0.9375rem;
+    font-family: var(--font-body);
+    color: var(--color-text-primary);
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color var(--ease-out-expo, 0.3s ease), box-shadow var(--ease-out-expo, 0.3s ease);
+    
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: var(--color-sage);
+      box-shadow: 0 0 0 3px rgba(157, 193, 131, 0.1);
+    }
+  }
+}
+
 .drawer-actions {
   display: flex;
   gap: 12px;
@@ -1010,6 +1035,25 @@
       color: white !important;
     }
   }
+}
+
+.stat-value-bs {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.total-value-bs {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  display: block;
+}
+
+.apt-amount-bs {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  display: block;
 }
 
 @media (max-width: 1024px) {

@@ -6,6 +6,7 @@ export interface WeeklySummaryRow {
   employee_name: string;
   total_appointments: number;
   total_amount: number;
+  total_amount_bs: number;
   total_commission: number;
 }
 
@@ -15,6 +16,8 @@ export interface WeeklyDetailRow {
   client_name: string;
   services: Service[];
   amount_collected: number;
+  exchange_rate: number;
+  amount_in_bs: number;
   status: AppointmentStatus;
   commission: number;
 }

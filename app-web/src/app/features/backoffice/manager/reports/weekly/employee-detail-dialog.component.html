@@ -49,6 +49,7 @@
       </div>
       <div class="stat-card stat-amount">
         <span class="stat-value">${{ totalAmount().toFixed(2) }}</span>
+        <span class="stat-value-bs">Bs. {{ totalAmountBs().toFixed(2) }}</span>
         <span class="stat-label">Monto Total</span>
       </div>
       <div class="stat-card stat-commission">
@@ -71,6 +72,7 @@
             <th>Cliente</th>
             <th>Servicios</th>
             <th pSortableColumn="amount_collected">Monto <p-sortIcon field="amount_collected"></p-sortIcon></th>
+            <th pSortableColumn="amount_in_bs">Monto Bs. <p-sortIcon field="amount_in_bs"></p-sortIcon></th>
             <th pSortableColumn="commission">Comisión <p-sortIcon field="commission"></p-sortIcon></th>
             <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
           </tr>
@@ -82,6 +84,7 @@
             <td>{{ row.client_name }}</td>
             <td>{{ formatServicesList(row.services) }}</td>
             <td>${{ row.amount_collected.toFixed(2) }}</td>
+            <td>Bs. {{ row.amount_in_bs.toFixed(2) }}</td>
             <td class="commission-cell">${{ row.commission.toFixed(2) }}</td>
             <td>
               <p-tag [value]="getStatusLabel(row.status)" [severity]="getStatusSeverity(row.status)"></p-tag>
@@ -90,7 +93,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="7" class="empty-cell">No hay citas en este período.</td>
+            <td colspan="8" class="empty-cell">No hay citas en este período.</td>
           </tr>
         </ng-template>
       </p-table>

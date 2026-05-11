@@ -541,6 +541,27 @@ a {
   color: white !important;
 }
 
+/* Drawer form spacing */
+.amount-drawer .drawer-content {
+  padding: var(--space-lg) !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  background: var(--color-warm-white) !important;
+}
+
+.amount-drawer .amount-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.amount-drawer .amount-input-section label {
+  font-weight: 500;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+}
+
 /* ================================
    Appointments Status Drawer Styles
    ================================ */

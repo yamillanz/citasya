@@ -177,9 +177,19 @@
               </div>
               
               @if (apt.status === 'completed' && apt.amount_collected) {
-                <div class="card-amount">
-                  <i class="pi pi-dollar"></i>
-                  {{ apt.amount_collected | number:'1.2-2' }}
+                <div class="card-amount-info">
+                  <div class="amount-line">
+                    <span class="amount-usd"><i class="pi pi-dollar"></i>{{ apt.amount_collected | number:'1.2-2' }}</span>
+                    @if (apt.exchange_rate && apt.exchange_rate !== 1) {
+                      <span class="amount-rate">Tasa: {{ apt.exchange_rate | number:'1.2-2' }}</span>
+                    }
+                  </div>
+                  @if (apt.amount_in_bs) {
+                    <span class="amount-bs">Bs. {{ apt.amount_in_bs | number:'1.2-2' }}</span>
+                  }
+                  @if (apt.observations) {
+                    <span class="amount-obs">{{ apt.observations }}</span>
+                  }
                 </div>
               }
               

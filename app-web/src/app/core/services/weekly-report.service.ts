@@ -83,6 +83,7 @@ export class WeeklyReportService {
     employeeMap.forEach((value, empId) => {
       const totalAppointments = value.appointments.length;
       const totalAmount = value.appointments.reduce((sum, apt) => sum + (apt.amount_collected || 0), 0);
+      const totalAmountBs = value.appointments.reduce((sum, apt) => sum + (apt.amount_in_bs || 0), 0);
       const totalCommission = value.appointments.reduce((sum, apt) => {
         return sum + calculateAppointmentCommission(apt.amount_collected || 0, apt.services || []);
       }, 0);
@@ -92,6 +93,7 @@ export class WeeklyReportService {
         employee_name: value.name,
         total_appointments: totalAppointments,
         total_amount: totalAmount,
+        total_amount_bs: totalAmountBs,
         total_commission: Math.round(totalCommission * 100) / 100
       });
     });
@@ -131,9 +133,11 @@ export class WeeklyReportService {
       appointment_date: apt.appointment_date,
       appointment_time: apt.appointment_time,
       client_name: apt.client_name,
+      status: apt.status as AppointmentStatus,
       services: apt.services || [],
       amount_collected: apt.amount_collected || 0,
-      status: apt.status as AppointmentStatus,
+      exchange_rate: apt.exchange_rate || 1,
+      amount_in_bs: apt.amount_in_bs || 0,
       commission: Math.round(
         calculateAppointmentCommission(apt.amount_collected || 0, apt.services || []) * 100
       ) / 100
