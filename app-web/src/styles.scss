@@ -701,6 +701,55 @@ a {
   box-shadow: 0 0 0 3px var(--color-sage-pale);
 }
 
+.status-drawer .amount-input {
+  margin-bottom: var(--space-md);
+}
+
+.status-drawer .amount-input .p-inputnumber {
+  width: 100%;
+}
+
+.status-drawer .amount-input .p-inputnumber .p-inputnumber-input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 1.125rem;
+  background: white;
+  transition: all var(--duration-fast) ease;
+}
+
+.status-drawer .amount-input .p-inputnumber .p-inputnumber-input:focus {
+  outline: none;
+  border-color: var(--color-sage);
+  box-shadow: 0 0 0 3px var(--color-sage-pale);
+}
+
+.status-drawer .amount-input textarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color var(--ease-out-expo, 0.3s ease), box-shadow var(--ease-out-expo, 0.3s ease);
+  box-sizing: border-box;
+}
+
+.status-drawer .amount-input textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.status-drawer .amount-input textarea:focus {
+  outline: none;
+  border-color: var(--color-sage);
+  box-shadow: 0 0 0 3px var(--color-sage-pale);
+}
+
 .status-drawer .confirm-message {
   display: flex;
   flex-direction: column;

@@ -286,17 +286,50 @@
   <div class="drawer-content">
     @if (statusAction() === 'completed') {
       <div class="amount-input">
-        <label>Monto cobrado</label>
+        <label>Monto cobrado *</label>
         <div class="price-input">
           <span class="currency-symbol">$</span>
           <p-inputNumber 
             [(ngModel)]="amountCollected"
+            (onInput)="onUsdChange($event.value)"
             mode="decimal"
             [minFractionDigits]="2"
             [maxFractionDigits]="2"
             placeholder="0.00">
           </p-inputNumber>
         </div>
+      </div>
+      <div class="amount-input">
+        <label>Tasa de cambio *</label>
+        <p-inputNumber 
+          [(ngModel)]="exchangeRate"
+          (onInput)="onRateChange($event.value)"
+          mode="decimal"
+          [min]="0.01"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          placeholder="1.00">
+        </p-inputNumber>
+      </div>
+      <div class="amount-input">
+        <label>Monto en bolívares *</label>
+        <p-inputNumber 
+          [(ngModel)]="amountBs"
+          (onInput)="onBsChange($event.value)"
+          mode="decimal"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          placeholder="0.00">
+        </p-inputNumber>
+      </div>
+      <div class="amount-input">
+        <label>Observaciones</label>
+        <textarea
+          pInputTextarea
+          [(ngModel)]="observations"
+          rows="3"
+          placeholder="Ej: descuento aplicado, cliente frecuente...">
+        </textarea>
       </div>
     } @else if (statusAction() === 'cancelled' || statusAction() === 'no_show') {
       <div class="confirm-message">
