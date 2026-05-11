@@ -9,6 +9,7 @@ import { MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { DrawerModule } from 'primeng/drawer';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { TextareaModule } from 'primeng/textarea';
 
 import { TooltipModule } from 'primeng/tooltip';
 import { DailyCloseFacade, Employee, AppointmentWithRelations } from './daily-close.facade';
@@ -28,6 +29,7 @@ import { IConfirmationDialog } from '../../../../core/interfaces/confirmation-di
     InputTextModule,
     DrawerModule,
     InputNumberModule,
+    TextareaModule,
     TooltipModule
   ],
   templateUrl: './daily-close.component.html',
@@ -43,6 +45,10 @@ export class DailyCloseComponent implements OnInit {
   selectedAppointment = signal<AppointmentWithRelations | null>(null);
   amountInput: number | null = null;
   searchQuery = signal('');
+  exchangeRate: number = 1;
+  amountBs: number | null = null;
+  observations: string = '';
+  private lastEdited: 'usd' | 'bs' | null = null;
 
   maxDateValue = new Date();
 
@@ -104,6 +110,10 @@ export class DailyCloseComponent implements OnInit {
   openCompleteDrawer(appointment: AppointmentWithRelations) {
     this.selectedAppointment.set(appointment);
     this.amountInput = null;
+    this.exchangeRate = 1;
+    this.amountBs = null;
+    this.observations = '';
+    this.lastEdited = null;
     this.amountDrawerVisible.set(true);
   }
 
@@ -111,6 +121,37 @@ export class DailyCloseComponent implements OnInit {
     this.amountDrawerVisible.set(false);
     this.selectedAppointment.set(null);
     this.amountInput = null;
+    this.exchangeRate = 1;
+    this.amountBs = null;
+    this.observations = '';
+    this.lastEdited = null;
+  }
+
+  onUsdChange(value: number | null) {
+    if (this.lastEdited === 'bs') return;
+    if (value !== null && this.exchangeRate > 0) {
+      this.lastEdited = 'usd';
+      this.amountBs = parseFloat((value * this.exchangeRate).toFixed(2));
+      this.lastEdited = null;
+    }
+  }
+
+  onRateChange(value: number | null) {
+    if (this.lastEdited === 'bs') return;
+    if (value !== null && this.amountInput !== null && value > 0) {
+      this.lastEdited = 'usd';
+      this.amountBs = parseFloat((this.amountInput * value).toFixed(2));
+      this.lastEdited = null;
+    }
+  }
+
+  onBsChange(value: number | null) {
+    if (this.lastEdited === 'usd') return;
+    if (value !== null && this.exchangeRate > 0) {
+      this.lastEdited = 'bs';
+      this.amountInput = parseFloat((value / this.exchangeRate).toFixed(2));
+      this.lastEdited = null;
+    }
   }
 
   async confirmCompletion() {
@@ -126,8 +167,32 @@ export class DailyCloseComponent implements OnInit {
       return;
     }
 
+    if (this.exchangeRate === null || this.exchangeRate === undefined || this.exchangeRate <= 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La tasa de cambio debe ser mayor a 0'
+      });
+      return;
+    }
+
+    if (this.amountBs === null || this.amountBs === undefined || this.amountBs <= 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'El monto en bolívares debe ser mayor a 0'
+      });
+      return;
+    }
+
     try {
-      await this.facade.confirmAppointmentCompletion(apt.id, this.amountInput);
+      await this.facade.confirmAppointmentCompletion(
+        apt.id,
+        this.amountInput,
+        this.exchangeRate,
+        this.amountBs,
+        this.observations
+      );
       this.messageService.add({
         severity: 'success',
         summary: 'Éxito',

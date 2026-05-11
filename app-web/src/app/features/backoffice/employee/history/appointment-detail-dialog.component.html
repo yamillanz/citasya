@@ -111,6 +111,24 @@
                 }
               </span>
             </div>
+            <div class="detail-row">
+              <span class="label">Monto Bs.:</span>
+              <span class="value amount">
+                @if (appointment()!.amount_in_bs) {
+                  Bs. {{ appointment()!.amount_in_bs }}
+                } @else {
+                  -
+                }
+              </span>
+            </div>
+
+            @if (appointment()!.observations) {
+              <div class="detail-row">
+                <span class="label">Observaciones:</span>
+                <span class="value notes-text">{{ appointment()!.observations }}</span>
+              </div>
+            }
+
           </div>
         </p-card>
 

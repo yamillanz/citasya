@@ -51,6 +51,7 @@ export class EmployeeDetailDialogComponent implements OnChanges {
   cancelledCount = computed(() => this.detailData().filter(r => r.status === 'cancelled').length);
   noShowCount = computed(() => this.detailData().filter(r => r.status === 'no_show').length);
   totalAmount = computed(() => this.detailData().reduce((sum, r) => sum + r.amount_collected, 0));
+  totalAmountBs = computed(() => this.detailData().reduce((sum, r) => sum + r.amount_in_bs, 0));
   totalCommission = computed(() => this.detailData().reduce((sum, r) => sum + r.commission, 0));
 
   ngOnChanges(changes: SimpleChanges) {
@@ -85,13 +86,14 @@ export class EmployeeDetailDialogComponent implements OnChanges {
 
     this.exporting.set(true);
 
-    const headers = ['Fecha', 'Hora', 'Cliente', 'Servicios', 'Monto', 'Comisión', 'Estado'];
+    const headers = ['Fecha', 'Hora', 'Cliente', 'Servicios', 'Monto', 'Monto Bs.', 'Comisión', 'Estado'];
     const rows = data.map(row => [
       row.appointment_date,
       row.appointment_time,
       row.client_name,
       formatServicesList(row.services),
       `$${row.amount_collected.toFixed(2)}`,
+      `Bs. ${(row.amount_in_bs ?? 0).toFixed(2)}`,
       `$${row.commission.toFixed(2)}`,
       getStatusLabel(row.status)
     ]);

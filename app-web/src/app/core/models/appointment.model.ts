@@ -15,6 +15,9 @@ export interface Appointment {
   appointment_time: string;
   status: AppointmentStatus;
   amount_collected?: number;
+  exchange_rate?: number;
+  amount_in_bs?: number;
+  observations?: string;
   notes?: string;
   cancellation_token?: string;
   created_at: string;

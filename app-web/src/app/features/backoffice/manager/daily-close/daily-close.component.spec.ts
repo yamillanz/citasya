@@ -35,7 +35,7 @@ class TestDailyCloseFacade {
   markAppointmentAsNoShow = jest.fn().mockResolvedValue(undefined);
   cancelAppointment = jest.fn().mockResolvedValue(undefined);
   generateDailyClose = jest.fn().mockResolvedValue(undefined);
-  getEmployeeStats = jest.fn(() => ({ totalAmount: 0, totalAppointments: 0, completedCount: 0, pendingCount: 0 }));
+  getEmployeeStats = jest.fn(() => ({ totalAmount: 0, totalAmountBs: 0, totalAppointments: 0, completedCount: 0, pendingCount: 0 }));
   getStatusLabel = jest.fn((s: string) => s);
   getStatusClass = jest.fn((s: string) => s);
   formatDate = jest.fn(() => 'formatted date');
@@ -63,7 +63,8 @@ describe('DailyCloseComponent', () => {
 
   const createMockAppointment = (overrides: Partial<AppointmentWithRelations> = {}): AppointmentWithRelations => ({
     id: 'apt-1', client_name: 'Cliente Uno', appointment_date: '2026-03-20', appointment_time: '10:00',
-    status: 'completed' as AppointmentStatus, amount_collected: 25, employee_id: 'emp-1', service_id: 'srv-1',
+    status: 'completed' as AppointmentStatus, amount_collected: 25, exchange_rate: 1, amount_in_bs: 25, observations: '',
+    employee_id: 'emp-1', service_id: 'srv-1',
     company_id: 'company-1', service: { name: 'Corte de cabello' }, employee: { full_name: 'Juan Pérez' },
     created_at: new Date().toISOString(), updated_at: new Date().toISOString(), notes: '',
     cancellation_token: '', client_phone: '', client_email: '', ...overrides
@@ -125,6 +126,66 @@ describe('DailyCloseComponent', () => {
       await component.confirmCompletion();
       // Validation happens before facade call
       expect(facade.confirmAppointmentCompletion).not.toHaveBeenCalled();
+    });
+    it('should reset exchangeRate, amountBs, and observations when opening drawer', () => {
+      component.exchangeRate = 2;
+      component.amountBs = 100;
+      component.observations = 'test';
+      component.openCompleteDrawer(mockAppointments[1]);
+      expect(component.exchangeRate).toBe(1);
+      expect(component.amountBs).toBeNull();
+      expect(component.observations).toBe('');
+    });
+    it('should recalculate BS when USD changes', () => {
+      component.exchangeRate = 2;
+      component.onUsdChange(50);
+      expect(component.amountBs).toBe(100);
+    });
+    it('should recalculate BS when exchange rate changes', () => {
+      component.amountInput = 50;
+      component.onRateChange(3);
+      expect(component.amountBs).toBe(150);
+    });
+    it('should recalculate USD when BS changes', () => {
+      component.exchangeRate = 2;
+      component.onBsChange(200);
+      expect(component.amountInput).toBe(100);
+    });
+    it('should validate exchange rate is greater than 0', async () => {
+      const facade = TestBed.inject(DailyCloseFacade) as TestDailyCloseFacade;
+      component.openCompleteDrawer(mockAppointments[1]);
+      component.amountInput = 50;
+      component.exchangeRate = 0;
+      component.amountBs = 100;
+      await component.confirmCompletion();
+      expect(facade.confirmAppointmentCompletion).not.toHaveBeenCalled();
+      expect(mockMessageService.add).toHaveBeenCalledWith(
+        expect.objectContaining({ detail: 'La tasa de cambio debe ser mayor a 0' })
+      );
+    });
+    it('should validate BS amount is greater than 0', async () => {
+      const facade = TestBed.inject(DailyCloseFacade) as TestDailyCloseFacade;
+      component.openCompleteDrawer(mockAppointments[1]);
+      component.amountInput = 50;
+      component.exchangeRate = 1;
+      component.amountBs = 0;
+      await component.confirmCompletion();
+      expect(facade.confirmAppointmentCompletion).not.toHaveBeenCalled();
+      expect(mockMessageService.add).toHaveBeenCalledWith(
+        expect.objectContaining({ detail: 'El monto en bolívares debe ser mayor a 0' })
+      );
+    });
+    it('should pass all values to facade when completing', async () => {
+      const facade = TestBed.inject(DailyCloseFacade) as TestDailyCloseFacade;
+      component.openCompleteDrawer(mockAppointments[1]);
+      component.amountInput = 50;
+      component.exchangeRate = 1.5;
+      component.amountBs = 75;
+      component.observations = 'descuento';
+      await component.confirmCompletion();
+      expect(facade.confirmAppointmentCompletion).toHaveBeenCalledWith(
+        'apt-2', 50, 1.5, 75, 'descuento'
+      );
     });
   });
 

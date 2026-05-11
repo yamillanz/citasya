@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { TextareaModule } from 'primeng/textarea';
 import { DrawerModule } from 'primeng/drawer';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
@@ -36,6 +37,7 @@ interface DateGroup {
     SelectModule,
     DatePickerModule,
     InputNumberModule,
+    TextareaModule,
     DrawerModule,
     TooltipModule,
     ManagerAppointmentCreateDialogComponent
@@ -69,6 +71,10 @@ export class AppointmentsComponent implements OnInit {
   selectedAppointment = signal<Appointment | null>(null);
   statusAction = signal<'completed' | 'cancelled' | 'no_show' | null>(null);
   amountCollected = signal<number>(0);
+  exchangeRate = signal<number>(1);
+  amountBs = signal<number>(0);
+  observations = signal<string>('');
+  private lastEdited: 'usd' | 'bs' | null = null;
 
   statusOptions: FilterOption[] = [
     { label: 'Todos los estados', value: '' },
@@ -202,6 +208,10 @@ export class AppointmentsComponent implements OnInit {
     
     if (status === 'completed') {
       this.amountCollected.set(0);
+      this.exchangeRate.set(1);
+      this.amountBs.set(0);
+      this.observations.set('');
+      this.lastEdited = null;
     }
   }
 
@@ -250,6 +260,33 @@ export class AppointmentsComponent implements OnInit {
     }
   }
 
+  onUsdChange(value: number | null) {
+    if (this.lastEdited === 'bs') return;
+    if (value !== null && this.exchangeRate() > 0) {
+      this.lastEdited = 'usd';
+      this.amountBs.set(parseFloat((value * this.exchangeRate()).toFixed(2)));
+      this.lastEdited = null;
+    }
+  }
+
+  onRateChange(value: number | null) {
+    if (this.lastEdited === 'bs') return;
+    if (value !== null && this.amountCollected() > 0 && value > 0) {
+      this.lastEdited = 'usd';
+      this.amountBs.set(parseFloat((this.amountCollected() * value).toFixed(2)));
+      this.lastEdited = null;
+    }
+  }
+
+  onBsChange(value: number | null) {
+    if (this.lastEdited === 'usd') return;
+    if (value !== null && this.exchangeRate() > 0) {
+      this.lastEdited = 'bs';
+      this.amountCollected.set(parseFloat((value / this.exchangeRate()).toFixed(2)));
+      this.lastEdited = null;
+    }
+  }
+
   async confirmStatusChange() {
     const appointment = this.selectedAppointment();
     const action = this.statusAction();
@@ -262,7 +299,10 @@ export class AppointmentsComponent implements OnInit {
   async updateStatus(appointment: Appointment, status: AppointmentStatus) {
     try {
       const amount = status === 'completed' ? this.amountCollected() : undefined;
-      await this.appointmentService.updateStatus(appointment.id, status, amount);
+      const rate = status === 'completed' ? this.exchangeRate() : undefined;
+      const bs = status === 'completed' ? this.amountBs() : undefined;
+      const obs = status === 'completed' ? this.observations() : undefined;
+      await this.appointmentService.updateStatus(appointment.id, status, amount, rate, bs, obs);
 
       if (status === 'cancelled' || status === 'no_show') {
         this.emailNotificationService.notify(appointment.id, status);
@@ -270,7 +310,7 @@ export class AppointmentsComponent implements OnInit {
 
       const updated = this.appointments().map(apt => 
         apt.id === appointment.id 
-          ? { ...apt, status, amount_collected: amount || apt.amount_collected }
+          ? { ...apt, status, amount_collected: amount || apt.amount_collected, exchange_rate: rate || apt.exchange_rate, amount_in_bs: bs || apt.amount_in_bs, observations: obs || apt.observations }
           : apt
       );
       this.appointments.set(updated);

@@ -21,6 +21,8 @@ export interface AppointmentWithService {
   appointment_time: string;
   status: string;
   amount_collected?: number;
+  amount_in_bs?: number;
+  observations?: string;
   notes?: string;
   cancellation_token?: string;
   created_at: string;
@@ -100,7 +102,9 @@ export class SharedCalendarComponent {
         clientPhone: apt.client_phone,
         clientEmail: apt.client_email || '',
         status: apt.status,
-        amount: apt.amount_collected
+        amount: apt.amount_collected,
+        amountBs: apt.amount_in_bs,
+        observations: apt.observations,
       }
     }));
   }

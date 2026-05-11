@@ -216,7 +216,7 @@ export class AppointmentService {
     return data?.map(apt => this.flattenServices(apt)) || [];
   }
 
-  async updateStatus(id: string, status: AppointmentStatus, amountCollected?: number): Promise<void> {
+  async updateStatus(id: string, status: AppointmentStatus, amountCollected?: number, exchangeRate?: number, amountInBs?: number, observations?: string): Promise<void> {
     const updateData: Partial<Appointment> = { 
       status, 
       updated_at: new Date().toISOString() 
@@ -224,6 +224,18 @@ export class AppointmentService {
     
     if (amountCollected !== undefined) {
       updateData.amount_collected = amountCollected;
+    }
+    
+    if (exchangeRate !== undefined) {
+      updateData.exchange_rate = exchangeRate;
+    }
+    
+    if (amountInBs !== undefined) {
+      updateData.amount_in_bs = amountInBs;
+    }
+    
+    if (observations !== undefined) {
+      updateData.observations = observations;
     }
 
     const { error } = await this.supabase

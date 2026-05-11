@@ -147,6 +147,10 @@
                 Monto
                 <p-sortIcon field="amount_collected"></p-sortIcon>
               </th>
+              <th pSortableColumn="amount_in_bs">
+                Monto Bs.
+                <p-sortIcon field="amount_in_bs"></p-sortIcon>
+              </th>
               <th>Acciones</th>
             </tr>
           </ng-template>
@@ -183,6 +187,13 @@
                   <span class="no-amount">-</span>
                 }
               </td>
+              <td>
+                @if (apt.amount_in_bs) {
+                  <span class="amount">Bs. {{ apt.amount_in_bs }}</span>
+                } @else {
+                  <span class="no-amount">-</span>
+                }
+              </td>
               <td (click)="$event.stopPropagation()">
                 <p-button 
                   icon="pi pi-eye"
@@ -197,7 +208,7 @@
           
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="9" class="empty-message">
+              <td colspan="10" class="empty-message">
                 No se encontraron citas
               </td>
             </tr>

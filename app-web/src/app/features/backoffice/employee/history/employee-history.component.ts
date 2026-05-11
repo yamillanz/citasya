@@ -202,7 +202,7 @@ export class EmployeeHistoryComponent implements OnInit {
 
     this.exporting.set(true);
 
-    const headers = ['Fecha', 'Hora', 'Cliente', 'Teléfono', 'Email', 'Servicios', 'Duración (min)', 'Precio', 'Estado', 'Monto', 'Notas'];
+    const headers = ['Fecha', 'Hora', 'Cliente', 'Teléfono', 'Email', 'Servicios', 'Duración (min)', 'Precio', 'Estado', 'Monto', 'Monto Bs.', 'Notas'];
     
     const rows = data.map(apt => [
       this.formatDate(apt.appointment_date),
@@ -215,6 +215,7 @@ export class EmployeeHistoryComponent implements OnInit {
       `$${calculateTotalPrice(apt.services || [])}`,
       this.getStatusLabel(apt.status),
       apt.amount_collected ? `$${apt.amount_collected}` : '-',
+      apt.amount_in_bs ? `Bs. ${apt.amount_in_bs}` : '-',
       apt.notes || ''
     ]);
 

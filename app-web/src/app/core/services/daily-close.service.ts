@@ -35,9 +35,13 @@ export class DailyCloseService {
       (sum, apt) => sum + (apt.amount_collected || 0), 
       0
     );
+    const totalAmountBs = completedAppointments.reduce(
+      (sum, apt) => sum + (apt.amount_in_bs || 0),
+      0
+    );
 
     // Generate PDF
-    this.generatePDF(date, completedAppointments, totalAmount, companyName);
+    this.generatePDF(date, completedAppointments, totalAmount, totalAmountBs, companyName);
     
     // Save to daily_closes
     const { error } = await this.supabase
@@ -56,6 +60,7 @@ export class DailyCloseService {
     date: string, 
     appointments: Appointment[], 
     total: number,
+    totalAmountBs: number,
     companyName: string
   ): void {
     const doc = new jsPDF();
@@ -76,6 +81,7 @@ export class DailyCloseService {
     doc.setFontSize(11);
     doc.text(`Total de citas completadas: ${appointments.length}`, 20, 65);
     doc.text(`Monto total: $${total.toFixed(2)}`, 20, 72);
+    doc.text(`Total Bs.: Bs. ${totalAmountBs.toFixed(2)}`, 20, 82);
     
     // Appointments detail
     doc.setFontSize(14);
@@ -92,6 +98,7 @@ export class DailyCloseService {
     doc.text('Cliente', 50, y);
     doc.text('Servicio', 100, y);
     doc.text('Monto', 170, y);
+    doc.text('Monto Bs.', 220, y);
     
     doc.setTextColor(0, 0, 0);
     y += 10;
@@ -107,6 +114,17 @@ export class DailyCloseService {
       doc.text(apt.client_name.substring(0, 20), 50, y);
       doc.text(((apt as any).service?.name || 'N/A').substring(0, 25), 100, y);
       doc.text(`$${(apt.amount_collected || 0).toFixed(2)}`, 170, y);
+      doc.text(`Bs. ${(apt.amount_in_bs || 0).toFixed(2)}`, 220, y);
+      
+      // Observations
+      if (apt.observations) {
+        y += 5;
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Obs: ${apt.observations.substring(0, 50)}`, 50, y);
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+      }
       
       y += 8;
       
@@ -122,6 +140,7 @@ export class DailyCloseService {
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text(`TOTAL: $${total.toFixed(2)}`, 170, y, { align: 'right' });
+    doc.text(`TOTAL Bs.: Bs. ${totalAmountBs.toFixed(2)}`, 220, y, { align: 'right' });
     
     // Save
     doc.save(`cierre-${date}.pdf`);

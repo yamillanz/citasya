@@ -15,6 +15,9 @@ const createMockAppointment = (overrides: Partial<AppointmentWithRelations> = {}
   appointment_time: '10:00',
   status: 'completed' as AppointmentStatus,
   amount_collected: 25,
+  exchange_rate: 1,
+  amount_in_bs: 25,
+  observations: '',
   employee_id: 'emp-1',
   service_id: 'srv-1',
   company_id: 'company-1',
@@ -71,6 +74,16 @@ describe('Pure Functions', () => {
       expect(stats.pendingCount).toBe(0);
       expect(stats.totalAmount).toBe(300);
     });
+
+    it('should calculate totalAmountBs alongside totalAmount', () => {
+      const apps = [
+        createMockAppointment({ status: 'completed', amount_collected: 50, amount_in_bs: 75 }),
+        createMockAppointment({ status: 'completed', amount_collected: 100, amount_in_bs: 150 }),
+        createMockAppointment({ status: 'pending', amount_in_bs: undefined }),
+      ];
+      const stats = calculateDayStats(apps);
+      expect(stats.totalAmountBs).toBe(225);
+    });
   });
 
   describe('calculateEmployeeStats', () => {
@@ -116,6 +129,17 @@ describe('Pure Functions', () => {
       expect(stats.get('emp-2')?.totalAppointments).toBe(2);
       expect(stats.get('emp-2')?.pendingCount).toBe(1);
       expect(stats.get('emp-2')?.totalAmount).toBe(0);
+    });
+
+    it('should calculate totalAmountBs per employee', () => {
+      const apps = [
+        createMockAppointment({ employee_id: 'emp-1', status: 'completed', amount_in_bs: 75 }),
+        createMockAppointment({ employee_id: 'emp-1', status: 'completed', amount_in_bs: 150 }),
+        createMockAppointment({ employee_id: 'emp-2', status: 'completed', amount_in_bs: undefined }),
+      ];
+      const stats = calculateEmployeeStats(apps);
+      expect(stats.get('emp-1')?.totalAmountBs).toBe(225);
+      expect(stats.get('emp-2')?.totalAmountBs).toBe(0);
     });
   });
 });
@@ -484,7 +508,7 @@ describe('DailyCloseFacade', () => {
 
         await facade.confirmAppointmentCompletion('apt-3', 75);
 
-        expect(mockAppointmentService.updateStatus).toHaveBeenCalledWith('apt-3', 'completed', 75);
+        expect(mockAppointmentService.updateStatus).toHaveBeenCalledWith('apt-3', 'completed', 75, undefined, undefined, undefined);
       });
 
       it('should throw error if amount is invalid', async () => {
@@ -509,6 +533,29 @@ describe('DailyCloseFacade', () => {
 
         await expect(facade.confirmAppointmentCompletion('apt-3', 75))
           .rejects.toThrow('Update failed');
+      });
+
+      it('should pass exchangeRate, amountBs, and observations to updateStatus', async () => {
+        mockAppointmentService.updateStatus.mockResolvedValue(undefined);
+
+        await facade.confirmAppointmentCompletion('apt-3', 75, 1.5, 112.5, 'descuento aplicado');
+
+        expect(mockAppointmentService.updateStatus).toHaveBeenCalledWith(
+          'apt-3', 'completed', 75, 1.5, 112.5, 'descuento aplicado'
+        );
+      });
+
+      it('should update local state with new fields', async () => {
+        mockAppointmentService.updateStatus.mockResolvedValue(undefined);
+
+        await facade.confirmAppointmentCompletion('apt-3', 75, 1.5, 112.5, 'test obs');
+
+        const updated = facade.appointments().find(a => a.id === 'apt-3');
+        expect(updated?.status).toBe('completed');
+        expect(updated?.amount_collected).toBe(75);
+        expect(updated?.exchange_rate).toBe(1.5);
+        expect(updated?.amount_in_bs).toBe(112.5);
+        expect(updated?.observations).toBe('test obs');
       });
     });
 

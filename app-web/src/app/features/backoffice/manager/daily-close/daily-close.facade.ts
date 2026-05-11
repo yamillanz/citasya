@@ -14,6 +14,7 @@ export interface Employee {
 
 export interface EmployeeStats {
   totalAmount: number;
+  totalAmountBs: number;
   totalAppointments: number;
   completedCount: number;
   pendingCount: number;
@@ -21,6 +22,7 @@ export interface EmployeeStats {
 
 export interface DayStats {
   totalAmount: number;
+  totalAmountBs: number;
   totalAppointments: number;
   completedCount: number;
   pendingCount: number;
@@ -39,6 +41,7 @@ export function calculateEmployeeStats(appointments: AppointmentWithRelations[])
     if (existing) {
       const updated: EmployeeStats = {
         totalAmount: existing.totalAmount + (apt.status === 'completed' ? (apt.amount_collected || 0) : 0),
+        totalAmountBs: existing.totalAmountBs + (apt.status === 'completed' ? (apt.amount_in_bs || 0) : 0),
         totalAppointments: existing.totalAppointments + 1,
         completedCount: existing.completedCount + (apt.status === 'completed' ? 1 : 0),
         pendingCount: existing.pendingCount + (apt.status === 'pending' ? 1 : 0)
@@ -47,6 +50,7 @@ export function calculateEmployeeStats(appointments: AppointmentWithRelations[])
     } else {
       stats.set(empId, {
         totalAmount: apt.status === 'completed' ? (apt.amount_collected || 0) : 0,
+        totalAmountBs: apt.status === 'completed' ? (apt.amount_in_bs || 0) : 0,
         totalAppointments: 1,
         completedCount: apt.status === 'completed' ? 1 : 0,
         pendingCount: apt.status === 'pending' ? 1 : 0
@@ -58,6 +62,7 @@ export function calculateEmployeeStats(appointments: AppointmentWithRelations[])
 
 export function calculateDayStats(appointments: AppointmentWithRelations[]): DayStats {
   let totalAmount = 0;
+  let totalAmountBs = 0;
   let totalAppointments = 0;
   let completedCount = 0;
   let pendingCount = 0;
@@ -66,11 +71,12 @@ export function calculateDayStats(appointments: AppointmentWithRelations[]): Day
     if (apt.status === 'completed') {
       completedCount++;
       totalAmount += apt.amount_collected || 0;
+      totalAmountBs += apt.amount_in_bs || 0;
     } else if (apt.status === 'pending') {
       pendingCount++;
     }
   }
-  return { totalAmount, totalAppointments, completedCount, pendingCount };
+  return { totalAmount, totalAmountBs, totalAppointments, completedCount, pendingCount };
 }
 
 @Injectable()
@@ -266,15 +272,15 @@ export class DailyCloseFacade {
     this._amountInput.set(amount);
   }
 
-  async confirmAppointmentCompletion(appointmentId: string, amount: number): Promise<void> {
+  async confirmAppointmentCompletion(appointmentId: string, amount: number, exchangeRate?: number, amountBs?: number, observations?: string): Promise<void> {
     if (amount <= 0) {
       throw new Error('El monto debe ser mayor a 0');
     }
 
-    await this.appointmentService.updateStatus(appointmentId, 'completed', amount);
+    await this.appointmentService.updateStatus(appointmentId, 'completed', amount, exchangeRate, amountBs, observations);
 
     this._appointments.update(apps =>
-      apps.map(a => a.id === appointmentId ? { ...a, status: 'completed' as AppointmentStatus, amount_collected: amount } : a)
+      apps.map(a => a.id === appointmentId ? { ...a, status: 'completed' as AppointmentStatus, amount_collected: amount, exchange_rate: exchangeRate, amount_in_bs: amountBs, observations: observations } : a)
     );
   }
 
@@ -323,6 +329,7 @@ export class DailyCloseFacade {
   getEmployeeStats(employeeId: string): EmployeeStats {
     return this.employeeStats().get(employeeId) || {
       totalAmount: 0,
+      totalAmountBs: 0,
       totalAppointments: 0,
       completedCount: 0,
       pendingCount: 0

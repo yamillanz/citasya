@@ -64,6 +64,12 @@ export class DashboardComponent implements OnInit {
       .reduce((sum, apt) => sum + (apt.amount_collected || 0), 0)
   );
 
+  totalRevenueBs = computed(() =>
+    this.todayAppointments()
+      .filter(a => a.status === 'completed')
+      .reduce((sum, apt) => sum + (apt.amount_in_bs || 0), 0)
+  );
+
   async ngOnInit() {
     this.user.set(await this.authService.getCurrentUser());
     if (this.user()?.company_id) {
