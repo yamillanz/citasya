@@ -3,6 +3,9 @@
     <div class="header-content">
       <h1>Mi Calendario</h1>
       <p class="subtitle">Consulta tus citas programadas</p>
+      @if (companyName()) {
+        <span class="company-context">{{ companyName() }}</span>
+      }
     </div>
     <div class="header-actions">
       <p-button

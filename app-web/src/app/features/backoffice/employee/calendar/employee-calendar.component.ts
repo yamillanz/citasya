@@ -44,6 +44,7 @@ export class EmployeeCalendarComponent implements OnInit {
   loading = signal(true);
   error = signal('');
   copying = signal(false);
+  companyName = signal('');
 
   showDetailsDialog = signal(false);
   selectedAppointment = signal<Appointment | null>(null);
@@ -63,6 +64,12 @@ export class EmployeeCalendarComponent implements OnInit {
     const user = await this.authService.getCurrentUser();
     if (user) {
       this.user.set(user);
+      if (user.company_id) {
+        const company = await this.companyService.getById(user.company_id);
+        if (company) {
+          this.companyName.set(company.name);
+        }
+      }
       await this.loadAppointments();
     } else {
       this.error.set('No se pudo obtener la información del usuario');

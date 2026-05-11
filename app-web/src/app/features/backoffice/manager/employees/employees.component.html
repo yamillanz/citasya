@@ -6,6 +6,9 @@
         <div class="header-badge">Recursos Humanos</div>
         <h1>Empleados</h1>
         <p>Gestiona tu equipo de trabajo</p>
+        @if (companyName()) {
+          <span class="company-context">{{ companyName() }}</span>
+        }
       </div>
       <div class="header-actions">
         <p-button 
