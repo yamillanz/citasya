@@ -13,6 +13,8 @@ describe('EmployeeDetailDialogComponent', () => {
       client_name: 'Juan Pérez',
       services: [{ id: 's1', company_id: 'c1', name: 'Corte', duration_minutes: 30, price: 100, commission_percentage: 50, is_active: true, created_at: '2026-01-01' }],
       amount_collected: 150,
+      exchange_rate: 1,
+      amount_in_bs: 150,
       status: 'completed',
       commission: 75
     },
@@ -22,6 +24,8 @@ describe('EmployeeDetailDialogComponent', () => {
       client_name: 'María Torres',
       services: [{ id: 's2', company_id: 'c1', name: 'Peinado', duration_minutes: 45, price: 80, commission_percentage: 40, is_active: true, created_at: '2026-01-01' }],
       amount_collected: 80,
+      exchange_rate: 1,
+      amount_in_bs: 80,
       status: 'pending',
       commission: 32
     },
@@ -31,6 +35,8 @@ describe('EmployeeDetailDialogComponent', () => {
       client_name: 'Pedro Ruiz',
       services: [],
       amount_collected: 0,
+      exchange_rate: 1,
+      amount_in_bs: 0,
       status: 'cancelled',
       commission: 0
     },
@@ -40,6 +46,8 @@ describe('EmployeeDetailDialogComponent', () => {
       client_name: 'Laura Díaz',
       services: [{ id: 's3', company_id: 'c1', name: 'Tinte', duration_minutes: 60, price: 120, commission_percentage: 30, is_active: true, created_at: '2026-01-01' }],
       amount_collected: 120,
+      exchange_rate: 1,
+      amount_in_bs: 120,
       status: 'no_show',
       commission: 36
     }
@@ -55,12 +63,13 @@ describe('EmployeeDetailDialogComponent', () => {
       const cancelledCount = computed(() => detailData().filter(r => r.status === 'cancelled').length);
       const noShowCount = computed(() => detailData().filter(r => r.status === 'no_show').length);
       const totalAmount = computed(() => detailData().reduce((sum, r) => sum + r.amount_collected, 0));
+      const totalAmountBs = computed(() => detailData().reduce((sum, r) => sum + r.amount_in_bs, 0));
       const totalCommission = computed(() => detailData().reduce((sum, r) => sum + r.commission, 0));
 
       return {
         detailData, loading,
         completedCount, pendingCount, cancelledCount, noShowCount,
-        totalAmount, totalCommission
+        totalAmount, totalAmountBs, totalCommission
       };
     };
 

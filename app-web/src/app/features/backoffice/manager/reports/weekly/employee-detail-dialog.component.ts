@@ -93,7 +93,7 @@ export class EmployeeDetailDialogComponent implements OnChanges {
       row.client_name,
       formatServicesList(row.services),
       `$${row.amount_collected.toFixed(2)}`,
-      `Bs. ${row.amount_in_bs.toFixed(2)}`,
+      `Bs. ${(row.amount_in_bs ?? 0).toFixed(2)}`,
       `$${row.commission.toFixed(2)}`,
       getStatusLabel(row.status)
     ]);
