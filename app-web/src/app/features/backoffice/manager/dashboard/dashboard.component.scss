@@ -81,6 +81,13 @@
     color: var(--color-text-primary);
     margin-bottom: var(--space-xs);
   }
+
+  .company-name-inline {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+    color: var(--color-sage-dark);
+  }
   
   p {
     font-size: 0.9375rem;

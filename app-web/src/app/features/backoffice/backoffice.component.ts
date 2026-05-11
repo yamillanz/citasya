@@ -7,6 +7,7 @@ import { MenuModule } from 'primeng/menu';
 import { DrawerModule } from 'primeng/drawer';
 import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../core/services/auth.service';
+import { CompanyService } from '../../core/services/company.service';
 import { User } from '../../core/models/user.model';
 
 interface MenuItem {
@@ -34,9 +35,11 @@ interface MenuItem {
 })
 export class BackofficeComponent implements OnInit {
   private authService = inject(AuthService);
+  private companyService = inject(CompanyService);
   private router = inject(Router);
 
   user = signal<User | null>(null);
+  companyName = signal('');
   sidebarVisible = signal(false);
 
   private baseMenuItems: MenuItem[] = [
@@ -63,7 +66,14 @@ export class BackofficeComponent implements OnInit {
   });
 
   async ngOnInit() {
-    this.user.set(await this.authService.getCurrentUser());
+    const user = await this.authService.getCurrentUser();
+    this.user.set(user);
+    if (user?.company_id) {
+      const company = await this.companyService.getById(user.company_id);
+      if (company) {
+        this.companyName.set(company.name);
+      }
+    }
   }
 
   async logout() {

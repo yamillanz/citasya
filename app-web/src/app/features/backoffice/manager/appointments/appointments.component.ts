@@ -11,6 +11,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentService } from '../../../../core/services/appointment.service';
+import { CompanyService } from '../../../../core/services/company.service';
 import { EmailNotificationService } from '../../../../core/services/email-notification.service';
 import { UserService } from '../../../../core/services/user.service';
 import { Appointment, AppointmentStatus, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../../core/models/appointment.model';
@@ -49,6 +50,7 @@ interface DateGroup {
 export class AppointmentsComponent implements OnInit {
   private authService = inject(AuthService);
   private appointmentService = inject(AppointmentService);
+  private companyService = inject(CompanyService);
   private userService = inject(UserService);
   private messageService = inject(MessageService);
   private emailNotificationService = inject(EmailNotificationService);
@@ -57,6 +59,7 @@ export class AppointmentsComponent implements OnInit {
   employees = signal<User[]>([]);
   loading = signal(true);
   companyId = signal<string | null>(null);
+  companyName = signal('');
 
   // Filters
   filterEmployee = signal<string>('');
@@ -145,6 +148,10 @@ export class AppointmentsComponent implements OnInit {
     const user = await this.authService.getCurrentUser();
     if (user?.company_id) {
       this.companyId.set(user.company_id);
+      const company = await this.companyService.getById(user.company_id);
+      if (company) {
+        this.companyName.set(company.name);
+      }
       await this.loadData();
     }
     this.loading.set(false);

@@ -6,6 +6,9 @@
         <div class="header-badge">Operaciones</div>
         <h1>Citas</h1>
         <p>Gestiona y controla todas las citas</p>
+        @if (companyName()) {
+          <span class="company-context">{{ companyName() }}</span>
+        }
       </div>
       <div class="header-actions">
         <p-button
