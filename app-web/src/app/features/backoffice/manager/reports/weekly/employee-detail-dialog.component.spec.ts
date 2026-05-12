@@ -16,7 +16,9 @@ describe('EmployeeDetailDialogComponent', () => {
       exchange_rate: 1,
       amount_in_bs: 150,
       status: 'completed',
-      commission: 75
+      commission: 75,
+      is_paid: true,
+      payment_date: '2026-04-13T15:00:00Z'
     },
     {
       appointment_date: '2026-04-14',
@@ -27,7 +29,8 @@ describe('EmployeeDetailDialogComponent', () => {
       exchange_rate: 1,
       amount_in_bs: 80,
       status: 'pending',
-      commission: 32
+      commission: 32,
+      is_paid: false
     },
     {
       appointment_date: '2026-04-15',
@@ -38,7 +41,8 @@ describe('EmployeeDetailDialogComponent', () => {
       exchange_rate: 1,
       amount_in_bs: 0,
       status: 'cancelled',
-      commission: 0
+      commission: 0,
+      is_paid: false
     },
     {
       appointment_date: '2026-04-16',
@@ -49,7 +53,8 @@ describe('EmployeeDetailDialogComponent', () => {
       exchange_rate: 1,
       amount_in_bs: 120,
       status: 'no_show',
-      commission: 36
+      commission: 36,
+      is_paid: false
     }
   ];
 
@@ -184,7 +189,7 @@ describe('EmployeeDetailDialogComponent', () => {
 
       expect(csvExportServiceMock.exportCsv).toHaveBeenCalledWith(
         expect.stringContaining('detalle-ana-garc'),
-        expect.arrayContaining(['Fecha', 'Hora', 'Cliente', 'Servicios', 'Monto', 'Comisión', 'Estado']),
+        expect.arrayContaining(['Fecha', 'Hora', 'Cliente', 'Servicios', 'Monto', 'Monto Bs.', 'Comisión', 'Estado', 'Pagado', 'Fecha pago']),
         expect.any(Array)
       );
     });
@@ -215,6 +220,30 @@ describe('EmployeeDetailDialogComponent', () => {
       component.visible = false;
       component.ngOnChanges({ visible: { currentValue: false, previousValue: true, firstChange: false } } as any);
       expect(weeklyReportServiceMock.getEmployeeDetail).not.toHaveBeenCalled();
+    });
+
+    it('getPaidLabel debe retornar "Sí" para true y "No" para false', () => {
+      expect(component.getPaidLabel(true)).toBe('Sí');
+      expect(component.getPaidLabel(false)).toBe('No');
+    });
+
+    it('formatPaymentDate debe formatear fecha ISO', () => {
+      const result = component.formatPaymentDate('2026-04-13T15:00:00Z');
+      expect(result).toContain('2026');
+      expect(result.length).toBeGreaterThan(0);
+    });
+
+    it('CSV debe incluir columnas Pagado y Fecha pago', () => {
+      component.detailData.set(mockDetailData);
+      component.exportDetailCsv();
+
+      const csvCall = csvExportServiceMock.exportCsv.mock.calls[0];
+      const headers = csvCall[1];
+      const rows = csvCall[2];
+      expect(headers).toContain('Pagado');
+      expect(headers).toContain('Fecha pago');
+      expect(rows[0]).toContain('Sí');
+      expect(rows[1]).toContain('No');
     });
   });
 });

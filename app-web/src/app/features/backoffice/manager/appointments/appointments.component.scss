@@ -385,6 +385,24 @@
   }
 }
 
+.paid-badge {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: var(--radius-full);
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+  margin-left: var(--space-sm);
+
+  i {
+    margin-right: var(--space-xs);
+    font-size: 0.6875rem;
+  }
+}
+
 .card-body {
   margin-bottom: var(--space-md);
 }
@@ -669,6 +687,12 @@
     &:hover {
       background: #16a34a !important;
     }
+  }
+
+  .btn-payment {
+    padding: var(--space-xs) var(--space-md) !important;
+    font-weight: 600 !important;
+    border-radius: var(--radius-md) !important;
   }
   
   .btn-danger-outline,

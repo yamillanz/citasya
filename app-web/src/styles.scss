@@ -778,6 +778,23 @@ a {
   color: var(--color-text-primary);
 }
 
+.status-drawer .payment-date-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--color-cream);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.status-drawer .payment-date-info i {
+  font-size: 1rem;
+  color: var(--color-sage);
+}
+
 .status-drawer .drawer-footer {
   display: flex;
   justify-content: flex-end;

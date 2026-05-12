@@ -86,7 +86,7 @@ export class EmployeeDetailDialogComponent implements OnChanges {
 
     this.exporting.set(true);
 
-    const headers = ['Fecha', 'Hora', 'Cliente', 'Servicios', 'Monto', 'Monto Bs.', 'Comisión', 'Estado'];
+    const headers = ['Fecha', 'Hora', 'Cliente', 'Servicios', 'Monto', 'Monto Bs.', 'Comisión', 'Estado', 'Pagado', 'Fecha pago'];
     const rows = data.map(row => [
       row.appointment_date,
       row.appointment_time,
@@ -95,7 +95,9 @@ export class EmployeeDetailDialogComponent implements OnChanges {
       `$${row.amount_collected.toFixed(2)}`,
       `Bs. ${(row.amount_in_bs ?? 0).toFixed(2)}`,
       `$${row.commission.toFixed(2)}`,
-      getStatusLabel(row.status)
+      getStatusLabel(row.status),
+      this.getPaidLabel(row.is_paid),
+      row.payment_date ? this.formatPaymentDate(row.payment_date) : '—'
     ]);
 
     const filename = `detalle-${this.employeeName.replace(/\s+/g, '-').toLowerCase()}-${formatDate(this.startDate)}-a-${formatDate(this.endDate)}.csv`;
@@ -112,6 +114,15 @@ export class EmployeeDetailDialogComponent implements OnChanges {
   formatTimeDisplay(timeStr: string): string {
     const [hours, minutes] = timeStr.split(':');
     return `${hours}:${minutes}`;
+  }
+
+  formatPaymentDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  getPaidLabel(isPaid: boolean): string {
+    return isPaid ? 'Sí' : 'No';
   }
 
   getStatusLabel = getStatusLabel;

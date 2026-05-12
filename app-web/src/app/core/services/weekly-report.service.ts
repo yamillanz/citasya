@@ -140,7 +140,9 @@ export class WeeklyReportService {
       amount_in_bs: apt.amount_in_bs || 0,
       commission: Math.round(
         calculateAppointmentCommission(apt.amount_collected || 0, apt.services || []) * 100
-      ) / 100
+      ) / 100,
+      is_paid: apt.is_paid || false,
+      payment_date: apt.payment_date || undefined
     }));
   }
 

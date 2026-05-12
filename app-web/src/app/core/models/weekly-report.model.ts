@@ -20,6 +20,8 @@ export interface WeeklyDetailRow {
   amount_in_bs: number;
   status: AppointmentStatus;
   commission: number;
+  is_paid: boolean;
+  payment_date?: string;
 }
 
 export interface DateRange {

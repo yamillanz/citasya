@@ -15,7 +15,7 @@ import { CompanyService } from '../../../../core/services/company.service';
 import { EmailNotificationService } from '../../../../core/services/email-notification.service';
 import { UserService } from '../../../../core/services/user.service';
 import { ExchangeRateStorageService } from '../../../../core/services/exchange-rate-storage.service';
-import { Appointment, AppointmentStatus, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../../core/models/appointment.model';
+import { Appointment, AppointmentStatus, PaymentMethod, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../../core/models/appointment.model';
 import { User } from '../../../../core/models/user.model';
 import { ManagerAppointmentCreateDialogComponent } from './manager-appointment-create-dialog.component';
 
@@ -74,12 +74,23 @@ export class AppointmentsComponent implements OnInit {
   showStatusDialog = signal(false);
   showCreateDialog = signal(false);
   selectedAppointment = signal<Appointment | null>(null);
-  statusAction = signal<'completed' | 'cancelled' | 'no_show' | null>(null);
+  statusAction = signal<'completed' | 'cancelled' | 'no_show' | 'paid' | null>(null);
   amountCollected = signal<number>(0);
   exchangeRate = signal<number>(1);
   amountBs = signal<number>(0);
   observations = signal<string>('');
+  paymentMethod = signal<PaymentMethod | null>(null);
+  paymentReference = signal<string>('');
+  paymentAmountBs = signal<number>(0);
+  saving = signal(false);
   private lastEdited: 'usd' | 'bs' | null = null;
+
+  paymentMethodOptions = [
+    { label: 'Efectivo', value: 'cash' as PaymentMethod },
+    { label: 'Transferencia', value: 'transfer' as PaymentMethod },
+    { label: 'Pago móvil', value: 'mobile_payment' as PaymentMethod },
+    { label: 'Tarjeta', value: 'card' as PaymentMethod },
+  ];
 
   statusOptions: FilterOption[] = [
     { label: 'Todos los estados', value: '' },
@@ -230,6 +241,56 @@ export class AppointmentsComponent implements OnInit {
     this.showStatusDialog.set(false);
     this.selectedAppointment.set(null);
     this.statusAction.set(null);
+    this.paymentMethod.set(null);
+    this.paymentReference.set('');
+    this.paymentAmountBs.set(0);
+  }
+
+  openPaymentDrawer(appointment: Appointment) {
+    this.selectedAppointment.set(appointment);
+    this.statusAction.set('paid');
+    this.showStatusDialog.set(true);
+    this.paymentAmountBs.set(appointment.amount_in_bs ?? 0);
+    this.paymentMethod.set(null);
+    this.paymentReference.set('');
+  }
+
+  async confirmPayment() {
+    const appointment = this.selectedAppointment();
+    const method = this.paymentMethod();
+    if (!appointment || !method) return;
+
+    this.saving.set(true);
+    try {
+      await this.appointmentService.markAsPaid(appointment.id, {
+        payment_method: method,
+        payment_reference: this.paymentReference() || undefined,
+        payment_amount_bs: this.paymentAmountBs() || undefined,
+      });
+
+      const updated = this.appointments().map(apt =>
+        apt.id === appointment.id
+          ? { ...apt, is_paid: true, payment_method: method, payment_reference: this.paymentReference() || undefined, payment_amount_bs: this.paymentAmountBs() || undefined, payment_date: new Date().toISOString() }
+          : apt
+      );
+      this.appointments.set(updated);
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Pago registrado',
+        detail: `Cita de ${appointment.client_name} marcada como pagada`
+      });
+
+      this.closeDrawer();
+    } catch (error: any) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo registrar el pago'
+      });
+    } finally {
+      this.saving.set(false);
+    }
   }
 
   getDrawerTitle(): string {
@@ -238,6 +299,7 @@ export class AppointmentsComponent implements OnInit {
       case 'completed': return 'Completar Cita';
       case 'cancelled': return 'Cancelar Cita';
       case 'no_show': return 'Marcar como No Asistió';
+      case 'paid': return 'Registrar Pago';
       default: return 'Actualizar Estado';
     }
   }
@@ -248,6 +310,7 @@ export class AppointmentsComponent implements OnInit {
       case 'completed': return 'Confirmar y Completar';
       case 'cancelled': return 'Sí, Cancelar';
       case 'no_show': return 'Sí, No Asistió';
+      case 'paid': return 'Confirmar pago';
       default: return 'Aceptar';
     }
   }
@@ -256,8 +319,9 @@ export class AppointmentsComponent implements OnInit {
     const action = this.statusAction();
     switch (action) {
       case 'completed': return 'success';
-      case 'cancelled':
+      case 'cancelled': return 'danger';
       case 'no_show': return 'danger';
+      case 'paid': return 'success';
       default: return 'secondary';
     }
   }
@@ -267,6 +331,7 @@ export class AppointmentsComponent implements OnInit {
       case 'completed': return 'pi pi-check-circle';
       case 'cancelled': return 'pi pi-times-circle';
       case 'no_show': return 'pi pi-user-minus';
+      case 'paid': return 'pi pi-money-bill';
       default: return 'pi pi-info-circle';
     }
   }
@@ -301,7 +366,7 @@ export class AppointmentsComponent implements OnInit {
   async confirmStatusChange() {
     const appointment = this.selectedAppointment();
     const action = this.statusAction();
-    if (!appointment || !action) return;
+    if (!appointment || !action || action === 'paid') return;
 
     await this.updateStatus(appointment, action);
     this.closeDrawer();

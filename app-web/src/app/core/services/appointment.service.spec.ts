@@ -245,4 +245,62 @@ describe('AppointmentService', () => {
       await expect(service.updateServices('apt-1', [])).rejects.toThrow('At least one service is required');
     });
   });
+
+  describe('markAsPaid', () => {
+    it('debe actualizar la cita con campos de pago', async () => {
+      await service.markAsPaid('apt-1', {
+        payment_method: 'cash',
+        payment_reference: 'ref-001',
+        payment_amount_bs: 500
+      });
+
+      expect(mockFromFn).toHaveBeenCalledWith('appointments');
+      expect(appointmentsUpdateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          is_paid: true,
+          payment_method: 'cash',
+          payment_reference: 'ref-001',
+          payment_amount_bs: 500
+        })
+      );
+    });
+
+    it('debe omitir campos opcionales si no se proveen', async () => {
+      await service.markAsPaid('apt-1', {
+        payment_method: 'transfer'
+      });
+
+      expect(appointmentsUpdateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          is_paid: true,
+          payment_method: 'transfer'
+        })
+      );
+      const callArgs = appointmentsUpdateMock.mock.calls[0][0];
+      expect(callArgs.payment_reference).toBeUndefined();
+      expect(callArgs.payment_amount_bs).toBeUndefined();
+    });
+
+    it('debe incluir payment_date automáticamente', async () => {
+      await service.markAsPaid('apt-1', {
+        payment_method: 'mobile_payment'
+      });
+
+      expect(appointmentsUpdateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payment_date: expect.any(String)
+        })
+      );
+    });
+
+    it('debe propager el error si supabase falla', async () => {
+      appointmentsUpdateMock.mockReturnValueOnce({
+        eq: jest.fn().mockResolvedValue({ error: new Error('DB error') })
+      });
+
+      await expect(
+        service.markAsPaid('apt-1', { payment_method: 'card' })
+      ).rejects.toThrow('DB error');
+    });
+  });
 });
