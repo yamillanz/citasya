@@ -3,7 +3,7 @@
 ## Purpose
 Provides a manual data refresh control for views that display dynamic data, allowing users to trigger a reload of the current view's data without navigating away.
 
-## Requirements
+## ADDED Requirements
 
 ### Requirement: Refresh button displays in component header area
 The system SHALL display a small icon-only refresh button in the header/navigation area of supported views.
