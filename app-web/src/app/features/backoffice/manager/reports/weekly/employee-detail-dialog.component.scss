@@ -122,6 +122,26 @@
   padding: var(--space-xl);
 }
 
+.paid-badge-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+
+  i {
+    font-size: 0.625rem;
+  }
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
 :host ::ng-deep {
   .p-datatable {
     .p-datatable-thead > tr > th {
