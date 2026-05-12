@@ -1,5 +1,5 @@
 import { signal, computed } from '@angular/core';
-import { Appointment, AppointmentStatus } from '../../../../core/models/appointment.model';
+import { Appointment, AppointmentStatus, PaymentMethod } from '../../../../core/models/appointment.model';
 import { User } from '../../../../core/models/user.model';
 
 describe('AppointmentsComponent (Manager)', () => {
@@ -11,19 +11,19 @@ describe('AppointmentsComponent (Manager)', () => {
   const mockAppointments: Appointment[] = [
     { id: 'apt-1', client_name: 'Cliente Uno', client_phone: '555-111-1111',
       appointment_date: '2026-03-20', appointment_time: '10:00', status: 'pending' as const,
-      employee_id: 'emp-1', service_id: 'srv-1', company_id: 'company-1',
+      employee_id: 'emp-1', service_id: 'srv-1', company_id: 'company-1', is_paid: false,
       created_at: '2026-03-19T10:00:00Z', updated_at: '2026-03-19T10:00:00Z',
       services: [{ id: 'srv-1', name: 'Corte', duration_minutes: 30, price: 50, company_id: 'company-1', commission_percentage: 0, is_active: true, created_at: '2026-01-01T00:00:00Z' }, { id: 'srv-2', name: 'Peinado', duration_minutes: 20, price: 30, company_id: 'company-1', commission_percentage: 0, is_active: true, created_at: '2026-01-01T00:00:00Z' }],
       employee: { full_name: 'Juan Pérez' } },
     { id: 'apt-2', client_name: 'Cliente Dos', client_phone: '555-222-2222',
       appointment_date: '2026-03-20', appointment_time: '11:00', status: 'completed' as const,
-      amount_collected: 120, employee_id: 'emp-2', service_id: 'srv-3', company_id: 'company-1',
+      amount_collected: 120, amount_in_bs: 720, employee_id: 'emp-2', service_id: 'srv-3', company_id: 'company-1', is_paid: false,
       created_at: '2026-03-19T11:00:00Z', updated_at: '2026-03-19T11:00:00Z',
       services: [{ id: 'srv-3', name: 'Tinte', duration_minutes: 60, price: 80, company_id: 'company-1', commission_percentage: 0, is_active: true, created_at: '2026-01-01T00:00:00Z' }],
       employee: { full_name: 'María García' } }
   ];
 
-  type StatusAction = 'completed' | 'cancelled' | 'no_show' | null;
+  type StatusAction = 'completed' | 'cancelled' | 'no_show' | 'paid' | null;
 
   const createMock = () => {
     const appointments = signal<Appointment[]>([]);
@@ -38,6 +38,10 @@ describe('AppointmentsComponent (Manager)', () => {
     const exchangeRate = signal<number>(1);
     const amountBs = signal<number>(0);
     const observations = signal<string>('');
+    const paymentMethod = signal<PaymentMethod | null>(null);
+    const paymentReference = signal<string>('');
+    const paymentAmountBs = signal<number>(0);
+    const saving = signal(false);
 
     const updateStatusCalls: { appointment: Appointment; status: AppointmentStatus }[] = [];
 
@@ -75,6 +79,18 @@ describe('AppointmentsComponent (Manager)', () => {
       showStatusDialog.set(false);
       selectedAppointment.set(null);
       statusAction.set(null);
+      paymentMethod.set(null);
+      paymentReference.set('');
+      paymentAmountBs.set(0);
+    };
+
+    const openPaymentDrawer = (appointment: Appointment) => {
+      selectedAppointment.set(appointment);
+      statusAction.set('paid');
+      showStatusDialog.set(true);
+      paymentAmountBs.set(appointment.amount_in_bs ?? 0);
+      paymentMethod.set(null);
+      paymentReference.set('');
     };
 
     const getDrawerTitle = () => {
@@ -83,6 +99,7 @@ describe('AppointmentsComponent (Manager)', () => {
         case 'completed': return 'Completar Cita';
         case 'cancelled': return 'Cancelar Cita';
         case 'no_show': return 'Marcar como No Asistió';
+        case 'paid': return 'Registrar Pago';
         default: return 'Actualizar Estado';
       }
     };
@@ -93,6 +110,7 @@ describe('AppointmentsComponent (Manager)', () => {
         case 'completed': return 'Confirmar y Completar';
         case 'cancelled': return 'Sí, Cancelar';
         case 'no_show': return 'Sí, No Asistió';
+        case 'paid': return 'Confirmar pago';
         default: return 'Aceptar';
       }
     };
@@ -103,6 +121,7 @@ describe('AppointmentsComponent (Manager)', () => {
         case 'completed': return 'success';
         case 'cancelled':
         case 'no_show': return 'danger';
+        case 'paid': return 'success';
         default: return 'secondary';
       }
     };
@@ -115,7 +134,24 @@ describe('AppointmentsComponent (Manager)', () => {
       closeDrawer();
     };
 
-    return { appointments, employees, loading, filterEmployee, filterStatus, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, filteredAppointments, employeeOptions, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, updateStatusCalls };
+    const markAsPaidCalls: { id: string; paymentData: { payment_method: PaymentMethod; payment_reference?: string; payment_amount_bs?: number } }[] = [];
+
+    const confirmPayment = () => {
+      const appointment = selectedAppointment();
+      const method = paymentMethod();
+      if (!appointment || !method) return;
+      markAsPaidCalls.push({
+        id: appointment.id,
+        paymentData: {
+          payment_method: method,
+          payment_reference: paymentReference() || undefined,
+          payment_amount_bs: paymentAmountBs() || undefined,
+        }
+      });
+      closeDrawer();
+    };
+
+    return { appointments, employees, loading, filterEmployee, filterStatus, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, employeeOptions, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls };
   };
 
   describe('filtrado de citas', () => {
@@ -346,6 +382,122 @@ describe('AppointmentsComponent (Manager)', () => {
       comp.showStatusDialog.set(true);
       comp.confirmStatusChange();
       expect(comp.updateStatusCalls).toHaveLength(0);
+    });
+  });
+
+  describe('openPaymentDrawer — apertura del drawer de pago', () => {
+    it('debe abrir el drawer con statusAction paid y precargar monto en Bs', () => {
+      const comp = createMock();
+      comp.openPaymentDrawer(mockAppointments[1]);
+      expect(comp.showStatusDialog()).toBe(true);
+      expect(comp.selectedAppointment()?.id).toBe('apt-2');
+      expect(comp.statusAction()).toBe('paid');
+      expect(comp.paymentAmountBs()).toBe(720);
+    });
+
+    it('debe precargar 0 si la cita no tiene amount_in_bs', () => {
+      const comp = createMock();
+      const apt = { ...mockAppointments[1], amount_in_bs: undefined };
+      comp.openPaymentDrawer(apt);
+      expect(comp.paymentAmountBs()).toBe(0);
+    });
+
+    it('debe resetear paymentMethod y paymentReference al abrir', () => {
+      const comp = createMock();
+      comp.paymentMethod.set('cash' as PaymentMethod);
+      comp.paymentReference.set('ref');
+      comp.openPaymentDrawer(mockAppointments[1]);
+      expect(comp.paymentMethod()).toBeNull();
+      expect(comp.paymentReference()).toBe('');
+    });
+  });
+
+  describe('getDrawerTitle — título para pago', () => {
+    it('debe retornar "Registrar Pago" para acción paid', () => {
+      const comp = createMock();
+      comp.openPaymentDrawer(mockAppointments[1]);
+      expect(comp.getDrawerTitle()).toBe('Registrar Pago');
+    });
+  });
+
+  describe('getActionLabel — etiqueta para pago', () => {
+    it('debe retornar "Confirmar pago" para acción paid', () => {
+      const comp = createMock();
+      comp.openPaymentDrawer(mockAppointments[1]);
+      expect(comp.getActionLabel()).toBe('Confirmar pago');
+    });
+  });
+
+  describe('getActionSeverity — severidad para pago', () => {
+    it('debe retornar success para paid', () => {
+      const comp = createMock();
+      comp.openPaymentDrawer(mockAppointments[1]);
+      expect(comp.getActionSeverity()).toBe('success');
+    });
+  });
+
+  describe('confirmPayment — confirmación de pago', () => {
+    it('debe registrar el pago y cerrar el drawer', () => {
+      const comp = createMock();
+      comp.openPaymentDrawer(mockAppointments[1]);
+      comp.paymentMethod.set('cash' as PaymentMethod);
+      comp.paymentReference.set('ref-001');
+      comp.paymentAmountBs.set(700);
+      comp.confirmPayment();
+      expect(comp.markAsPaidCalls).toHaveLength(1);
+      expect(comp.markAsPaidCalls[0]).toEqual({
+        id: 'apt-2',
+        paymentData: {
+          payment_method: 'cash',
+          payment_reference: 'ref-001',
+          payment_amount_bs: 700
+        }
+      });
+      expect(comp.showStatusDialog()).toBe(false);
+    });
+
+    it('NO debe registrar pago si no hay método de pago', () => {
+      const comp = createMock();
+      comp.openPaymentDrawer(mockAppointments[1]);
+      comp.confirmPayment();
+      expect(comp.markAsPaidCalls).toHaveLength(0);
+      expect(comp.showStatusDialog()).toBe(true);
+    });
+
+    it('NO debe registrar pago si no hay cita seleccionada', () => {
+      const comp = createMock();
+      comp.statusAction.set('paid');
+      comp.paymentMethod.set('transfer' as PaymentMethod);
+      comp.confirmPayment();
+      expect(comp.markAsPaidCalls).toHaveLength(0);
+    });
+
+    it('debe omitir referencia y monto si están vacíos', () => {
+      const comp = createMock();
+      comp.openPaymentDrawer(mockAppointments[1]);
+      comp.paymentMethod.set('mobile_payment' as PaymentMethod);
+      comp.paymentAmountBs.set(0);
+      comp.confirmPayment();
+      expect(comp.markAsPaidCalls).toHaveLength(1);
+      expect(comp.markAsPaidCalls[0].paymentData.payment_reference).toBeUndefined();
+      expect(comp.markAsPaidCalls[0].paymentData.payment_amount_bs).toBeUndefined();
+    });
+  });
+
+  describe('closeDrawer — reset de señales de pago', () => {
+    it('debe resetear paymentMethod, reference y amountBs al cerrar', () => {
+      const comp = createMock();
+      comp.openPaymentDrawer(mockAppointments[1]);
+      comp.paymentMethod.set('card' as PaymentMethod);
+      comp.paymentReference.set('test');
+      comp.paymentAmountBs.set(500);
+      comp.closeDrawer();
+      expect(comp.showStatusDialog()).toBe(false);
+      expect(comp.selectedAppointment()).toBeNull();
+      expect(comp.statusAction()).toBeNull();
+      expect(comp.paymentMethod()).toBeNull();
+      expect(comp.paymentReference()).toBe('');
+      expect(comp.paymentAmountBs()).toBe(0);
     });
   });
 });

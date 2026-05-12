@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Appointment, AppointmentStatus, CreateAppointmentDto, UpdateAppointmentServicesDto } from '../models/appointment.model';
+import { Appointment, AppointmentStatus, CreateAppointmentDto, UpdateAppointmentServicesDto, PaymentMethod } from '../models/appointment.model';
 import { Service } from '../models/service.model';
 import { ScheduleService } from './schedule.service';
 import { supabase } from '../supabase';
@@ -244,6 +244,30 @@ export class AppointmentService {
       .update(updateData)
       .eq('id', id);
     
+    if (error) throw error;
+  }
+
+  async markAsPaid(id: string, paymentData: { payment_method: PaymentMethod; payment_reference?: string; payment_amount_bs?: number }): Promise<void> {
+    const updateData: Partial<Appointment> = {
+      is_paid: true,
+      payment_method: paymentData.payment_method,
+      payment_date: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    if (paymentData.payment_reference !== undefined) {
+      updateData.payment_reference = paymentData.payment_reference;
+    }
+
+    if (paymentData.payment_amount_bs !== undefined) {
+      updateData.payment_amount_bs = paymentData.payment_amount_bs;
+    }
+
+    const { error } = await this.supabase
+      .from('appointments')
+      .update(updateData)
+      .eq('id', id);
+
     if (error) throw error;
   }
 

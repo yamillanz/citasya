@@ -2,6 +2,8 @@ import { Service } from './service.model';
 
 export type AppointmentStatus = 'pending' | 'completed' | 'cancelled' | 'no_show';
 
+export type PaymentMethod = 'cash' | 'transfer' | 'mobile_payment' | 'card';
+
 export interface Appointment {
   id: string;
   company_id: string;
@@ -20,6 +22,11 @@ export interface Appointment {
   observations?: string;
   notes?: string;
   cancellation_token?: string;
+  is_paid: boolean;
+  payment_method?: PaymentMethod;
+  payment_reference?: string;
+  payment_amount_bs?: number;
+  payment_date?: string;
   created_at: string;
   updated_at: string;
 }

@@ -155,6 +155,11 @@
                   <span class="status-badge" [class]="apt.status">
                     {{ getStatusLabel(apt.status) }}
                   </span>
+                  @if (apt.is_paid) {
+                    <span class="paid-badge">
+                      <i class="pi pi-check"></i> Pagado
+                    </span>
+                  }
                 </div>
               </div>
               
@@ -193,6 +198,19 @@
                   @if (apt.observations) {
                     <span class="amount-obs">{{ apt.observations }}</span>
                   }
+                </div>
+              }
+
+              @if (apt.status === 'completed' && !apt.is_paid) {
+                <div class="card-actions">
+                  <p-button
+                    label="Registrar pago"
+                    icon="pi pi-money-bill"
+                    severity="info"
+                    size="small"
+                    (onClick)="openPaymentDrawer(apt)"
+                    styleClass="btn-payment">
+                  </p-button>
                 </div>
               }
               
@@ -339,6 +357,43 @@
         <i class="pi pi-warning"></i>
         <p>¿Estás seguro de marcar esta cita como <strong>{{ statusAction() === 'no_show' ? 'no asistida' : 'cancelada' }}</strong>?</p>
       </div>
+    } @else if (statusAction() === 'paid') {
+      <div class="amount-input">
+        <label>Método de pago *</label>
+        <p-select
+          [options]="paymentMethodOptions"
+          [(ngModel)]="paymentMethod"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar método de pago"
+          styleClass="w-full">
+        </p-select>
+      </div>
+      <div class="amount-input">
+        <label>N° de referencia</label>
+        <input
+          pInputText
+          [(ngModel)]="paymentReference"
+          placeholder="Ej: 1234, ref-001..."
+          class="w-full" />
+      </div>
+      <div class="amount-input">
+        <label>Monto (Bs)</label>
+        <p-inputNumber
+          [(ngModel)]="paymentAmountBs"
+          mode="decimal"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          placeholder="0.00">
+        </p-inputNumber>
+      </div>
+      <div class="amount-input">
+        <label>Fecha y hora</label>
+        <p class="payment-date-info">
+          <i class="pi pi-calendar-clock"></i>
+          Se registrará al confirmar
+        </p>
+      </div>
     }
   </div>
   
@@ -347,13 +402,16 @@
       <p-button 
         label="Cerrar"
         severity="secondary"
+        [disabled]="saving()"
         (onClick)="closeDrawer()"
         styleClass="btn-secondary">
       </p-button>
       <p-button 
-        [label]="getActionLabel()"
+        [label]="saving() ? 'Registrando...' : getActionLabel()"
         [severity]="getActionSeverity()"
-        (onClick)="confirmStatusChange()"
+        [loading]="saving()"
+        [disabled]="statusAction() === 'paid' && !paymentMethod()"
+        (onClick)="statusAction() === 'paid' ? confirmPayment() : confirmStatusChange()"
         styleClass="btn-action">
       </p-button>
     </div>
