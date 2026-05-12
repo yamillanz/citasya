@@ -1,10 +1,8 @@
 # appointment-cancellation-backoffice Specification
 
 ## Purpose
-Enables authenticated employees to cancel their pending appointments from the backoffice employee calendar (`/emp/calendar`), using the reusable appointment detail dialog with confirmation.
-
+TBD - created by archiving change add-cancellation-to-employee-calendar. Update Purpose after archive.
 ## Requirements
-
 ### Requirement: Show full appointment details on backoffice calendar
 The system SHALL display the reusable `AppointmentDetailDialogComponent` when the employee clicks on an appointment event in their backoffice calendar.
 
@@ -85,3 +83,4 @@ The system SHALL NOT break the `AppointmentDetailDialogComponent` when used from
 - **THEN** the "Cancelar" button does NOT appear (because `canCancel` defaults to `false`)
 - **AND** the "Editar Servicios" button DOES appear for pending appointments (because `canEdit` defaults to `true`)
 - **AND** all existing functionality (navigation, service editing) works unchanged
+

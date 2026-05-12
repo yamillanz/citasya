@@ -15,6 +15,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DailyCloseFacade, Employee, AppointmentWithRelations } from './daily-close.facade';
 import { CONFIRMATION_DIALOG } from '../../../../core/tokens/confirmation-dialog.token';
 import { IConfirmationDialog } from '../../../../core/interfaces/confirmation-dialog.interface';
+import { ExchangeRateStorageService } from '../../../../core/services/exchange-rate-storage.service';
 
 @Component({
   selector: 'app-daily-close',
@@ -39,6 +40,7 @@ export class DailyCloseComponent implements OnInit {
   private facade = inject(DailyCloseFacade);
   private messageService = inject(MessageService);
   private confirmationDialog = inject<IConfirmationDialog>(CONFIRMATION_DIALOG);
+  private exchangeRateStorage = inject(ExchangeRateStorageService);
 
   // UI State
   amountDrawerVisible = signal(false);
@@ -110,7 +112,7 @@ export class DailyCloseComponent implements OnInit {
   openCompleteDrawer(appointment: AppointmentWithRelations) {
     this.selectedAppointment.set(appointment);
     this.amountInput = null;
-    this.exchangeRate = 1;
+    this.exchangeRate = this.exchangeRateStorage.getRate();
     this.amountBs = null;
     this.observations = '';
     this.lastEdited = null;
@@ -121,7 +123,7 @@ export class DailyCloseComponent implements OnInit {
     this.amountDrawerVisible.set(false);
     this.selectedAppointment.set(null);
     this.amountInput = null;
-    this.exchangeRate = 1;
+    this.exchangeRate = this.exchangeRateStorage.getRate();
     this.amountBs = null;
     this.observations = '';
     this.lastEdited = null;
@@ -193,6 +195,11 @@ export class DailyCloseComponent implements OnInit {
         this.amountBs,
         this.observations
       );
+
+      if (this.exchangeRate > 0) {
+        this.exchangeRateStorage.setRate(this.exchangeRate);
+      }
+
       this.messageService.add({
         severity: 'success',
         summary: 'Éxito',
