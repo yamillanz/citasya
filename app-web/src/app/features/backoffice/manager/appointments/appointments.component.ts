@@ -14,6 +14,7 @@ import { AppointmentService } from '../../../../core/services/appointment.servic
 import { CompanyService } from '../../../../core/services/company.service';
 import { EmailNotificationService } from '../../../../core/services/email-notification.service';
 import { UserService } from '../../../../core/services/user.service';
+import { ExchangeRateStorageService } from '../../../../core/services/exchange-rate-storage.service';
 import { Appointment, AppointmentStatus, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../../core/models/appointment.model';
 import { User } from '../../../../core/models/user.model';
 import { ManagerAppointmentCreateDialogComponent } from './manager-appointment-create-dialog.component';
@@ -54,6 +55,7 @@ export class AppointmentsComponent implements OnInit {
   private userService = inject(UserService);
   private messageService = inject(MessageService);
   private emailNotificationService = inject(EmailNotificationService);
+  private exchangeRateStorage = inject(ExchangeRateStorageService);
 
   appointments = signal<Appointment[]>([]);
   employees = signal<User[]>([]);
@@ -215,8 +217,9 @@ export class AppointmentsComponent implements OnInit {
     this.showStatusDialog.set(true);
     
     if (status === 'completed') {
+      const lastRate = this.exchangeRateStorage.getRate();
       this.amountCollected.set(0);
-      this.exchangeRate.set(1);
+      this.exchangeRate.set(lastRate);
       this.amountBs.set(0);
       this.observations.set('');
       this.lastEdited = null;
@@ -311,6 +314,10 @@ export class AppointmentsComponent implements OnInit {
       const bs = status === 'completed' ? this.amountBs() : undefined;
       const obs = status === 'completed' ? this.observations() : undefined;
       await this.appointmentService.updateStatus(appointment.id, status, amount, rate, bs, obs);
+
+      if (status === 'completed' && rate && rate > 0) {
+        this.exchangeRateStorage.setRate(rate);
+      }
 
       if (status === 'cancelled' || status === 'no_show') {
         this.emailNotificationService.notify(appointment.id, status);
