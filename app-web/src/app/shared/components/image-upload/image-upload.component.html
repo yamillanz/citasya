@@ -1,0 +1,44 @@
+<div class="image-upload">
+  @if (previewUrl() || currentImageUrl()) {
+    <div class="image-preview">
+      <img [src]="previewUrl() || currentImageUrl()" alt="Comprobante" />
+      @if (!uploading()) {
+        <button class="remove-btn" (click)="removeImage()" type="button" aria-label="Eliminar imagen">
+          <i class="pi pi-times"></i>
+        </button>
+      }
+      <span class="file-info">{{ fileName() }} · {{ fileSize() }}</span>
+    </div>
+  } @else {
+    <div
+      class="upload-zone"
+      [class.upload-zone--paste]="showPasteFeedback()"
+      [class.upload-zone--disabled]="uploading()"
+      tabindex="0"
+      (click)="fileInput.click()"
+      (dragover)="onDragOver($event)"
+      (drop)="onDrop($event)"
+      (paste)="onPaste($event)"
+    >
+      <i class="pi pi-cloud-upload"></i>
+      <p>Arrastra, pega o haz clic para seleccionar una imagen</p>
+      <span class="hint">PNG o JPG, máximo 2MB · También puedes pegar desde el portapapeles</span>
+    </div>
+  }
+
+  @if (uploading()) {
+    <p-progressBar mode="indeterminate" [style]="{ height: '4px' }" />
+  }
+
+  @if (error() || validationError()) {
+    <p class="error-message">{{ error() || validationError() }}</p>
+  }
+
+  <input
+    #fileInput
+    type="file"
+    hidden
+    accept=".png,.jpg,.jpeg"
+    (change)="onFileSelected($event)"
+  />
+</div>

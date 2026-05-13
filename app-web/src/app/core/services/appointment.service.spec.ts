@@ -302,5 +302,77 @@ describe('AppointmentService', () => {
         service.markAsPaid('apt-1', { payment_method: 'card' })
       ).rejects.toThrow('DB error');
     });
+
+    it('debe incluir payment_receipt_url cuando se provee', async () => {
+      await service.markAsPaid('apt-1', {
+        payment_method: 'transfer',
+        payment_receipt_url: 'https://example.com/receipts/payment.png'
+      });
+
+      expect(appointmentsUpdateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          is_paid: true,
+          payment_method: 'transfer',
+          payment_receipt_url: 'https://example.com/receipts/payment.png'
+        })
+      );
+    });
+
+    it('debe omitir payment_receipt_url si no se provee', async () => {
+      await service.markAsPaid('apt-1', {
+        payment_method: 'cash'
+      });
+
+      const callArgs = appointmentsUpdateMock.mock.calls[0][0];
+      expect(callArgs.payment_receipt_url).toBeUndefined();
+    });
+  });
+
+  describe('updateStatus', () => {
+    it('debe incluir receipt_url cuando se provee al completar', async () => {
+      await service.updateStatus(
+        'apt-1',
+        'completed',
+        50,
+        6.5,
+        325,
+        'Cliente frecuente',
+        'https://example.com/receipts/completion.png'
+      );
+
+      expect(appointmentsUpdateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'completed',
+          amount_collected: 50,
+          exchange_rate: 6.5,
+          amount_in_bs: 325,
+          observations: 'Cliente frecuente',
+          receipt_url: 'https://example.com/receipts/completion.png'
+        })
+      );
+    });
+
+    it('debe omitir receipt_url si no se provee', async () => {
+      await service.updateStatus('apt-1', 'completed', 50, 6.5, 325, 'Sin comprobante');
+
+      const callArgs = appointmentsUpdateMock.mock.calls[0][0];
+      expect(callArgs.receipt_url).toBeUndefined();
+    });
+
+    it('debe incluir receipt_url incluso sin observaciones', async () => {
+      await service.updateStatus(
+        'apt-1',
+        'completed',
+        50,
+        6.5,
+        325,
+        undefined,
+        'https://example.com/receipts/completion.png'
+      );
+
+      const callArgs = appointmentsUpdateMock.mock.calls[0][0];
+      expect(callArgs.receipt_url).toBe('https://example.com/receipts/completion.png');
+      expect(callArgs.observations).toBeUndefined();
+    });
   });
 });

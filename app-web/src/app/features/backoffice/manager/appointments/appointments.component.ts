@@ -15,9 +15,11 @@ import { CompanyService } from '../../../../core/services/company.service';
 import { EmailNotificationService } from '../../../../core/services/email-notification.service';
 import { UserService } from '../../../../core/services/user.service';
 import { ExchangeRateStorageService } from '../../../../core/services/exchange-rate-storage.service';
+import { StorageService } from '../../../../core/services/storage.service';
 import { Appointment, AppointmentStatus, PaymentMethod, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../../core/models/appointment.model';
 import { User } from '../../../../core/models/user.model';
 import { ManagerAppointmentCreateDialogComponent } from './manager-appointment-create-dialog.component';
+import { ImageUploadComponent } from '../../../../shared/components/image-upload/image-upload.component';
 
 interface FilterOption {
   label: string;
@@ -42,7 +44,8 @@ interface DateGroup {
     TextareaModule,
     DrawerModule,
     TooltipModule,
-    ManagerAppointmentCreateDialogComponent
+    ManagerAppointmentCreateDialogComponent,
+    ImageUploadComponent
   ],
   templateUrl: './appointments.component.html',
   styleUrl: './appointments.component.scss',
@@ -56,6 +59,7 @@ export class AppointmentsComponent implements OnInit {
   private messageService = inject(MessageService);
   private emailNotificationService = inject(EmailNotificationService);
   private exchangeRateStorage = inject(ExchangeRateStorageService);
+  private storageService = inject(StorageService);
 
   appointments = signal<Appointment[]>([]);
   employees = signal<User[]>([]);
@@ -84,6 +88,13 @@ export class AppointmentsComponent implements OnInit {
   paymentAmountBs = signal<number>(0);
   saving = signal(false);
   private lastEdited: 'usd' | 'bs' | null = null;
+
+  selectedCompletionReceipt = signal<File | null>(null);
+  completionReceiptError = signal<string | null>(null);
+  uploadingCompletionReceipt = signal(false);
+  selectedPaymentReceipt = signal<File | null>(null);
+  paymentReceiptError = signal<string | null>(null);
+  uploadingPaymentReceipt = signal(false);
 
   paymentMethodOptions = [
     { label: 'Efectivo', value: 'cash' as PaymentMethod },
@@ -234,6 +245,9 @@ export class AppointmentsComponent implements OnInit {
       this.amountBs.set(0);
       this.observations.set('');
       this.lastEdited = null;
+      this.selectedCompletionReceipt.set(null);
+      this.completionReceiptError.set(null);
+      this.uploadingCompletionReceipt.set(false);
     }
   }
 
@@ -244,6 +258,12 @@ export class AppointmentsComponent implements OnInit {
     this.paymentMethod.set(null);
     this.paymentReference.set('');
     this.paymentAmountBs.set(0);
+    this.selectedCompletionReceipt.set(null);
+    this.completionReceiptError.set(null);
+    this.uploadingCompletionReceipt.set(false);
+    this.selectedPaymentReceipt.set(null);
+    this.paymentReceiptError.set(null);
+    this.uploadingPaymentReceipt.set(false);
   }
 
   openPaymentDrawer(appointment: Appointment) {
@@ -253,6 +273,9 @@ export class AppointmentsComponent implements OnInit {
     this.paymentAmountBs.set(appointment.amount_in_bs ?? 0);
     this.paymentMethod.set(null);
     this.paymentReference.set('');
+    this.selectedPaymentReceipt.set(null);
+    this.paymentReceiptError.set(null);
+    this.uploadingPaymentReceipt.set(false);
   }
 
   async confirmPayment() {
@@ -261,16 +284,39 @@ export class AppointmentsComponent implements OnInit {
     if (!appointment || !method) return;
 
     this.saving.set(true);
+    this.uploadingPaymentReceipt.set(true);
+    this.paymentReceiptError.set(null);
+
+    let receiptUrl: string | undefined;
+    const receiptFile = this.selectedPaymentReceipt();
+
+    if (receiptFile) {
+      try {
+        receiptUrl = await this.storageService.uploadReceipt(
+          receiptFile,
+          this.companyId()!,
+          appointment.id,
+          'payment'
+        );
+      } catch (error: any) {
+        this.paymentReceiptError.set(error.message || 'Error al subir el comprobante. Intente de nuevo.');
+        this.saving.set(false);
+        this.uploadingPaymentReceipt.set(false);
+        return;
+      }
+    }
+
     try {
       await this.appointmentService.markAsPaid(appointment.id, {
         payment_method: method,
         payment_reference: this.paymentReference() || undefined,
         payment_amount_bs: this.paymentAmountBs() || undefined,
+        payment_receipt_url: receiptUrl,
       });
 
       const updated = this.appointments().map(apt =>
         apt.id === appointment.id
-          ? { ...apt, is_paid: true, payment_method: method, payment_reference: this.paymentReference() || undefined, payment_amount_bs: this.paymentAmountBs() || undefined, payment_date: new Date().toISOString() }
+          ? { ...apt, is_paid: true, payment_method: method, payment_reference: this.paymentReference() || undefined, payment_amount_bs: this.paymentAmountBs() || undefined, payment_date: new Date().toISOString(), payment_receipt_url: receiptUrl }
           : apt
       );
       this.appointments.set(updated);
@@ -290,6 +336,7 @@ export class AppointmentsComponent implements OnInit {
       });
     } finally {
       this.saving.set(false);
+      this.uploadingPaymentReceipt.set(false);
     }
   }
 
@@ -378,7 +425,30 @@ export class AppointmentsComponent implements OnInit {
       const rate = status === 'completed' ? this.exchangeRate() : undefined;
       const bs = status === 'completed' ? this.amountBs() : undefined;
       const obs = status === 'completed' ? this.observations() : undefined;
-      await this.appointmentService.updateStatus(appointment.id, status, amount, rate, bs, obs);
+
+      let receiptUrl: string | undefined;
+      if (status === 'completed') {
+        this.uploadingCompletionReceipt.set(true);
+        this.completionReceiptError.set(null);
+        const receiptFile = this.selectedCompletionReceipt();
+        if (receiptFile) {
+          try {
+            receiptUrl = await this.storageService.uploadReceipt(
+              receiptFile,
+              this.companyId()!,
+              appointment.id,
+              'completion'
+            );
+          } catch (error: any) {
+            this.completionReceiptError.set(error.message || 'Error al subir el comprobante. Intente de nuevo.');
+            this.saving.set(false);
+            this.uploadingCompletionReceipt.set(false);
+            return;
+          }
+        }
+      }
+
+      await this.appointmentService.updateStatus(appointment.id, status, amount, rate, bs, obs, receiptUrl);
 
       if (status === 'completed' && rate && rate > 0) {
         this.exchangeRateStorage.setRate(rate);
@@ -390,7 +460,7 @@ export class AppointmentsComponent implements OnInit {
 
       const updated = this.appointments().map(apt => 
         apt.id === appointment.id 
-          ? { ...apt, status, amount_collected: amount || apt.amount_collected, exchange_rate: rate || apt.exchange_rate, amount_in_bs: bs || apt.amount_in_bs, observations: obs || apt.observations }
+          ? { ...apt, status, amount_collected: amount || apt.amount_collected, exchange_rate: rate || apt.exchange_rate, amount_in_bs: bs || apt.amount_in_bs, observations: obs || apt.observations, receipt_url: receiptUrl }
           : apt
       );
       this.appointments.set(updated);
@@ -406,6 +476,8 @@ export class AppointmentsComponent implements OnInit {
         summary: 'Error',
         detail: 'No se pudo actualizar el estado'
       });
+    } finally {
+      this.uploadingCompletionReceipt.set(false);
     }
   }
 

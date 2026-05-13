@@ -403,6 +403,30 @@
   }
 }
 
+.receipt-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(93, 109, 126, 0.08);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  margin-left: var(--space-xs);
+  transition: all var(--duration-fast) ease;
+
+  i {
+    font-size: 0.75rem;
+    margin: 0;
+  }
+
+  &:hover {
+    background: var(--color-sage-pale);
+    color: var(--color-sage-dark);
+  }
+}
+
 .card-body {
   margin-bottom: var(--space-md);
 }

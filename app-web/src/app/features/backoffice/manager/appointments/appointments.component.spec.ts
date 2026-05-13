@@ -42,6 +42,12 @@ describe('AppointmentsComponent (Manager)', () => {
     const paymentReference = signal<string>('');
     const paymentAmountBs = signal<number>(0);
     const saving = signal(false);
+    const selectedCompletionReceipt = signal<File | null>(null);
+    const completionReceiptError = signal<string | null>(null);
+    const uploadingCompletionReceipt = signal(false);
+    const selectedPaymentReceipt = signal<File | null>(null);
+    const paymentReceiptError = signal<string | null>(null);
+    const uploadingPaymentReceipt = signal(false);
 
     const updateStatusCalls: { appointment: Appointment; status: AppointmentStatus }[] = [];
 
@@ -72,6 +78,9 @@ describe('AppointmentsComponent (Manager)', () => {
         exchangeRate.set(1);
         amountBs.set(0);
         observations.set('');
+        selectedCompletionReceipt.set(null);
+        completionReceiptError.set(null);
+        uploadingCompletionReceipt.set(false);
       }
     };
 
@@ -82,6 +91,12 @@ describe('AppointmentsComponent (Manager)', () => {
       paymentMethod.set(null);
       paymentReference.set('');
       paymentAmountBs.set(0);
+      selectedCompletionReceipt.set(null);
+      completionReceiptError.set(null);
+      uploadingCompletionReceipt.set(false);
+      selectedPaymentReceipt.set(null);
+      paymentReceiptError.set(null);
+      uploadingPaymentReceipt.set(false);
     };
 
     const openPaymentDrawer = (appointment: Appointment) => {
@@ -91,6 +106,9 @@ describe('AppointmentsComponent (Manager)', () => {
       paymentAmountBs.set(appointment.amount_in_bs ?? 0);
       paymentMethod.set(null);
       paymentReference.set('');
+      selectedPaymentReceipt.set(null);
+      paymentReceiptError.set(null);
+      uploadingPaymentReceipt.set(false);
     };
 
     const getDrawerTitle = () => {
@@ -130,6 +148,7 @@ describe('AppointmentsComponent (Manager)', () => {
       const appointment = selectedAppointment();
       const action = statusAction();
       if (!appointment || !action) return;
+      if (action === 'completed' && completionReceiptError()) return;
       updateStatusCalls.push({ appointment, status: action as AppointmentStatus });
       closeDrawer();
     };
@@ -140,6 +159,7 @@ describe('AppointmentsComponent (Manager)', () => {
       const appointment = selectedAppointment();
       const method = paymentMethod();
       if (!appointment || !method) return;
+      if (paymentReceiptError()) return;
       markAsPaidCalls.push({
         id: appointment.id,
         paymentData: {
@@ -151,7 +171,7 @@ describe('AppointmentsComponent (Manager)', () => {
       closeDrawer();
     };
 
-    return { appointments, employees, loading, filterEmployee, filterStatus, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, employeeOptions, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls };
+    return { appointments, employees, loading, filterEmployee, filterStatus, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, employeeOptions, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls, selectedCompletionReceipt, completionReceiptError, uploadingCompletionReceipt, selectedPaymentReceipt, paymentReceiptError, uploadingPaymentReceipt };
   };
 
   describe('filtrado de citas', () => {
@@ -498,6 +518,103 @@ describe('AppointmentsComponent (Manager)', () => {
       expect(comp.paymentMethod()).toBeNull();
       expect(comp.paymentReference()).toBe('');
       expect(comp.paymentAmountBs()).toBe(0);
+    });
+  });
+
+  describe('señales de comprobante — apertura de drawers', () => {
+    it('debe resetear señales de comprobante al abrir drawer de completar', () => {
+      const comp = createMock();
+      comp.selectedCompletionReceipt.set(new File(['x'], 'old.png', { type: 'image/png' }));
+      comp.completionReceiptError.set('error previo');
+      comp.uploadingCompletionReceipt.set(true);
+      comp.openStatusDialog(mockAppointments[0], 'completed');
+      expect(comp.selectedCompletionReceipt()).toBeNull();
+      expect(comp.completionReceiptError()).toBeNull();
+      expect(comp.uploadingCompletionReceipt()).toBe(false);
+    });
+
+    it('debe resetear señales de comprobante de pago al abrir drawer de pago', () => {
+      const comp = createMock();
+      comp.selectedPaymentReceipt.set(new File(['x'], 'old.png', { type: 'image/png' }));
+      comp.paymentReceiptError.set('error previo');
+      comp.uploadingPaymentReceipt.set(true);
+      comp.openPaymentDrawer(mockAppointments[1]);
+      expect(comp.selectedPaymentReceipt()).toBeNull();
+      expect(comp.paymentReceiptError()).toBeNull();
+      expect(comp.uploadingPaymentReceipt()).toBe(false);
+    });
+  });
+
+  describe('closeDrawer — reset de señales de comprobante', () => {
+    it('debe resetear todas las señales de comprobante al cerrar', () => {
+      const comp = createMock();
+      comp.selectedCompletionReceipt.set(new File(['x'], 'receipt.png', { type: 'image/png' }));
+      comp.completionReceiptError.set('upload failed');
+      comp.uploadingCompletionReceipt.set(true);
+      comp.selectedPaymentReceipt.set(new File(['x'], 'payment.png', { type: 'image/png' }));
+      comp.paymentReceiptError.set('upload failed');
+      comp.uploadingPaymentReceipt.set(true);
+
+      comp.closeDrawer();
+
+      expect(comp.selectedCompletionReceipt()).toBeNull();
+      expect(comp.completionReceiptError()).toBeNull();
+      expect(comp.uploadingCompletionReceipt()).toBe(false);
+      expect(comp.selectedPaymentReceipt()).toBeNull();
+      expect(comp.paymentReceiptError()).toBeNull();
+      expect(comp.uploadingPaymentReceipt()).toBe(false);
+    });
+  });
+
+  describe('confirmStatusChange — con comprobante', () => {
+    it('debe subir comprobante antes de actualizar estado cuando hay archivo seleccionado', () => {
+      const comp = createMock();
+      const receiptFile = new File(['x'], 'receipt.png', { type: 'image/png' });
+      comp.openStatusDialog(mockAppointments[0], 'completed');
+      comp.selectedCompletionReceipt.set(receiptFile);
+      comp.confirmStatusChange();
+
+      expect(comp.updateStatusCalls).toHaveLength(1);
+      expect(comp.showStatusDialog()).toBe(false);
+    });
+
+    it('NO debe ejecutar updateStatus si la subida del comprobante falla', () => {
+      const comp = createMock();
+      comp.openStatusDialog(mockAppointments[0], 'completed');
+      comp.selectedCompletionReceipt.set(new File(['x'], 'receipt.png', { type: 'image/png' }));
+      comp.completionReceiptError.set('Error al subir el comprobante. Intente de nuevo.');
+
+      comp.confirmStatusChange();
+
+      expect(comp.updateStatusCalls).toHaveLength(0);
+      expect(comp.showStatusDialog()).toBe(true);
+    });
+  });
+
+  describe('confirmPayment — con comprobante de pago', () => {
+    it('debe subir comprobante antes de registrar pago cuando hay archivo seleccionado', () => {
+      const comp = createMock();
+      const receiptFile = new File(['x'], 'payment.png', { type: 'image/png' });
+      comp.openPaymentDrawer(mockAppointments[1]);
+      comp.paymentMethod.set('cash' as PaymentMethod);
+      comp.selectedPaymentReceipt.set(receiptFile);
+      comp.confirmPayment();
+
+      expect(comp.markAsPaidCalls).toHaveLength(1);
+      expect(comp.showStatusDialog()).toBe(false);
+    });
+
+    it('NO debe ejecutar markAsPaid si la subida del comprobante falla', () => {
+      const comp = createMock();
+      comp.openPaymentDrawer(mockAppointments[1]);
+      comp.paymentMethod.set('cash' as PaymentMethod);
+      comp.selectedPaymentReceipt.set(new File(['x'], 'payment.png', { type: 'image/png' }));
+      comp.paymentReceiptError.set('Error al subir el comprobante. Intente de nuevo.');
+
+      comp.confirmPayment();
+
+      expect(comp.markAsPaidCalls).toHaveLength(0);
+      expect(comp.showStatusDialog()).toBe(true);
     });
   });
 });

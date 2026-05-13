@@ -27,6 +27,8 @@ export interface Appointment {
   payment_reference?: string;
   payment_amount_bs?: number;
   payment_date?: string;
+  receipt_url?: string;
+  payment_receipt_url?: string;
   created_at: string;
   updated_at: string;
 }
