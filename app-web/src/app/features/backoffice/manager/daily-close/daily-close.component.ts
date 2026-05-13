@@ -12,10 +12,13 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { TextareaModule } from 'primeng/textarea';
 
 import { TooltipModule } from 'primeng/tooltip';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { DailyCloseFacade, Employee, AppointmentWithRelations } from './daily-close.facade';
 import { CONFIRMATION_DIALOG } from '../../../../core/tokens/confirmation-dialog.token';
 import { IConfirmationDialog } from '../../../../core/interfaces/confirmation-dialog.interface';
 import { ExchangeRateStorageService } from '../../../../core/services/exchange-rate-storage.service';
+import { StorageService } from '../../../../core/services/storage.service';
+import { ImageUploadComponent } from '../../../../shared/components/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-daily-close',
@@ -31,7 +34,9 @@ import { ExchangeRateStorageService } from '../../../../core/services/exchange-r
     DrawerModule,
     InputNumberModule,
     TextareaModule,
-    TooltipModule
+    TooltipModule,
+    ProgressBarModule,
+    ImageUploadComponent
   ],
   templateUrl: './daily-close.component.html',
   styleUrl: './daily-close.component.scss'
@@ -41,6 +46,7 @@ export class DailyCloseComponent implements OnInit {
   private messageService = inject(MessageService);
   private confirmationDialog = inject<IConfirmationDialog>(CONFIRMATION_DIALOG);
   private exchangeRateStorage = inject(ExchangeRateStorageService);
+  private storageService = inject(StorageService);
 
   // UI State
   amountDrawerVisible = signal(false);
@@ -51,6 +57,11 @@ export class DailyCloseComponent implements OnInit {
   amountBs: number | null = null;
   observations: string = '';
   private lastEdited: 'usd' | 'bs' | null = null;
+
+  // Receipt upload state
+  selectedCompletionReceipt = signal<File | null>(null);
+  completionReceiptError = signal<string | null>(null);
+  uploadingCompletionReceipt = signal(false);
 
   maxDateValue = new Date();
 
@@ -116,6 +127,9 @@ export class DailyCloseComponent implements OnInit {
     this.amountBs = null;
     this.observations = '';
     this.lastEdited = null;
+    this.selectedCompletionReceipt.set(null);
+    this.completionReceiptError.set(null);
+    this.uploadingCompletionReceipt.set(false);
     this.amountDrawerVisible.set(true);
   }
 
@@ -127,6 +141,9 @@ export class DailyCloseComponent implements OnInit {
     this.amountBs = null;
     this.observations = '';
     this.lastEdited = null;
+    this.selectedCompletionReceipt.set(null);
+    this.completionReceiptError.set(null);
+    this.uploadingCompletionReceipt.set(false);
   }
 
   onUsdChange(value: number | null) {
@@ -188,12 +205,29 @@ export class DailyCloseComponent implements OnInit {
     }
 
     try {
+      let receiptUrl: string | undefined;
+
+      if (this.selectedCompletionReceipt()) {
+        this.uploadingCompletionReceipt.set(true);
+        try {
+          receiptUrl = await this.storageService.uploadReceipt(
+            this.selectedCompletionReceipt()!,
+            apt.company_id,
+            apt.id,
+            'completion'
+          );
+        } finally {
+          this.uploadingCompletionReceipt.set(false);
+        }
+      }
+
       await this.facade.confirmAppointmentCompletion(
         apt.id,
         this.amountInput,
         this.exchangeRate,
         this.amountBs,
-        this.observations
+        this.observations,
+        receiptUrl
       );
 
       if (this.exchangeRate > 0) {
@@ -207,6 +241,9 @@ export class DailyCloseComponent implements OnInit {
       });
       this.closeDrawer();
     } catch (error: any) {
+      if (error?.message?.includes('archivo')) {
+        this.completionReceiptError.set(error.message);
+      }
       this.messageService.add({
         severity: 'error',
         summary: 'Error',

@@ -1,0 +1,122 @@
+.image-upload {
+  width: 100%;
+}
+
+.upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 16px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-cream);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+
+  &:hover {
+    border-color: var(--color-sage);
+    background: var(--color-sage-pale);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-sage);
+    outline-offset: 2px;
+  }
+
+  &--paste {
+    border-color: var(--color-success) !important;
+    background: var(--color-sage-pale) !important;
+    animation: pasteFlash 1s ease;
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  i {
+    font-size: 32px;
+    color: var(--color-text-muted);
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+  }
+
+  .hint {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+}
+
+.image-preview {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--radius-lg);
+  background: var(--color-warm-white);
+  box-shadow: var(--shadow-sm);
+
+  img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+
+  .remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-error);
+    color: white;
+    font-size: 10px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  .file-info {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+}
+
+.error-message {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--color-coral);
+  text-align: center;
+}
+
+@keyframes pasteFlash {
+  0% {
+    border-color: var(--color-success);
+    background: var(--color-sage-pale);
+  }
+  100% {
+    border-color: var(--color-border);
+    background: var(--color-cream);
+  }
+}

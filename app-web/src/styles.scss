@@ -795,6 +795,11 @@ a {
   color: var(--color-sage);
 }
 
+.status-drawer .amount-input app-image-upload {
+  display: block;
+  margin-top: var(--space-xs);
+}
+
 .status-drawer .drawer-footer {
   display: flex;
   justify-content: flex-end;

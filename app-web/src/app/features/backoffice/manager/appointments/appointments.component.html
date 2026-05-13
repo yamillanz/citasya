@@ -160,6 +160,16 @@
                       <i class="pi pi-check"></i> Pagado
                     </span>
                   }
+                  @if (apt.receipt_url) {
+                    <a [href]="apt.receipt_url" target="_blank" rel="noopener" class="receipt-link" title="Ver comprobante de cita">
+                      <i class="pi pi-paperclip"></i>
+                    </a>
+                  }
+                  @if (apt.payment_receipt_url) {
+                    <a [href]="apt.payment_receipt_url" target="_blank" rel="noopener" class="receipt-link" title="Ver comprobante de pago">
+                      <i class="pi pi-image"></i>
+                    </a>
+                  }
                 </div>
               </div>
               
@@ -352,6 +362,15 @@
           placeholder="Ej: descuento aplicado, cliente frecuente...">
         </textarea>
       </div>
+      <div class="amount-input">
+        <label>Comprobante</label>
+        <app-image-upload
+          [uploading]="uploadingCompletionReceipt()"
+          [error]="completionReceiptError()"
+          (imageSelected)="selectedCompletionReceipt.set($event)"
+          (imageRemoved)="selectedCompletionReceipt.set(null)">
+        </app-image-upload>
+      </div>
     } @else if (statusAction() === 'cancelled' || statusAction() === 'no_show') {
       <div class="confirm-message">
         <i class="pi pi-warning"></i>
@@ -393,6 +412,15 @@
           <i class="pi pi-calendar-clock"></i>
           Se registrará al confirmar
         </p>
+      </div>
+      <div class="amount-input">
+        <label>Comprobante de pago</label>
+        <app-image-upload
+          [uploading]="uploadingPaymentReceipt()"
+          [error]="paymentReceiptError()"
+          (imageSelected)="selectedPaymentReceipt.set($event)"
+          (imageRemoved)="selectedPaymentReceipt.set(null)">
+        </app-image-upload>
       </div>
     }
   </div>

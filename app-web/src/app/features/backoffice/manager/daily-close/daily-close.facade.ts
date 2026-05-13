@@ -272,15 +272,15 @@ export class DailyCloseFacade {
     this._amountInput.set(amount);
   }
 
-  async confirmAppointmentCompletion(appointmentId: string, amount: number, exchangeRate?: number, amountBs?: number, observations?: string): Promise<void> {
+  async confirmAppointmentCompletion(appointmentId: string, amount: number, exchangeRate?: number, amountBs?: number, observations?: string, receiptUrl?: string): Promise<void> {
     if (amount <= 0) {
       throw new Error('El monto debe ser mayor a 0');
     }
 
-    await this.appointmentService.updateStatus(appointmentId, 'completed', amount, exchangeRate, amountBs, observations);
+    await this.appointmentService.updateStatus(appointmentId, 'completed', amount, exchangeRate, amountBs, observations, receiptUrl);
 
     this._appointments.update(apps =>
-      apps.map(a => a.id === appointmentId ? { ...a, status: 'completed' as AppointmentStatus, amount_collected: amount, exchange_rate: exchangeRate, amount_in_bs: amountBs, observations: observations } : a)
+      apps.map(a => a.id === appointmentId ? { ...a, status: 'completed' as AppointmentStatus, amount_collected: amount, exchange_rate: exchangeRate, amount_in_bs: amountBs, observations: observations, receipt_url: receiptUrl } : a)
     );
   }
 

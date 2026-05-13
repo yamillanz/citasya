@@ -217,7 +217,7 @@ export class AppointmentService {
     return data?.map(apt => this.flattenServices(apt)) || [];
   }
 
-  async updateStatus(id: string, status: AppointmentStatus, amountCollected?: number, exchangeRate?: number, amountInBs?: number, observations?: string): Promise<void> {
+  async updateStatus(id: string, status: AppointmentStatus, amountCollected?: number, exchangeRate?: number, amountInBs?: number, observations?: string, receiptUrl?: string): Promise<void> {
     const updateData: Partial<Appointment> = { 
       status, 
       updated_at: new Date().toISOString() 
@@ -239,6 +239,10 @@ export class AppointmentService {
       updateData.observations = observations;
     }
 
+    if (receiptUrl !== undefined) {
+      updateData.receipt_url = receiptUrl;
+    }
+
     const { error } = await this.supabase
       .from('appointments')
       .update(updateData)
@@ -247,7 +251,7 @@ export class AppointmentService {
     if (error) throw error;
   }
 
-  async markAsPaid(id: string, paymentData: { payment_method: PaymentMethod; payment_reference?: string; payment_amount_bs?: number }): Promise<void> {
+  async markAsPaid(id: string, paymentData: { payment_method: PaymentMethod; payment_reference?: string; payment_amount_bs?: number; payment_receipt_url?: string }): Promise<void> {
     const updateData: Partial<Appointment> = {
       is_paid: true,
       payment_method: paymentData.payment_method,
@@ -261,6 +265,10 @@ export class AppointmentService {
 
     if (paymentData.payment_amount_bs !== undefined) {
       updateData.payment_amount_bs = paymentData.payment_amount_bs;
+    }
+
+    if (paymentData.payment_receipt_url !== undefined) {
+      updateData.payment_receipt_url = paymentData.payment_receipt_url;
     }
 
     const { error } = await this.supabase

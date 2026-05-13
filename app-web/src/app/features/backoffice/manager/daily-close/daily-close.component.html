@@ -391,6 +391,16 @@
         </textarea>
       </div>
 
+      <div class="amount-input-section">
+        <label>Comprobante (opcional)</label>
+        <app-image-upload
+          [uploading]="uploadingCompletionReceipt()"
+          [error]="completionReceiptError()"
+          (imageSelected)="selectedCompletionReceipt.set($event)"
+          (imageRemoved)="selectedCompletionReceipt.set(null)">
+        </app-image-upload>
+      </div>
+
       <div class="drawer-actions">
         <p-button 
           label="Cancelar"
