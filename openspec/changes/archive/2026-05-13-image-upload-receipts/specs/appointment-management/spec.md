@@ -1,6 +1,6 @@
 # appointment-management — Delta Spec (image-upload-receipts)
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Receipt image on appointment completion
 The appointment completion drawer SHALL allow the manager to optionally attach a receipt/voucher image when marking an appointment as completed.

@@ -1,6 +1,6 @@
 # appointment-payment — Delta Spec (image-upload-receipts)
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Payment receipt image on mark-as-paid
 The payment drawer SHALL allow the manager to optionally attach a receipt/voucher image when registering a payment to an employee.
