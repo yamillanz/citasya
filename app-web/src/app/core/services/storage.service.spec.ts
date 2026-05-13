@@ -52,7 +52,7 @@ describe('StorageService', () => {
 
       expect(mockFromFn).toHaveBeenCalledWith('receipts');
       expect(mockUploadFn).toHaveBeenCalledWith(
-        'receipts/company-1/apt-1_completion.png',
+        'company-1/apt-1_completion.png',
         mockFile,
         { upsert: true }
       );
@@ -63,7 +63,7 @@ describe('StorageService', () => {
       const url = await service.uploadReceipt(mockJpgFile, 'company-1', 'apt-2', 'payment');
 
       expect(mockUploadFn).toHaveBeenCalledWith(
-        'receipts/company-1/apt-2_payment.jpg',
+        'company-1/apt-2_payment.jpg',
         mockJpgFile,
         { upsert: true }
       );
@@ -118,11 +118,11 @@ describe('StorageService', () => {
 
   describe('deleteReceipt', () => {
     it('debe eliminar el archivo del bucket receipts', async () => {
-      await service.deleteReceipt('receipts/company-1/apt-1_completion.png');
+      await service.deleteReceipt('company-1/apt-1_completion.png');
 
       expect(mockFromFn).toHaveBeenCalledWith('receipts');
       expect(mockRemoveFn).toHaveBeenCalledWith([
-        'receipts/company-1/apt-1_completion.png'
+        'company-1/apt-1_completion.png'
       ]);
     });
 
@@ -130,7 +130,7 @@ describe('StorageService', () => {
       mockRemoveFn.mockResolvedValueOnce({ error: new Error('Delete failed') });
 
       await expect(
-        service.deleteReceipt('receipts/company-1/apt-1_completion.png')
+        service.deleteReceipt('company-1/apt-1_completion.png')
       ).rejects.toThrow('Delete failed');
     });
   });
@@ -140,7 +140,7 @@ describe('StorageService', () => {
       const url = service.getReceiptUrl('company-1', 'apt-1', 'completion');
 
       expect(mockGetPublicUrlFn).toHaveBeenCalledWith(
-        'receipts/company-1/apt-1_completion.jpg'
+        'company-1/apt-1_completion.jpg'
       );
       expect(url).toBe('https://example.com/storage/receipts/receipt.png');
     });
@@ -149,7 +149,7 @@ describe('StorageService', () => {
       const url = service.getReceiptUrl('company-1', 'apt-2', 'payment');
 
       expect(mockGetPublicUrlFn).toHaveBeenCalledWith(
-        'receipts/company-1/apt-2_payment.jpg'
+        'company-1/apt-2_payment.jpg'
       );
     });
   });

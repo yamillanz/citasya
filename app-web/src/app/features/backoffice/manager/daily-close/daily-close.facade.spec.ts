@@ -508,7 +508,7 @@ describe('DailyCloseFacade', () => {
 
         await facade.confirmAppointmentCompletion('apt-3', 75);
 
-        expect(mockAppointmentService.updateStatus).toHaveBeenCalledWith('apt-3', 'completed', 75, undefined, undefined, undefined);
+        expect(mockAppointmentService.updateStatus).toHaveBeenCalledWith('apt-3', 'completed', 75, undefined, undefined, undefined, undefined);
       });
 
       it('should throw error if amount is invalid', async () => {
@@ -541,7 +541,17 @@ describe('DailyCloseFacade', () => {
         await facade.confirmAppointmentCompletion('apt-3', 75, 1.5, 112.5, 'descuento aplicado');
 
         expect(mockAppointmentService.updateStatus).toHaveBeenCalledWith(
-          'apt-3', 'completed', 75, 1.5, 112.5, 'descuento aplicado'
+          'apt-3', 'completed', 75, 1.5, 112.5, 'descuento aplicado', undefined
+        );
+      });
+
+      it('should pass receiptUrl to updateStatus when provided', async () => {
+        mockAppointmentService.updateStatus.mockResolvedValue(undefined);
+
+        await facade.confirmAppointmentCompletion('apt-3', 75, 1.5, 112.5, 'descuento', 'https://example.com/receipt.jpg');
+
+        expect(mockAppointmentService.updateStatus).toHaveBeenCalledWith(
+          'apt-3', 'completed', 75, 1.5, 112.5, 'descuento', 'https://example.com/receipt.jpg'
         );
       });
 
@@ -556,6 +566,15 @@ describe('DailyCloseFacade', () => {
         expect(updated?.exchange_rate).toBe(1.5);
         expect(updated?.amount_in_bs).toBe(112.5);
         expect(updated?.observations).toBe('test obs');
+      });
+
+      it('should update local state with receipt_url when provided', async () => {
+        mockAppointmentService.updateStatus.mockResolvedValue(undefined);
+
+        await facade.confirmAppointmentCompletion('apt-3', 75, 1.5, 112.5, 'test obs', 'https://example.com/receipt.jpg');
+
+        const updated = facade.appointments().find(a => a.id === 'apt-3');
+        expect(updated?.receipt_url).toBe('https://example.com/receipt.jpg');
       });
     });
 

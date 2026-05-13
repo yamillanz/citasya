@@ -184,7 +184,7 @@ describe('DailyCloseComponent', () => {
       component.observations = 'descuento';
       await component.confirmCompletion();
       expect(facade.confirmAppointmentCompletion).toHaveBeenCalledWith(
-        'apt-2', 50, 1.5, 75, 'descuento'
+        'apt-2', 50, 1.5, 75, 'descuento', undefined
       );
     });
   });

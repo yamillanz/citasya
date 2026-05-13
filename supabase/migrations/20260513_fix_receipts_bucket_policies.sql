@@ -1,13 +1,15 @@
 -- ============================================================================
--- Migration: Create receipts storage bucket with RLS policies
+-- Migration: Fix receipts bucket RLS policies
 -- Date: 2026-05-13
--- Purpose: Enable receipt image upload for appointment completion and payment
+-- Purpose: Drop and recreate RLS policies with correct path structure.
+--          The storage path is now: {company_id}/{appointment_id}_{type}.{ext}
+--          (no redundant 'receipts/' prefix).
 -- ============================================================================
 
--- Create storage bucket (non-public, requires authenticated access)
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('receipts', 'receipts', false)
-ON CONFLICT (id) DO NOTHING;
+-- Drop existing policies
+DROP POLICY IF EXISTS "Managers can upload receipts to their company" ON storage.objects;
+DROP POLICY IF EXISTS "Users can view receipts from their company" ON storage.objects;
+DROP POLICY IF EXISTS "Managers can delete receipts from their company" ON storage.objects;
 
 -- Policy: Managers can upload receipts to their company folder
 CREATE POLICY "Managers can upload receipts to their company"

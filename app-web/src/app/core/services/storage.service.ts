@@ -18,7 +18,7 @@ export class StorageService {
     this.validateFile(file);
 
     const ext = this.getFileExtension(file);
-    const path = `receipts/${companyId}/${appointmentId}_${type}.${ext}`;
+    const path = `${companyId}/${appointmentId}_${type}.${ext}`;
 
     const { error } = await this.supabase
       .storage
@@ -46,7 +46,7 @@ export class StorageService {
 
   getReceiptUrl(companyId: string, appointmentId: string, type: 'completion' | 'payment'): string {
     const ext = 'jpg';
-    const path = `receipts/${companyId}/${appointmentId}_${type}.${ext}`;
+    const path = `${companyId}/${appointmentId}_${type}.${ext}`;
     const { data } = this.supabase
       .storage
       .from('receipts')
