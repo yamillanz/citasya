@@ -49,7 +49,7 @@
         
         <p-datepicker 
           [(ngModel)]="filterDate"
-          (ngModelChange)="onDateChange()"
+          (ngModelChange)="onFilterChange()"
           [showIcon]="true"
           placeholder="Filtrar por fecha"
           dateFormat="dd/mm/yy"
@@ -60,6 +60,7 @@
         <p-select 
           [options]="employeeOptions()"
           [(ngModel)]="filterEmployee"
+          (ngModelChange)="onFilterChange()"
           optionLabel="label"
           optionValue="value"
           placeholder="Todos los empleados"
@@ -70,6 +71,7 @@
         <p-select 
           [options]="statusOptions"
           [(ngModel)]="filterStatus"
+          (ngModelChange)="onFilterChange()"
           optionLabel="label"
           optionValue="value"
           placeholder="Todos los estados"
@@ -99,7 +101,7 @@
     <!-- Stats Summary -->
     <div class="stats-row">
       <div class="stat-pill">
-        <span class="stat-value">{{ filteredAppointments().length }}</span>
+        <span class="stat-value">{{ totalCount() }}</span>
         <span class="stat-label">Total</span>
       </div>
       <div class="stat-pill pending">
@@ -252,9 +254,26 @@
                     (onClick)="openStatusDialog(apt, 'no_show')"
                     styleClass="btn-secondary-outline">
                   </p-button>
-                </div>
-              }
             </div>
+          }
+
+          @if (loadingMore()) {
+            <div class="loading-more">
+              <div class="loading-spinner"></div>
+              <span>Cargando más citas...</span>
+            </div>
+          }
+
+          @if (hasMore()) {
+            <div #sentinel class="scroll-sentinel"></div>
+          }
+
+          @if (!hasMore() && accumulatedAppointments().length > 0) {
+            <div class="end-of-list">
+              <span>No hay más citas</span>
+            </div>
+          }
+        </div>
           }
         </div>
       } @else {

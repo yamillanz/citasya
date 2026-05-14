@@ -375,4 +375,227 @@ describe('AppointmentService', () => {
       expect(callArgs.observations).toBeUndefined();
     });
   });
+
+  describe('getByCompanyPaginated', () => {
+    const mockPaginatedAppointments = [
+      { ...mockAppointment, id: 'apt-1', client_name: 'Juan Pérez' },
+      { ...mockAppointment, id: 'apt-2', client_name: 'María López', status: 'completed' as const },
+      { ...mockAppointment, id: 'apt-3', client_name: 'Carlos Ruiz' },
+      { ...mockAppointment, id: 'apt-4', client_name: 'Ana Martínez', status: 'cancelled' as const },
+      { ...mockAppointment, id: 'apt-5', client_name: 'Pedro Díaz' },
+      { ...mockAppointment, id: 'apt-6', client_name: 'Laura Sánchez', status: 'completed' as const },
+      { ...mockAppointment, id: 'apt-7', client_name: 'Diego Torres' },
+      { ...mockAppointment, id: 'apt-8', client_name: 'Sofía Herrera', status: 'no_show' as const },
+      { ...mockAppointment, id: 'apt-9', client_name: 'Andrés Vega' },
+      { ...mockAppointment, id: 'apt-10', client_name: 'Elena Rojas' },
+      { ...mockAppointment, id: 'apt-11', client_name: 'Miguel Ángel' },
+      { ...mockAppointment, id: 'apt-12', client_name: 'Valentina Cruz' },
+    ];
+
+    const paginatedQueryResult = { data: null as any, error: null as any, count: 0 };
+    let paginatedRangeMock: jest.Mock;
+    let paginatedEqCalls: string[][];
+    let paginatedIlikeCalls: string[][];
+
+    beforeEach(() => {
+      paginatedEqCalls = [];
+      paginatedIlikeCalls = [];
+
+      paginatedRangeMock = jest.fn().mockResolvedValue(paginatedQueryResult);
+      const paginatedOrderTimeMock = jest.fn().mockReturnValue({ range: paginatedRangeMock });
+      const orderDateMock = jest.fn().mockReturnValue({ order: paginatedOrderTimeMock });
+
+      const chainMethods = {
+        eq: jest.fn().mockImplementation(function (this: any, field: string, value: string) {
+          paginatedEqCalls.push([field, value]);
+          return this;
+        }),
+        neq: jest.fn().mockImplementation(function (this: any) {
+          return this;
+        }),
+        ilike: jest.fn().mockImplementation(function (this: any, field: string, value: string) {
+          paginatedIlikeCalls.push([field, value]);
+          return this;
+        }),
+      };
+
+      mockFromFn.mockImplementation((table: string) => {
+        if (table === 'appointments') {
+          return {
+            select: jest.fn().mockReturnValue(
+              Object.assign({ order: orderDateMock, range: paginatedRangeMock }, chainMethods)
+            )
+          };
+        }
+        if (table === 'services') {
+          return { select: jest.fn().mockReturnValue({ in: servicesSelectInMock }) };
+        }
+        if (table === 'appointment_services') {
+          return {
+            insert: appointmentServicesInsertMock,
+            delete: jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) })
+          };
+        }
+        return {
+          select: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                neq: jest.fn().mockReturnValue({
+                  single: jest.fn().mockResolvedValue({ data: mockAppointment, error: null })
+                })
+              }),
+              single: jest.fn().mockResolvedValue({ data: mockAppointment, error: null }),
+              order: jest.fn().mockReturnValue({
+                order: jest.fn().mockResolvedValue({ data: [mockAppointment], error: null })
+              })
+            }),
+            in: servicesSelectInMock
+          }),
+          insert: appointmentsInsertMock,
+          update: appointmentsUpdateMock,
+          delete: jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) })
+        };
+      });
+    });
+
+    it('debe usar range con los offsets correctos y count exact para la primera página', async () => {
+      paginatedQueryResult.data = mockPaginatedAppointments.slice(0, 10);
+      paginatedQueryResult.count = 12;
+      paginatedQueryResult.error = null;
+
+      const result = await service.getByCompanyPaginated({
+        companyId: 'company-1',
+        page: 0,
+        pageSize: 10
+      });
+
+      expect(paginatedRangeMock).toHaveBeenCalledWith(0, 9);
+      expect(result.data).toHaveLength(10);
+      expect(result.totalCount).toBe(12);
+      expect(result.hasMore).toBe(true);
+    });
+
+    it('debe retornar hasMore false cuando es la última página', async () => {
+      paginatedQueryResult.data = mockPaginatedAppointments.slice(10, 12);
+      paginatedQueryResult.count = 12;
+      paginatedQueryResult.error = null;
+
+      const result = await service.getByCompanyPaginated({
+        companyId: 'company-1',
+        page: 1,
+        pageSize: 10
+      });
+
+      expect(paginatedRangeMock).toHaveBeenCalledWith(10, 19);
+      expect(result.data).toHaveLength(2);
+      expect(result.totalCount).toBe(12);
+      expect(result.hasMore).toBe(false);
+    });
+
+    it('debe aplicar filtro de estado cuando se provee', async () => {
+      paginatedQueryResult.data = mockPaginatedAppointments.filter(a => a.status === 'pending');
+      paginatedQueryResult.count = 6;
+      paginatedQueryResult.error = null;
+
+      await service.getByCompanyPaginated({
+        companyId: 'company-1',
+        page: 0,
+        pageSize: 10,
+        status: 'pending'
+      });
+
+      expect(paginatedEqCalls.some((call: string[]) => call[0] === 'status' && call[1] === 'pending')).toBe(true);
+    });
+
+    it('NO debe aplicar filtro de estado cuando es all', async () => {
+      paginatedQueryResult.data = mockPaginatedAppointments;
+      paginatedQueryResult.count = 12;
+      paginatedQueryResult.error = null;
+
+      await service.getByCompanyPaginated({
+        companyId: 'company-1',
+        page: 0,
+        pageSize: 10,
+        status: 'all'
+      });
+
+      expect(paginatedEqCalls.some((call: string[]) => call[0] === 'status')).toBe(false);
+    });
+
+    it('debe aplicar filtro de empleado cuando se provee', async () => {
+      paginatedQueryResult.data = [mockPaginatedAppointments[0]];
+      paginatedQueryResult.count = 1;
+      paginatedQueryResult.error = null;
+
+      await service.getByCompanyPaginated({
+        companyId: 'company-1',
+        page: 0,
+        pageSize: 10,
+        employeeId: 'emp-1'
+      });
+
+      expect(paginatedEqCalls.some((call: string[]) => call[0] === 'employee_id' && call[1] === 'emp-1')).toBe(true);
+    });
+
+    it('debe aplicar filtro de fecha cuando se provee', async () => {
+      paginatedQueryResult.data = [mockPaginatedAppointments[0]];
+      paginatedQueryResult.count = 1;
+      paginatedQueryResult.error = null;
+
+      await service.getByCompanyPaginated({
+        companyId: 'company-1',
+        page: 0,
+        pageSize: 10,
+        date: '2026-03-20'
+      });
+
+      expect(paginatedEqCalls.some((call: string[]) => call[0] === 'appointment_date' && call[1] === '2026-03-20')).toBe(true);
+    });
+
+    it('debe aplicar búsqueda con ilike cuando se provee search', async () => {
+      paginatedQueryResult.data = [mockPaginatedAppointments[0]];
+      paginatedQueryResult.count = 1;
+      paginatedQueryResult.error = null;
+
+      await service.getByCompanyPaginated({
+        companyId: 'company-1',
+        page: 0,
+        pageSize: 10,
+        search: 'Juan'
+      });
+
+      expect(paginatedIlikeCalls.some((call: string[]) => call[0] === 'client_name' && call[1] === '%Juan%')).toBe(true);
+    });
+
+    it('debe propagar el error si Supabase falla', async () => {
+      paginatedQueryResult.data = null;
+      paginatedQueryResult.count = null;
+      paginatedQueryResult.error = new Error('DB error');
+
+      await expect(
+        service.getByCompanyPaginated({
+          companyId: 'company-1',
+          page: 0,
+          pageSize: 10
+        })
+      ).rejects.toThrow('DB error');
+    });
+
+    it('debe retornar hasMore false y totalCount 0 cuando no hay resultados', async () => {
+      paginatedQueryResult.data = [];
+      paginatedQueryResult.count = 0;
+      paginatedQueryResult.error = null;
+
+      const result = await service.getByCompanyPaginated({
+        companyId: 'company-1',
+        page: 0,
+        pageSize: 10,
+        search: 'zzz_no_existe'
+      });
+
+      expect(result.data).toHaveLength(0);
+      expect(result.totalCount).toBe(0);
+      expect(result.hasMore).toBe(false);
+    });
+  });
 });

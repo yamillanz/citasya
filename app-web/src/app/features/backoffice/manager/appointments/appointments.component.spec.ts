@@ -26,11 +26,18 @@ describe('AppointmentsComponent (Manager)', () => {
   type StatusAction = 'completed' | 'cancelled' | 'no_show' | 'paid' | null;
 
   const createMock = () => {
-    const appointments = signal<Appointment[]>([]);
+    const accumulatedAppointments = signal<Appointment[]>([]);
     const employees = signal<User[]>([]);
     const loading = signal(true);
     const filterEmployee = signal('');
     const filterStatus = signal('');
+    const filterDate = signal<Date | null>(null);
+    const searchQuery = signal('');
+    const pageSize = signal(10);
+    const currentPage = signal(0);
+    const hasMore = signal(true);
+    const loadingMore = signal(false);
+    const totalCount = signal(0);
     const selectedAppointment = signal<Appointment | null>(null);
     const showStatusDialog = signal(false);
     const statusAction = signal<StatusAction>(null);
@@ -52,11 +59,7 @@ describe('AppointmentsComponent (Manager)', () => {
     const updateStatusCalls: { appointment: Appointment; status: AppointmentStatus }[] = [];
 
     const filteredAppointments = computed(() =>
-      appointments().filter(apt => {
-        if (filterEmployee() && apt.employee_id !== filterEmployee()) return false;
-        if (filterStatus() && apt.status !== filterStatus()) return false;
-        return true;
-      })
+      accumulatedAppointments()
     );
 
     const employeeOptions = computed(() => [
@@ -171,31 +174,151 @@ describe('AppointmentsComponent (Manager)', () => {
       closeDrawer();
     };
 
-    return { appointments, employees, loading, filterEmployee, filterStatus, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, employeeOptions, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls, selectedCompletionReceipt, completionReceiptError, uploadingCompletionReceipt, selectedPaymentReceipt, paymentReceiptError, uploadingPaymentReceipt };
+    const resetAndLoadCalls: any[] = [];
+    const loadMoreCalls: any[] = [];
+
+    const resetAndLoad = () => {
+      resetAndLoadCalls.push({
+        filterEmployee: filterEmployee(),
+        filterDate: filterDate(),
+        filterStatus: filterStatus(),
+        searchQuery: searchQuery(),
+      });
+      currentPage.set(0);
+      loading.set(true);
+    };
+
+    const loadMore = () => {
+      if (!hasMore() || loadingMore() || loading()) return;
+      loadMoreCalls.push({ currentPage: currentPage() });
+      loadingMore.set(true);
+      currentPage.update(p => p + 1);
+    };
+
+    const onFilterChange = () => {
+      resetAndLoad();
+    };
+
+    const clearFilters = () => {
+      filterEmployee.set('');
+      filterDate.set(null);
+      filterStatus.set('');
+      searchQuery.set('');
+      resetAndLoad();
+    };
+
+    return { accumulatedAppointments, employees, loading, filterEmployee, filterDate, filterStatus, searchQuery, pageSize, currentPage, hasMore, loadingMore, totalCount, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, employeeOptions, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls, selectedCompletionReceipt, completionReceiptError, uploadingCompletionReceipt, selectedPaymentReceipt, paymentReceiptError, uploadingPaymentReceipt, resetAndLoad, loadMore, onFilterChange, clearFilters, resetAndLoadCalls, loadMoreCalls };
   };
 
-  describe('filtrado de citas', () => {
-    it('debe filtrar por empleado', () => {
+  describe('lazy loading — resetAndLoad', () => {
+    it('debe resetear currentPage a 0 y activar loading', () => {
       const comp = createMock();
-      comp.appointments.set(mockAppointments);
-      comp.filterEmployee.set('emp-1');
-      expect(comp.filteredAppointments()).toHaveLength(1);
-      expect(comp.filteredAppointments()[0].employee_id).toBe('emp-1');
+      comp.currentPage.set(3);
+      comp.loading.set(false);
+      comp.resetAndLoad();
+      expect(comp.currentPage()).toBe(0);
+      expect(comp.loading()).toBe(true);
     });
 
-    it('debe filtrar por estado', () => {
+    it('debe registrar los filtros activos al resetear', () => {
       const comp = createMock();
-      comp.appointments.set(mockAppointments);
-      comp.filterStatus.set('completed');
-      expect(comp.filteredAppointments()).toHaveLength(1);
-      expect(comp.filteredAppointments()[0].status).toBe('completed');
+      comp.filterEmployee.set('emp-1');
+      comp.filterStatus.set('pending');
+      comp.resetAndLoad();
+      expect(comp.resetAndLoadCalls).toHaveLength(1);
+      expect(comp.resetAndLoadCalls[0].filterEmployee).toBe('emp-1');
+      expect(comp.resetAndLoadCalls[0].filterStatus).toBe('pending');
+    });
+  });
+
+  describe('lazy loading — loadMore', () => {
+    it('debe incrementar currentPage y activar loadingMore', () => {
+      const comp = createMock();
+      comp.loading.set(false);
+      comp.currentPage.set(0);
+      comp.loadMore();
+      expect(comp.loadMoreCalls).toHaveLength(1);
+      expect(comp.loadingMore()).toBe(true);
+      expect(comp.currentPage()).toBe(1);
     });
 
-    it('debe combinar filtros', () => {
+    it('NO debe ejecutar loadMore si loadingMore ya está activo', () => {
       const comp = createMock();
-      comp.appointments.set(mockAppointments);
+      comp.loading.set(false);
+      comp.loadingMore.set(true);
+      comp.loadMore();
+      expect(comp.loadMoreCalls).toHaveLength(0);
+    });
+
+    it('NO debe ejecutar loadMore si loading está activo', () => {
+      const comp = createMock();
+      comp.loading.set(true);
+      comp.loadMore();
+      expect(comp.loadMoreCalls).toHaveLength(0);
+    });
+
+    it('NO debe ejecutar loadMore si hasMore es false', () => {
+      const comp = createMock();
+      comp.loading.set(false);
+      comp.hasMore.set(false);
+      comp.loadMore();
+      expect(comp.loadMoreCalls).toHaveLength(0);
+    });
+  });
+
+  describe('lazy loading — hasMore', () => {
+    it('debe iniciar con hasMore en true', () => {
+      const comp = createMock();
+      expect(comp.hasMore()).toBe(true);
+    });
+
+    it('debe permitir cambiar hasMore a false', () => {
+      const comp = createMock();
+      comp.hasMore.set(false);
+      expect(comp.hasMore()).toBe(false);
+    });
+  });
+
+  describe('lazy loading — onFilterChange', () => {
+    it('debe llamar a resetAndLoad cuando un filtro cambia', () => {
+      const comp = createMock();
+      comp.onFilterChange();
+      expect(comp.resetAndLoadCalls).toHaveLength(1);
+      expect(comp.currentPage()).toBe(0);
+    });
+
+    it('debe resetear currentPage al cambiar filtro', () => {
+      const comp = createMock();
+      comp.currentPage.set(2);
+      comp.onFilterChange();
+      expect(comp.currentPage()).toBe(0);
+    });
+  });
+
+  describe('lazy loading — clearFilters', () => {
+    it('debe limpiar todos los filtros y llamar resetAndLoad', () => {
+      const comp = createMock();
       comp.filterEmployee.set('emp-1');
       comp.filterStatus.set('completed');
+      comp.searchQuery.set('Juan');
+      comp.clearFilters();
+      expect(comp.filterEmployee()).toBe('');
+      expect(comp.filterStatus()).toBe('');
+      expect(comp.searchQuery()).toBe('');
+      expect(comp.resetAndLoadCalls).toHaveLength(1);
+    });
+  });
+
+  describe('lazy loading — filteredAppointments', () => {
+    it('debe reflejar accumulatedAppointments sin filtrado cliente-side', () => {
+      const comp = createMock();
+      comp.accumulatedAppointments.set(mockAppointments);
+      expect(comp.filteredAppointments()).toHaveLength(2);
+      expect(comp.filteredAppointments()).toEqual(mockAppointments);
+    });
+
+    it('debe estar vacío cuando no hay citas acumuladas', () => {
+      const comp = createMock();
       expect(comp.filteredAppointments()).toHaveLength(0);
     });
   });
