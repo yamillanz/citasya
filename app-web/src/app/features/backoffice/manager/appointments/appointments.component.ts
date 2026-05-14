@@ -84,6 +84,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
   sentinelEl = viewChild<ElementRef<HTMLDivElement>>('sentinel');
   private observer?: IntersectionObserver;
   private searchTimeout?: ReturnType<typeof setTimeout>;
+  private filterTimeout?: ReturnType<typeof setTimeout>;
 
   // Drawer state
   showStatusDialog = signal(false);
@@ -310,8 +311,31 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
     }, 300);
   }
 
-  onFilterChange() {
-    this.resetAndLoad();
+  onDateSelect(date: Date) {
+    this.filterDate.set(date);
+    this.debouncedFilterChange();
+  }
+
+  onDateClear() {
+    this.filterDate.set(null);
+    this.debouncedFilterChange();
+  }
+
+  onEmployeeChange(event: any) {
+    this.filterEmployee.set(event.value ?? '');
+    this.debouncedFilterChange();
+  }
+
+  onStatusChange(event: any) {
+    this.filterStatus.set(event.value ?? '');
+    this.debouncedFilterChange();
+  }
+
+  debouncedFilterChange() {
+    if (this.filterTimeout) clearTimeout(this.filterTimeout);
+    this.filterTimeout = setTimeout(() => {
+      this.resetAndLoad();
+    }, 300);
   }
 
   clearFilters() {
@@ -320,6 +344,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
     this.filterStatus.set('');
     this.searchQuery.set('');
     if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    if (this.filterTimeout) clearTimeout(this.filterTimeout);
     this.resetAndLoad();
   }
 
@@ -593,6 +618,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    if (this.filterTimeout) clearTimeout(this.filterTimeout);
     this.observer?.disconnect();
   }
 

@@ -116,6 +116,12 @@
   gap: var(--space-lg);
   margin-bottom: var(--space-lg);
   flex-wrap: wrap;
+  transition: opacity var(--duration-fast) ease;
+
+  &.loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
 }
 
 .filters-row {
