@@ -2,6 +2,22 @@ import { Service } from './service.model';
 
 export type AppointmentStatus = 'pending' | 'completed' | 'cancelled' | 'no_show';
 
+export interface PaginatedAppointmentOptions {
+  companyId: string;
+  page: number;
+  pageSize: number;
+  status?: AppointmentStatus | 'all';
+  employeeId?: string;
+  date?: string;
+  search?: string;
+}
+
+export interface PaginatedAppointmentResult {
+  data: Appointment[];
+  totalCount: number;
+  hasMore: boolean;
+}
+
 export type PaymentMethod = 'cash' | 'transfer' | 'mobile_payment' | 'card';
 
 export interface Appointment {

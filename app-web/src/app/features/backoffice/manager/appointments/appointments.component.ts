@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed, effect, ChangeDetectionStrategy, NgZone, viewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -51,7 +51,7 @@ interface DateGroup {
   styleUrl: './appointments.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppointmentsComponent implements OnInit {
+export class AppointmentsComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private appointmentService = inject(AppointmentService);
   private companyService = inject(CompanyService);
@@ -60,12 +60,19 @@ export class AppointmentsComponent implements OnInit {
   private emailNotificationService = inject(EmailNotificationService);
   private exchangeRateStorage = inject(ExchangeRateStorageService);
   private storageService = inject(StorageService);
+  private zone = inject(NgZone);
 
-  appointments = signal<Appointment[]>([]);
+  accumulatedAppointments = signal<Appointment[]>([]);
   employees = signal<User[]>([]);
   loading = signal(true);
   companyId = signal<string | null>(null);
   companyName = signal('');
+
+  pageSize = signal(10);
+  currentPage = signal(0);
+  hasMore = signal(true);
+  loadingMore = signal(false);
+  totalCount = signal(0);
 
   // Filters
   filterEmployee = signal<string>('');
@@ -73,6 +80,10 @@ export class AppointmentsComponent implements OnInit {
   filterStatus = signal<string>('');
   searchQuery = signal<string>('');
   viewMode = signal<'list' | 'calendar'>('list');
+
+  sentinelEl = viewChild<ElementRef<HTMLDivElement>>('sentinel');
+  private observer?: IntersectionObserver;
+  private searchTimeout?: ReturnType<typeof setTimeout>;
 
   // Drawer state
   showStatusDialog = signal(false);
@@ -119,6 +130,27 @@ export class AppointmentsComponent implements OnInit {
     }))
   ]);
 
+  constructor() {
+    this.zone.runOutsideAngular(() => {
+      this.observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && this.hasMore() && !this.loadingMore() && !this.loading()) {
+            this.zone.run(() => this.loadMore());
+          }
+        },
+        { rootMargin: '100px' }
+      );
+    });
+
+    effect(() => {
+      const el = this.sentinelEl();
+      if (el && this.observer) {
+        this.observer.disconnect();
+        this.observer.observe(el.nativeElement);
+      }
+    });
+  }
+
   pendingCount = computed(() => 
     this.filteredAppointments().filter(apt => apt.status === 'pending').length
   );
@@ -132,18 +164,7 @@ export class AppointmentsComponent implements OnInit {
   );
 
   filteredAppointments = computed(() => {
-    return this.appointments().filter(apt => {
-      if (this.filterEmployee() && apt.employee_id !== this.filterEmployee()) return false;
-      if (this.filterStatus() && apt.status !== this.filterStatus()) return false;
-      if (this.filterDate()) {
-        const fd = this.filterDate()!;
-        const filterDateStr = `${fd.getFullYear()}-${String(fd.getMonth() + 1).padStart(2, '0')}-${String(fd.getDate()).padStart(2, '0')}`;
-        if (apt.appointment_date !== filterDateStr) return false;
-      }
-      const query = this.searchQuery().toLowerCase().trim();
-      if (query && !apt.client_name.toLowerCase().includes(query)) return false;
-      return true;
-    });
+    return this.accumulatedAppointments();
   });
 
   groupedAppointments = computed(() => {
@@ -176,23 +197,50 @@ export class AppointmentsComponent implements OnInit {
       if (company) {
         this.companyName.set(company.name);
       }
-      await this.loadData();
+      await this.loadInitialData();
     }
     this.loading.set(false);
   }
 
-  async loadData() {
+  async loadInitialData() {
     if (!this.companyId()) return;
-    
+
     this.loading.set(true);
     try {
-      const [appointments, employees] = await Promise.all([
-        this.appointmentService.getByCompany(this.companyId()!),
-        this.userService.getByCompany(this.companyId()!)
-      ]);
-      
-      this.appointments.set(appointments);
+      const employees = await this.userService.getByCompany(this.companyId()!);
       this.employees.set(employees.filter(e => e.role === 'employee' || (e.role === 'manager' && e.can_be_employee)));
+    } catch {
+      // Employees are non-critical; filters won't populate but appointments still load
+    }
+
+    await this.resetAndLoad();
+  }
+
+  async resetAndLoad() {
+    if (!this.companyId()) return;
+
+    this.currentPage.set(0);
+    this.accumulatedAppointments.set([]);
+    this.hasMore.set(true);
+    this.loading.set(true);
+    try {
+      const filterDateStr = this.filterDate()
+        ? `${this.filterDate()!.getFullYear()}-${String(this.filterDate()!.getMonth() + 1).padStart(2, '0')}-${String(this.filterDate()!.getDate()).padStart(2, '0')}`
+        : undefined;
+
+      const result = await this.appointmentService.getByCompanyPaginated({
+        companyId: this.companyId()!,
+        page: 0,
+        pageSize: this.pageSize(),
+        status: (this.filterStatus() || undefined) as AppointmentStatus | undefined,
+        employeeId: this.filterEmployee() || undefined,
+        date: filterDateStr,
+        search: this.searchQuery().trim() || undefined,
+      });
+
+      this.accumulatedAppointments.set(result.data);
+      this.totalCount.set(result.totalCount);
+      this.hasMore.set(result.hasMore);
     } catch (error: any) {
       this.messageService.add({
         severity: 'error',
@@ -204,8 +252,43 @@ export class AppointmentsComponent implements OnInit {
     }
   }
 
+  async loadMore() {
+    if (!this.hasMore() || this.loadingMore() || this.loading() || !this.companyId()) return;
+
+    const nextPage = this.currentPage() + 1;
+    this.loadingMore.set(true);
+    try {
+      const filterDateStr = this.filterDate()
+        ? `${this.filterDate()!.getFullYear()}-${String(this.filterDate()!.getMonth() + 1).padStart(2, '0')}-${String(this.filterDate()!.getDate()).padStart(2, '0')}`
+        : undefined;
+
+      const result = await this.appointmentService.getByCompanyPaginated({
+        companyId: this.companyId()!,
+        page: nextPage,
+        pageSize: this.pageSize(),
+        status: (this.filterStatus() || undefined) as AppointmentStatus | undefined,
+        employeeId: this.filterEmployee() || undefined,
+        date: filterDateStr,
+        search: this.searchQuery().trim() || undefined,
+      });
+
+      this.accumulatedAppointments.update(current => [...current, ...result.data]);
+      this.totalCount.set(result.totalCount);
+      this.hasMore.set(result.hasMore);
+      this.currentPage.set(nextPage);
+    } catch (error: any) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudieron cargar más citas'
+      });
+    } finally {
+      this.loadingMore.set(false);
+    }
+  }
+
   async refreshData() {
-    await this.loadData();
+    await this.resetAndLoad();
   }
 
   openCreateDialog() {
@@ -214,16 +297,21 @@ export class AppointmentsComponent implements OnInit {
 
   async handleAppointmentCreated() {
     this.showCreateDialog.set(false);
-    await this.loadData();
+    await this.resetAndLoad();
   }
 
   onSearch(event: Event) {
     const input = event.target as HTMLInputElement;
     this.searchQuery.set(input.value);
+
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.resetAndLoad();
+    }, 300);
   }
 
-  onDateChange() {
-    // Filter date is already reactive via ngModel
+  onFilterChange() {
+    this.resetAndLoad();
   }
 
   clearFilters() {
@@ -231,6 +319,8 @@ export class AppointmentsComponent implements OnInit {
     this.filterDate.set(null);
     this.filterStatus.set('');
     this.searchQuery.set('');
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    this.resetAndLoad();
   }
 
   openStatusDialog(appointment: Appointment, status: AppointmentStatus) {
@@ -314,12 +404,12 @@ export class AppointmentsComponent implements OnInit {
         payment_receipt_url: receiptUrl,
       });
 
-      const updated = this.appointments().map(apt =>
+      const updated = this.accumulatedAppointments().map(apt =>
         apt.id === appointment.id
           ? { ...apt, is_paid: true, payment_method: method, payment_reference: this.paymentReference() || undefined, payment_amount_bs: this.paymentAmountBs() || undefined, payment_date: new Date().toISOString(), payment_receipt_url: receiptUrl }
           : apt
       );
-      this.appointments.set(updated);
+      this.accumulatedAppointments.set(updated);
 
       this.messageService.add({
         severity: 'success',
@@ -458,12 +548,12 @@ export class AppointmentsComponent implements OnInit {
         this.emailNotificationService.notify(appointment.id, status);
       }
 
-      const updated = this.appointments().map(apt => 
+      const updated = this.accumulatedAppointments().map(apt => 
         apt.id === appointment.id 
           ? { ...apt, status, amount_collected: amount || apt.amount_collected, exchange_rate: rate || apt.exchange_rate, amount_in_bs: bs || apt.amount_in_bs, observations: obs || apt.observations, receipt_url: receiptUrl }
           : apt
       );
-      this.appointments.set(updated);
+      this.accumulatedAppointments.set(updated);
 
       this.messageService.add({
         severity: 'success',
@@ -499,6 +589,11 @@ export class AppointmentsComponent implements OnInit {
       'no_show': 'No asistió'
     };
     return labels[status] || status;
+  }
+
+  ngOnDestroy() {
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    this.observer?.disconnect();
   }
 
   formatDate(dateStr: string): string {

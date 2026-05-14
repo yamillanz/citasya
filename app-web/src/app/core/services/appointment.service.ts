@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Appointment, AppointmentStatus, CreateAppointmentDto, UpdateAppointmentServicesDto, PaymentMethod } from '../models/appointment.model';
+import { Appointment, AppointmentStatus, CreateAppointmentDto, UpdateAppointmentServicesDto, PaymentMethod, PaginatedAppointmentOptions, PaginatedAppointmentResult } from '../models/appointment.model';
 import { Service } from '../models/service.model';
 import { ScheduleService } from './schedule.service';
 import { supabase } from '../supabase';
@@ -197,6 +197,51 @@ export class AppointmentService {
     
     if (error) throw error;
     return data?.map(apt => this.flattenServices(apt)) || [];
+  }
+
+  async getByCompanyPaginated(options: PaginatedAppointmentOptions): Promise<PaginatedAppointmentResult> {
+    const start = options.page * options.pageSize;
+    const end = start + options.pageSize - 1;
+
+    let query = this.supabase
+      .from('appointments')
+      .select(`
+        *,
+        services:appointment_services(
+          service:services(*)
+        ),
+        employee:employee_id (full_name)
+      `, { count: 'exact' })
+      .eq('company_id', options.companyId);
+
+    if (options.status && options.status !== 'all') {
+      query = query.eq('status', options.status);
+    }
+    if (options.employeeId) {
+      query = query.eq('employee_id', options.employeeId);
+    }
+    if (options.date) {
+      query = query.eq('appointment_date', options.date);
+    }
+    if (options.search) {
+      query = query.ilike('client_name', `%${options.search}%`);
+    }
+
+    const { data, error, count } = await query
+      .order('appointment_date', { ascending: false })
+      .order('appointment_time', { ascending: true })
+      .range(start, end);
+
+    if (error) throw error;
+
+    const totalCount = count ?? 0;
+    const hasMore = start + (data || []).length < totalCount;
+
+    return {
+      data: data?.map(apt => this.flattenServices(apt)) || [],
+      totalCount,
+      hasMore
+    };
   }
 
   async getByDate(companyId: string, date: string): Promise<Appointment[]> {
