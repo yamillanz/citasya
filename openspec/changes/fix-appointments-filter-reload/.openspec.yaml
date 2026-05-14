@@ -1,0 +1,5 @@
+name: fix-appointments-filter-reload
+description: Fix appointments listing component that reloads entirely and clears all filters when any filter is applied
+schema: spec-driven
+created: "2026-05-13"
+status: planning

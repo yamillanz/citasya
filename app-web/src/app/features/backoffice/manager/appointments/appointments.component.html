@@ -30,74 +30,78 @@
     </div>
   </header>
 
+  <!-- Filters Bar — always rendered, never destroyed by loading state -->
+  <div class="filters-bar" [class.loading]="loading()">
+    <div class="filters-row">
+      <div class="search-box">
+        <i class="pi pi-search"></i>
+        <input 
+          type="text" 
+          placeholder="Buscar por cliente..."
+          (input)="onSearch($event)">
+      </div>
+      
+      <p-datepicker 
+        [ngModel]="filterDate()"
+        (onSelect)="onDateSelect($event)"
+        (onClear)="onDateClear()"
+        [ngModelOptions]="{standalone: true}"
+        [showIcon]="true"
+        placeholder="Filtrar por fecha"
+        dateFormat="dd/mm/yy"
+        styleClass="date-filter"
+        inputStyleClass="date-input">
+      </p-datepicker>
+      
+      <p-select 
+        [options]="employeeOptions()"
+        [ngModel]="filterEmployee()"
+        (onChange)="onEmployeeChange($event)"
+        [ngModelOptions]="{standalone: true}"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Todos los empleados"
+        [showClear]="true"
+        styleClass="employee-filter">
+      </p-select>
+      
+      <p-select 
+        [options]="statusOptions"
+        [ngModel]="filterStatus()"
+        (onChange)="onStatusChange($event)"
+        [ngModelOptions]="{standalone: true}"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Todos los estados"
+        [showClear]="true"
+        styleClass="status-filter">
+      </p-select>
+    </div>
+    
+    <div class="view-toggle">
+      <button 
+        class="toggle-btn"
+        [class.active]="viewMode() === 'list'"
+        (click)="viewMode.set('list')"
+        title="Vista de lista">
+        <i class="pi pi-list"></i>
+      </button>
+      <button 
+        class="toggle-btn"
+        [class.active]="viewMode() === 'calendar'"
+        (click)="viewMode.set('calendar')"
+        title="Vista de calendario">
+        <i class="pi pi-calendar"></i>
+      </button>
+    </div>
+  </div>
+
   @if (loading()) {
     <div class="loading-state">
       <div class="loading-spinner"></div>
       <p>Cargando citas...</p>
     </div>
   } @else {
-    <!-- Filters Bar -->
-    <div class="filters-bar">
-      <div class="filters-row">
-        <div class="search-box">
-          <i class="pi pi-search"></i>
-          <input 
-            type="text" 
-            placeholder="Buscar por cliente..."
-            (input)="onSearch($event)">
-        </div>
-        
-        <p-datepicker 
-          [(ngModel)]="filterDate"
-          (ngModelChange)="onFilterChange()"
-          [showIcon]="true"
-          placeholder="Filtrar por fecha"
-          dateFormat="dd/mm/yy"
-          styleClass="date-filter"
-          inputStyleClass="date-input">
-        </p-datepicker>
-        
-        <p-select 
-          [options]="employeeOptions()"
-          [(ngModel)]="filterEmployee"
-          (ngModelChange)="onFilterChange()"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Todos los empleados"
-          [showClear]="true"
-          styleClass="employee-filter">
-        </p-select>
-        
-        <p-select 
-          [options]="statusOptions"
-          [(ngModel)]="filterStatus"
-          (ngModelChange)="onFilterChange()"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Todos los estados"
-          [showClear]="true"
-          styleClass="status-filter">
-        </p-select>
-      </div>
-      
-      <div class="view-toggle">
-        <button 
-          class="toggle-btn"
-          [class.active]="viewMode() === 'list'"
-          (click)="viewMode.set('list')"
-          title="Vista de lista">
-          <i class="pi pi-list"></i>
-        </button>
-        <button 
-          class="toggle-btn"
-          [class.active]="viewMode() === 'calendar'"
-          (click)="viewMode.set('calendar')"
-          title="Vista de calendario">
-          <i class="pi pi-calendar"></i>
-        </button>
-      </div>
-    </div>
-
     <!-- Stats Summary -->
     <div class="stats-row">
       <div class="stat-pill">
