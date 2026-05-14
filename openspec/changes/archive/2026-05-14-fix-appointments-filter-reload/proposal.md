@@ -1,10 +1,18 @@
 # Proposal: Fix Appointments Filter Reload
 
-## Intent
+## Why
 
 When a user applies any filter (date, employee, status) on the appointments listing page (`/bo/appointments`), the component reloads entirely and clears all filter selections. This makes filtering unusable — the user selects a filter, sees filtered data briefly, then the UI destroys and recreates the filter controls, which resets them to empty values and triggers a second unfiltered load.
 
 The root cause is that the template uses `@if (loading()) { spinner } @else { ENTIRE_UI }`, which destroys all PrimeNG filter components (p-datepicker, p-select) when `loading` becomes `true` during data fetching. When the components are recreated, PrimeNG emits default values through `[(ngModel)]`, overwriting the signal-based filter state and triggering another `resetAndLoad()` with empty filters.
+
+## What Changes
+
+- Restructure the template so the filters bar is **always rendered** (outside the `@if (loading())` conditional)
+- Only the data content area (stats, cards/list, calendar) should be replaced by the loading spinner
+- Fix the `p-datepicker` binding to use the recommended `(onSelect)` + signal pattern instead of `[(ngModel)]` (per project's AGENTS.md known bug)
+- Add debounce to dropdown filter changes (`onFilterChange`) to prevent rapid successive API calls
+- Apply the same one-way binding pattern to `p-select` components to prevent spurious emissions
 
 ## Scope
 
@@ -30,7 +38,7 @@ The root cause is that the template uses `@if (loading()) { spinner } @else { EN
 
 3. **p-datepicker fix**: Replace `[(ngModel)]="filterDate"` with `[ngModel]="filterDate()" (onSelect)="onDateSelect($event)" (onClear)="onDateClear()" [ngModelOptions]="{standalone: true}"` per the project's documented workaround for the PrimeNG + OnPush bug.
 
-4. **Debounce on dropdowns**: Add a debounce mechanism to `onFilterChange()` similar to the existing `onSearch()` debounce, to prevent rapid API calls when switching filters quickly.
+4. **Debounce on dropdowns**: Add a debounce mechanism to filter changes similar to the existing `onSearch()` debounce, to prevent rapid API calls when switching filters quickly.
 
 5. **Guard against re-trigger**: Ensure that when PrimeNG components re-render (e.g., after `loading` toggles), they do NOT emit `ngModelChange` events that would trigger another `resetAndLoad()`.
 
