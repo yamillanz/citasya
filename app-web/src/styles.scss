@@ -863,6 +863,7 @@ a {
   border: 1px solid var(--color-border) !important;
   border-radius: var(--radius-md) !important;
   height: 2.45rem !important;
+  font-family: var(--font-body) !important;
   transition: all var(--duration-fast) ease !important;
 
   .p-select-label {
@@ -872,9 +873,13 @@ a {
     line-height: 1.5 !important;
   }
 
-  .p-select-trigger {
+  .p-select-dropdown {
     width: 2.5rem !important;
     color: var(--color-text-muted) !important;
+
+    .p-select-dropdown-icon {
+      color: var(--color-text-muted) !important;
+    }
   }
 
   &:hover:not(.p-disabled):not(.p-focus) {
@@ -885,38 +890,87 @@ a {
     border-color: var(--color-sage) !important;
     box-shadow: 0 0 0 3px var(--color-sage-pale) !important;
   }
+
+  &.p-disabled {
+    opacity: 0.6 !important;
+    background: var(--color-linen) !important;
+    cursor: not-allowed !important;
+  }
+
+  .p-select-clear-icon {
+    color: var(--color-text-muted) !important;
+
+    &:hover {
+      color: var(--color-text-secondary) !important;
+    }
+  }
 }
 
-/* Select Panel (Dropdown Options) */
-.p-select-panel {
+/* Select Overlay (Dropdown Options) - PrimeNG 20
+   Uses body prefix for higher specificity to override PrimeNG inline styles */
+body .p-select-overlay {
   background: var(--color-warm-white) !important;
   border: 1px solid var(--color-border) !important;
   border-radius: var(--radius-md) !important;
   box-shadow: var(--shadow-lg) !important;
   margin-top: 4px !important;
+  font-family: var(--font-body) !important;
 
-  .p-select-items {
+  .p-select-header {
+    padding: var(--space-sm) var(--space-md) !important;
+    background: var(--color-linen) !important;
+    color: var(--color-text-primary) !important;
+    font-weight: 500 !important;
+    border-bottom: 1px solid var(--color-border) !important;
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+  }
+
+  .p-select-list-container {
     padding: var(--space-xs) !important;
   }
 
-  .p-select-item {
+  .p-select-list {
+    padding: 0 !important;
+  }
+
+  .p-select-option {
     border-radius: var(--radius-sm) !important;
     margin: 2px 0 !important;
+    padding: var(--space-sm) var(--space-md) !important;
+    font-size: 0.9375rem !important;
+    color: var(--color-text-primary) !important;
+    transition: all var(--duration-fast) ease !important;
 
-    &:not(.p-highlight):not(.p-disabled):hover {
+    &:not(.p-select-option-selected):not(.p-disabled):hover {
       background: var(--color-sage-pale) !important;
+      color: var(--color-sage-dark) !important;
     }
 
-    &.p-highlight {
+    &.p-select-option-selected {
       background: var(--color-sage-pale) !important;
       color: var(--color-sage-dark) !important;
       font-weight: 500 !important;
     }
 
-    .p-select-item-label {
-      padding: var(--space-sm) var(--space-md) !important;
+    &.p-disabled {
+      opacity: 0.5 !important;
+      cursor: not-allowed !important;
+    }
+
+    .p-select-option-label {
+      padding: 0 !important;
       font-size: 0.9375rem !important;
     }
+
+    .p-select-option-check-icon {
+      color: var(--color-sage-dark) !important;
+    }
+  }
+
+  .p-select-empty-message {
+    padding: var(--space-sm) var(--space-md) !important;
+    color: var(--color-text-muted) !important;
+    font-size: 0.9375rem !important;
   }
 }
 
@@ -928,6 +982,7 @@ a {
   border: 1px solid var(--color-border) !important;
   border-radius: var(--radius-md) !important;
   height: 2.45rem !important;
+  font-family: var(--font-body) !important;
   transition: all var(--duration-fast) ease !important;
 
   .p-dropdown-label {
@@ -949,6 +1004,62 @@ a {
   &.p-focus {
     border-color: var(--color-sage) !important;
     box-shadow: 0 0 0 3px var(--color-sage-pale) !important;
+  }
+
+  &.p-disabled {
+    opacity: 0.6 !important;
+    background: var(--color-linen) !important;
+    cursor: not-allowed !important;
+  }
+
+  .p-dropdown-clear-icon {
+    color: var(--color-text-muted) !important;
+
+    &:hover {
+      color: var(--color-text-secondary) !important;
+    }
+  }
+}
+
+/* Dropdown Panel (Legacy Dropdown Options) */
+.p-dropdown-panel {
+  background: var(--color-warm-white) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  margin-top: 4px !important;
+  font-family: var(--font-body) !important;
+
+  .p-dropdown-items {
+    padding: var(--space-xs) !important;
+  }
+
+  .p-dropdown-item {
+    border-radius: var(--radius-sm) !important;
+    margin: 2px 0 !important;
+    font-size: 0.9375rem !important;
+    color: var(--color-text-primary) !important;
+
+    &:not(.p-highlight):not(.p-disabled):hover {
+      background: var(--color-sage-pale) !important;
+      color: var(--color-sage-dark) !important;
+    }
+
+    &.p-highlight {
+      background: var(--color-sage-pale) !important;
+      color: var(--color-sage-dark) !important;
+      font-weight: 500 !important;
+    }
+
+    &.p-disabled {
+      opacity: 0.5 !important;
+      cursor: not-allowed !important;
+    }
+
+    .p-dropdown-item-label {
+      padding: var(--space-sm) var(--space-md) !important;
+      font-size: 0.9375rem !important;
+    }
   }
 }
 
