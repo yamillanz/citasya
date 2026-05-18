@@ -5,9 +5,6 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators,
-  ValidationErrors,
-  ValidatorFn,
-  AbstractControl,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CompanyService } from '../../../core/services/company.service';
@@ -28,25 +25,6 @@ import { SelectionStepComponent } from './steps/selection-step/selection-step.co
 import { SummaryStepComponent } from './steps/summary-step/summary-step.component';
 import { ContactFormStepComponent } from './steps/contact-form-step/contact-form-step.component';
 import { SuccessStepComponent } from './steps/success-step/success-step.component';
-
-export function atLeastOneContactValidator(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const group = control as FormGroup;
-    const phone = group.get('client_phone')?.value;
-    const email = group.get('client_email')?.value;
-
-    if (!phone?.trim() && !email?.trim()) {
-      return { noContact: true };
-    }
-
-    const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
-    if (cleanPhone && cleanPhone.length < 10) {
-      return { invalidPhone: true };
-    }
-
-    return null;
-  };
-}
 
 @Component({
   selector: 'app-booking-form',
@@ -113,11 +91,10 @@ export class BookingFormComponent implements OnInit {
   bookingForm = this.fb.group(
     {
       client_name: ['', [Validators.required, Validators.minLength(2)]],
-      client_phone: [''],
+      client_phone: ['', [Validators.required]],
       client_email: [''],
       notes: [''],
     },
-    { validators: atLeastOneContactValidator() },
   );
 
   private toDateString(date: Date): string {
