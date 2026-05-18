@@ -199,6 +199,12 @@
 
     .btn-primary {
       flex: 1;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        filter: grayscale(50%);
+      }
     }
   }
 }
