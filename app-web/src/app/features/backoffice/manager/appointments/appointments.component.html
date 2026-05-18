@@ -15,7 +15,8 @@
           label="Nueva Cita"
           icon="pi pi-plus"
           (onClick)="openCreateDialog()"
-          styleClass="btn-new-appointment">
+          styleClass="btn-new-appointment"
+        >
         </p-button>
         <p-button
           icon="pi pi-refresh"
@@ -24,7 +25,8 @@
           styleClass="refresh-btn"
           [outlined]="true"
           pTooltip="Actualizar datos"
-          tooltipPosition="left">
+          tooltipPosition="left"
+        >
         </p-button>
       </div>
     </div>
@@ -35,62 +37,64 @@
     <div class="filters-row">
       <div class="search-box">
         <i class="pi pi-search"></i>
-        <input 
-          type="text" 
-          placeholder="Buscar por cliente..."
-          (input)="onSearch($event)">
+        <input type="text" placeholder="Buscar por cliente..." (input)="onSearch($event)" />
       </div>
-      
-      <p-datepicker 
+
+      <p-datepicker
         [ngModel]="filterDate()"
         (onSelect)="onDateSelect($event)"
         (onClear)="onDateClear()"
-        [ngModelOptions]="{standalone: true}"
+        [ngModelOptions]="{ standalone: true }"
         [showIcon]="true"
         placeholder="Filtrar por fecha"
         dateFormat="dd/mm/yy"
         styleClass="date-filter"
-        inputStyleClass="date-input">
+        inputStyleClass="date-input"
+      >
       </p-datepicker>
-      
-      <p-select 
+
+      <p-select
         [options]="employeeOptions()"
         [ngModel]="filterEmployee()"
         (onChange)="onEmployeeChange($event)"
-        [ngModelOptions]="{standalone: true}"
+        [ngModelOptions]="{ standalone: true }"
         optionLabel="label"
         optionValue="value"
         placeholder="Todos los empleados"
         [showClear]="true"
-        styleClass="employee-filter">
+        styleClass="employee-filter"
+      >
       </p-select>
-      
-      <p-select 
+
+      <p-select
         [options]="statusOptions"
         [ngModel]="filterStatus()"
         (onChange)="onStatusChange($event)"
-        [ngModelOptions]="{standalone: true}"
+        [ngModelOptions]="{ standalone: true }"
         optionLabel="label"
         optionValue="value"
         placeholder="Todos los estados"
         [showClear]="true"
-        styleClass="status-filter">
+        styleClass="status-filter"
+      >
       </p-select>
     </div>
-    
+
     <div class="view-toggle">
-      <button 
+      <button
         class="toggle-btn"
         [class.active]="viewMode() === 'list'"
         (click)="viewMode.set('list')"
-        title="Vista de lista">
+        title="Vista de lista"
+      >
         <i class="pi pi-list"></i>
       </button>
-      <button 
+      <button
         class="toggle-btn"
         [class.active]="viewMode() === 'calendar'"
         (click)="viewMode.set('calendar')"
-        title="Vista de calendario">
+        title="Vista de calendario"
+      >
         <i class="pi pi-calendar"></i>
       </button>
     </div>
@@ -127,20 +131,26 @@
       <div class="empty-state">
         <div class="empty-illustration">
           <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-            <circle cx="50" cy="50" r="50" fill="#F5F2ED"/>
-            <rect x="25" y="28" width="50" height="44" rx="4" stroke="#B8D4A3" stroke-width="2.5"/>
-            <path d="M25 40H75" stroke="#B8D4A3" stroke-width="2.5"/>
-            <path d="M35 50H45M55 50H65M35 60H50" stroke="#B8D4A3" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="50" cy="50" r="50" fill="#F5F2ED" />
+            <rect x="25" y="28" width="50" height="44" rx="4" stroke="#B8D4A3" stroke-width="2.5" />
+            <path d="M25 40H75" stroke="#B8D4A3" stroke-width="2.5" />
+            <path
+              d="M35 50H45M55 50H65M35 60H50"
+              stroke="#B8D4A3"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
           </svg>
         </div>
         <h3>No hay citas registradas</h3>
         <p>No se encontraron citas con los filtros seleccionados.</p>
-        <p-button 
-          label="Limpiar filtros" 
+        <p-button
+          label="Limpiar filtros"
           icon="pi pi-filter-slash"
           severity="secondary"
           (onClick)="clearFilters()"
-          styleClass="btn-secondary">
+          styleClass="btn-secondary"
+        >
         </p-button>
       </div>
     } @else {
@@ -150,35 +160,43 @@
           @for (apt of filteredAppointments(); track apt.id) {
             <div class="appointment-card" [class]="'status-' + apt.status">
               <div class="card-decoration"></div>
-              
+
               <div class="card-header">
                 <div class="datetime-badge">
                   <span class="time">{{ apt.appointment_time }}</span>
                   <span class="date">{{ formatDateShort(apt.appointment_date) }}</span>
                 </div>
-                
+
                 <div class="card-status">
                   <span class="status-badge" [class]="apt.status">
                     {{ getStatusLabel(apt.status) }}
                   </span>
                   @if (apt.is_paid) {
-                    <span class="paid-badge">
-                      <i class="pi pi-check"></i> Pagado
-                    </span>
+                    <span class="paid-badge"> <i class="pi pi-check"></i> Pagado </span>
                   }
                   @if (apt.receipt_url) {
-                    <a [href]="apt.receipt_url" target="_blank" rel="noopener" class="receipt-link" title="Ver comprobante de cita">
+                    <button
+                      class="receipt-link"
+                      type="button"
+                      title="Ver comprobante de cita"
+                      (click)="openImageViewer(apt.receipt_url!)"
+                    >
                       <i class="pi pi-paperclip"></i>
-                    </a>
+                    </button>
                   }
                   @if (apt.payment_receipt_url) {
-                    <a [href]="apt.payment_receipt_url" target="_blank" rel="noopener" class="receipt-link" title="Ver comprobante de pago">
+                    <button
+                      class="receipt-link"
+                      type="button"
+                      title="Ver comprobante de pago"
+                      (click)="openImageViewer(apt.payment_receipt_url!)"
+                    >
                       <i class="pi pi-image"></i>
-                    </a>
+                    </button>
                   }
                 </div>
               </div>
-              
+
               <div class="card-body">
                 <div class="client-info">
                   <div class="client-avatar">
@@ -199,17 +217,22 @@
                   </div>
                 </div>
               </div>
-              
+
               @if (apt.status === 'completed' && apt.amount_collected) {
                 <div class="card-amount-info">
                   <div class="amount-line">
-                    <span class="amount-usd"><i class="pi pi-dollar"></i>{{ apt.amount_collected | number:'1.2-2' }}</span>
+                    <span class="amount-usd"
+                      ><i class="pi pi-dollar"></i
+                      >{{ apt.amount_collected | number: '1.2-2' }}</span
+                    >
                     @if (apt.exchange_rate && apt.exchange_rate !== 1) {
-                      <span class="amount-rate">Tasa: {{ apt.exchange_rate | number:'1.2-2' }}</span>
+                      <span class="amount-rate"
+                        >Tasa: {{ apt.exchange_rate | number: '1.2-2' }}</span
+                      >
                     }
                   </div>
                   @if (apt.amount_in_bs) {
-                    <span class="amount-bs">Bs. {{ apt.amount_in_bs | number:'1.2-2' }}</span>
+                    <span class="amount-bs">Bs. {{ apt.amount_in_bs | number: '1.2-2' }}</span>
                   }
                   @if (apt.observations) {
                     <span class="amount-obs">{{ apt.observations }}</span>
@@ -225,59 +248,63 @@
                     severity="info"
                     size="small"
                     (onClick)="openPaymentDrawer(apt)"
-                    styleClass="btn-payment">
+                    styleClass="btn-payment"
+                  >
                   </p-button>
                 </div>
               }
-              
+
               @if (apt.status === 'pending') {
                 <div class="card-actions">
-                  <p-button 
+                  <p-button
                     label="Completar"
                     icon="pi pi-check"
                     severity="success"
                     size="small"
                     (onClick)="openStatusDialog(apt, 'completed')"
-                    styleClass="btn-success">
+                    styleClass="btn-success"
+                  >
                   </p-button>
-                  <p-button 
+                  <p-button
                     label="Cancelar"
                     icon="pi pi-times"
                     severity="danger"
                     size="small"
                     [outlined]="true"
                     (onClick)="openStatusDialog(apt, 'cancelled')"
-                    styleClass="btn-danger-outline">
+                    styleClass="btn-danger-outline"
+                  >
                   </p-button>
-                  <p-button 
+                  <p-button
                     label="No asistió"
                     icon="pi pi-user-minus"
                     severity="secondary"
                     size="small"
                     [outlined]="true"
                     (onClick)="openStatusDialog(apt, 'no_show')"
-                    styleClass="btn-secondary-outline">
+                    styleClass="btn-secondary-outline"
+                  >
                   </p-button>
-            </div>
-          }
+                </div>
+              }
 
-          @if (loadingMore()) {
-            <div class="loading-more">
-              <div class="loading-spinner"></div>
-              <span>Cargando más citas...</span>
-            </div>
-          }
+              @if (loadingMore()) {
+                <div class="loading-more">
+                  <div class="loading-spinner"></div>
+                  <span>Cargando más citas...</span>
+                </div>
+              }
 
-          @if (hasMore()) {
-            <div #sentinel class="scroll-sentinel"></div>
-          }
+              @if (hasMore()) {
+                <div #sentinel class="scroll-sentinel"></div>
+              }
 
-          @if (!hasMore() && accumulatedAppointments().length > 0) {
-            <div class="end-of-list">
-              <span>No hay más citas</span>
+              @if (!hasMore() && accumulatedAppointments().length > 0) {
+                <div class="end-of-list">
+                  <span>No hay más citas</span>
+                </div>
+              }
             </div>
-          }
-        </div>
           }
         </div>
       } @else {
@@ -290,7 +317,7 @@
                 <span>{{ formatDateFull(group.date) }}</span>
                 <span class="count">{{ group.appointments.length }} cita(s)</span>
               </div>
-              
+
               <div class="date-appointments">
                 @for (apt of group.appointments; track apt.id) {
                   <div class="calendar-item" [class]="'status-' + apt.status">
@@ -298,7 +325,9 @@
                     <div class="item-info">
                       <span class="item-client">{{ apt.client_name }}</span>
                       <span class="item-meta">
-                        {{ formatServicesList(apt.services || []) }} • {{ calculateTotalDuration(apt.services || []) }} min • {{ $any(apt).employee?.full_name || 'Empleado' }}
+                        {{ formatServicesList(apt.services || []) }} •
+                        {{ calculateTotalDuration(apt.services || []) }} min •
+                        {{ $any(apt).employee?.full_name || 'Empleado' }}
                       </span>
                     </div>
                     <div class="item-status">
@@ -316,12 +345,13 @@
 </div>
 
 <!-- Status Update Drawer -->
-<p-drawer 
-  [(visible)]="showStatusDialog" 
+<p-drawer
+  [(visible)]="showStatusDialog"
   position="right"
   [style]="{ width: '400px' }"
   styleClass="status-drawer"
-  [closable]="false">
+  [closable]="false"
+>
   <ng-template pTemplate="header">
     <div class="drawer-header">
       <div class="drawer-icon" [class]="statusAction()">
@@ -331,49 +361,57 @@
         <h3>{{ getDrawerTitle() }}</h3>
         <p>{{ $any(selectedAppointment())?.client_name }}</p>
       </div>
-      <button class="drawer-close-btn" (click)="closeDrawer()" type="button" aria-label="Cerrar drawer">
+      <button
+        class="drawer-close-btn"
+        (click)="closeDrawer()"
+        type="button"
+        aria-label="Cerrar drawer"
+      >
         <i class="pi pi-times"></i>
       </button>
     </div>
   </ng-template>
-  
+
   <div class="drawer-content">
     @if (statusAction() === 'completed') {
       <div class="amount-input">
         <label>Monto cobrado *</label>
         <div class="price-input">
           <span class="currency-symbol">$</span>
-          <p-inputNumber 
+          <p-inputNumber
             [(ngModel)]="amountCollected"
             (onInput)="onUsdChange($event.value)"
             mode="decimal"
             [minFractionDigits]="2"
             [maxFractionDigits]="2"
-            placeholder="0.00">
+            placeholder="0.00"
+          >
           </p-inputNumber>
         </div>
       </div>
       <div class="amount-input">
         <label>Tasa de cambio *</label>
-        <p-inputNumber 
+        <p-inputNumber
           [(ngModel)]="exchangeRate"
           (onInput)="onRateChange($event.value)"
           mode="decimal"
           [min]="0.01"
           [minFractionDigits]="2"
           [maxFractionDigits]="2"
-          placeholder="1.00">
+          placeholder="1.00"
+        >
         </p-inputNumber>
       </div>
       <div class="amount-input">
         <label>Monto en bolívares *</label>
-        <p-inputNumber 
+        <p-inputNumber
           [(ngModel)]="amountBs"
           (onInput)="onBsChange($event.value)"
           mode="decimal"
           [minFractionDigits]="2"
           [maxFractionDigits]="2"
-          placeholder="0.00">
+          placeholder="0.00"
+        >
         </p-inputNumber>
       </div>
       <div class="amount-input">
@@ -382,7 +420,8 @@
           pInputTextarea
           [(ngModel)]="observations"
           rows="3"
-          placeholder="Ej: descuento aplicado, cliente frecuente...">
+          placeholder="Ej: descuento aplicado, cliente frecuente..."
+        >
         </textarea>
       </div>
       <div class="amount-input">
@@ -391,13 +430,18 @@
           [uploading]="uploadingCompletionReceipt()"
           [error]="completionReceiptError()"
           (imageSelected)="selectedCompletionReceipt.set($event)"
-          (imageRemoved)="selectedCompletionReceipt.set(null)">
+          (imageRemoved)="selectedCompletionReceipt.set(null)"
+        >
         </app-image-upload>
       </div>
     } @else if (statusAction() === 'cancelled' || statusAction() === 'no_show') {
       <div class="confirm-message">
         <i class="pi pi-warning"></i>
-        <p>¿Estás seguro de marcar esta cita como <strong>{{ statusAction() === 'no_show' ? 'no asistida' : 'cancelada' }}</strong>?</p>
+        <p>
+          ¿Estás seguro de marcar esta cita como
+          <strong>{{ statusAction() === 'no_show' ? 'no asistida' : 'cancelada' }}</strong
+          >?
+        </p>
       </div>
     } @else if (statusAction() === 'paid') {
       <div class="amount-input">
@@ -408,7 +452,8 @@
           optionLabel="label"
           optionValue="value"
           placeholder="Seleccionar método de pago"
-          styleClass="w-full">
+          styleClass="w-full"
+        >
         </p-select>
       </div>
       <div class="amount-input">
@@ -417,7 +462,8 @@
           pInputText
           [(ngModel)]="paymentReference"
           placeholder="Ej: 1234, ref-001..."
-          class="w-full" />
+          class="w-full"
+        />
       </div>
       <div class="amount-input">
         <label>Monto (Bs)</label>
@@ -426,7 +472,8 @@
           mode="decimal"
           [minFractionDigits]="2"
           [maxFractionDigits]="2"
-          placeholder="0.00">
+          placeholder="0.00"
+        >
         </p-inputNumber>
       </div>
       <div class="amount-input">
@@ -442,28 +489,31 @@
           [uploading]="uploadingPaymentReceipt()"
           [error]="paymentReceiptError()"
           (imageSelected)="selectedPaymentReceipt.set($event)"
-          (imageRemoved)="selectedPaymentReceipt.set(null)">
+          (imageRemoved)="selectedPaymentReceipt.set(null)"
+        >
         </app-image-upload>
       </div>
     }
   </div>
-  
+
   <ng-template pTemplate="footer">
     <div class="drawer-footer">
-      <p-button 
+      <p-button
         label="Cerrar"
         severity="secondary"
         [disabled]="saving()"
         (onClick)="closeDrawer()"
-        styleClass="btn-secondary">
+        styleClass="btn-secondary"
+      >
       </p-button>
-      <p-button 
+      <p-button
         [label]="saving() ? 'Registrando...' : getActionLabel()"
         [severity]="getActionSeverity()"
         [loading]="saving()"
         [disabled]="statusAction() === 'paid' && !paymentMethod()"
         (onClick)="statusAction() === 'paid' ? confirmPayment() : confirmStatusChange()"
-        styleClass="btn-action">
+        styleClass="btn-action"
+      >
       </p-button>
     </div>
   </ng-template>
@@ -474,7 +524,34 @@
   [companyId]="companyId() ?? ''"
   [employees]="employees()"
   (onClose)="showCreateDialog.set(false)"
-  (onCreated)="handleAppointmentCreated()">
+  (onCreated)="handleAppointmentCreated()"
+>
 </app-manager-appointment-create-dialog>
 
-
+<!-- Image Viewer Dialog -->
+<p-dialog
+  [visible]="showImageDialog()"
+  (onHide)="closeImageViewer()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [style]="{ width: 'auto', maxWidth: '90vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="dialog-header-with-close">
+      <span class="dialog-title-text">Comprobante</span>
+      <button
+        class="dialog-close-btn"
+        (click)="closeImageViewer()"
+        type="button"
+        aria-label="Cerrar visor"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </ng-template>
+  @if (selectedImageUrl()) {
+    <img [src]="selectedImageUrl()" alt="Comprobante" style="max-width: 100%; display: block" />
+  }
+</p-dialog>

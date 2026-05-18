@@ -46,6 +46,20 @@ export class EmployeeDetailDialogComponent implements OnChanges {
   exporting = signal(false);
   detailData = signal<WeeklyDetailRow[]>([]);
 
+  // Image viewer state
+  selectedImageUrl = signal<string | null>(null);
+  showImageDialog = signal(false);
+
+  openImageViewer(url: string): void {
+    this.selectedImageUrl.set(url);
+    this.showImageDialog.set(true);
+  }
+
+  closeImageViewer(): void {
+    this.showImageDialog.set(false);
+    this.selectedImageUrl.set(null);
+  }
+
   completedCount = computed(() => this.detailData().filter(r => r.status === 'completed').length);
   pendingCount = computed(() => this.detailData().filter(r => r.status === 'pending').length);
   cancelledCount = computed(() => this.detailData().filter(r => r.status === 'cancelled').length);

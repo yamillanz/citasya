@@ -56,6 +56,19 @@ describe('AppointmentsComponent (Manager)', () => {
     const paymentReceiptError = signal<string | null>(null);
     const uploadingPaymentReceipt = signal(false);
 
+    const selectedImageUrl = signal<string | null>(null);
+    const showImageDialog = signal(false);
+
+    const openImageViewer = (url: string) => {
+      selectedImageUrl.set(url);
+      showImageDialog.set(true);
+    };
+
+    const closeImageViewer = () => {
+      showImageDialog.set(false);
+      selectedImageUrl.set(null);
+    };
+
     const updateStatusCalls: { appointment: Appointment; status: AppointmentStatus }[] = [];
 
     const filteredAppointments = computed(() =>
@@ -207,7 +220,7 @@ describe('AppointmentsComponent (Manager)', () => {
       resetAndLoad();
     };
 
-    return { accumulatedAppointments, employees, loading, filterEmployee, filterDate, filterStatus, searchQuery, pageSize, currentPage, hasMore, loadingMore, totalCount, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, employeeOptions, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls, selectedCompletionReceipt, completionReceiptError, uploadingCompletionReceipt, selectedPaymentReceipt, paymentReceiptError, uploadingPaymentReceipt, resetAndLoad, loadMore, onFilterChange, clearFilters, resetAndLoadCalls, loadMoreCalls };
+    return { accumulatedAppointments, employees, loading, filterEmployee, filterDate, filterStatus, searchQuery, pageSize, currentPage, hasMore, loadingMore, totalCount, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, employeeOptions, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls, selectedCompletionReceipt, completionReceiptError, uploadingCompletionReceipt, selectedPaymentReceipt, paymentReceiptError, uploadingPaymentReceipt, resetAndLoad, loadMore, onFilterChange, clearFilters, resetAndLoadCalls, loadMoreCalls, selectedImageUrl, showImageDialog, openImageViewer, closeImageViewer };
   };
 
   describe('lazy loading — resetAndLoad', () => {
@@ -738,6 +751,38 @@ describe('AppointmentsComponent (Manager)', () => {
 
       expect(comp.markAsPaidCalls).toHaveLength(0);
       expect(comp.showStatusDialog()).toBe(true);
+    });
+  });
+
+  describe('visor de imágenes', () => {
+    it('debe abrir el diálogo de imagen al llamar openImageViewer con una URL', () => {
+      const comp = createMock();
+      comp.openImageViewer('https://example.com/receipt.jpg');
+
+      expect(comp.showImageDialog()).toBe(true);
+      expect(comp.selectedImageUrl()).toBe('https://example.com/receipt.jpg');
+    });
+
+    it('debe cerrar el diálogo y limpiar la URL al llamar closeImageViewer', () => {
+      const comp = createMock();
+      comp.openImageViewer('https://example.com/receipt.jpg');
+      expect(comp.showImageDialog()).toBe(true);
+      expect(comp.selectedImageUrl()).toBe('https://example.com/receipt.jpg');
+
+      comp.closeImageViewer();
+
+      expect(comp.showImageDialog()).toBe(false);
+      expect(comp.selectedImageUrl()).toBeNull();
+    });
+
+    it('debe permitir abrir el visor con diferentes URLs sin conflictos', () => {
+      const comp = createMock();
+      comp.openImageViewer('https://example.com/first.jpg');
+      expect(comp.selectedImageUrl()).toBe('https://example.com/first.jpg');
+
+      comp.openImageViewer('https://example.com/second.jpg');
+      expect(comp.selectedImageUrl()).toBe('https://example.com/second.jpg');
+      expect(comp.showImageDialog()).toBe(true);
     });
   });
 });
