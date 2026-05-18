@@ -199,6 +199,10 @@ export class BookingFormComponent implements OnInit {
       return;
     }
 
+    if (this.bookingForm.invalid) {
+      return;
+    }
+
     const comp = this.company();
     const emp = this.employee();
     const services = this.selectedServices();
