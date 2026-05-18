@@ -121,7 +121,7 @@
           <i class="pi pi-arrow-left" aria-hidden="true"></i>
           <span>Volver</span>
         </button>
-        <button type="submit" class="btn-primary" [disabled]="loading() || bookingForm().invalid">
+        <button type="submit" class="btn-primary" [disabled]="loading()">
           @if (loading()) {
             <span>Guardando...</span>
           } @else {
