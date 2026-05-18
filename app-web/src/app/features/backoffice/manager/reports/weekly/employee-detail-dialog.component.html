@@ -108,9 +108,13 @@
             </td>
             <td>
               @if (row.payment_receipt_url) {
-                <a [href]="row.payment_receipt_url" target="_blank" rel="noopener" class="receipt-link" title="Ver comprobante de pago">
+                <button
+                  class="receipt-link"
+                  type="button"
+                  title="Ver comprobante de pago"
+                  (click)="openImageViewer(row.payment_receipt_url!)">
                   <i class="pi pi-image"></i>
-                </a>
+                </button>
               } @else {
                 <span class="text-muted">—</span>
               }
@@ -146,4 +150,26 @@
       </p-button>
     </div>
   </ng-template>
+</p-dialog>
+
+<!-- Image Viewer Dialog -->
+<p-dialog
+  [visible]="showImageDialog()"
+  (onHide)="closeImageViewer()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [style]="{ width: 'auto', maxWidth: '90vw' }">
+  <ng-template pTemplate="header">
+    <div class="dialog-header-with-close">
+      <span class="dialog-title-text">Comprobante</span>
+      <button class="dialog-close-btn" (click)="closeImageViewer()" type="button" aria-label="Cerrar visor">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </ng-template>
+  @if (selectedImageUrl()) {
+    <img [src]="selectedImageUrl()" alt="Comprobante" style="max-width: 100%; display: block;">
+  }
 </p-dialog>

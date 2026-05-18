@@ -255,12 +255,12 @@ describe('EmployeeDetailDialogComponent', () => {
       expect(rows[1]).toContain('—');
     });
 
-    it('debe mostrar enlace de comprobante cuando payment_receipt_url existe', () => {
+    it('debe mostrar icono de comprobante clickeable cuando payment_receipt_url existe', () => {
       component.loading.set(false);
       component.detailData.set(mockDetailData);
       fixture.detectChanges();
 
-      const receiptLinks = document.querySelectorAll('a.receipt-link');
+      const receiptLinks = document.querySelectorAll('button.receipt-link');
       expect(receiptLinks.length).toBe(2);
       expect(receiptLinks[0].querySelector('.pi-image')).toBeTruthy();
     });
@@ -271,7 +271,28 @@ describe('EmployeeDetailDialogComponent', () => {
       component.detailData.set(dataWithoutReceipt);
       fixture.detectChanges();
 
-      expect(document.querySelector('a.receipt-link')).toBeFalsy();
+      expect(document.querySelector('button.receipt-link')).toBeFalsy();
+    });
+
+    it('debe abrir el visor de imagen al hacer clic en el icono de comprobante', () => {
+      component.loading.set(false);
+      component.detailData.set(mockDetailData);
+      fixture.detectChanges();
+
+      component.openImageViewer(mockDetailData[0].payment_receipt_url!);
+
+      expect(component.showImageDialog()).toBe(true);
+      expect(component.selectedImageUrl()).toBe(mockDetailData[0].payment_receipt_url);
+    });
+
+    it('debe cerrar el visor de imagen al llamar closeImageViewer', () => {
+      component.openImageViewer('https://example.com/receipt.jpg');
+      expect(component.showImageDialog()).toBe(true);
+
+      component.closeImageViewer();
+
+      expect(component.showImageDialog()).toBe(false);
+      expect(component.selectedImageUrl()).toBeNull();
     });
 
     it('getPaidLabel debe retornar "Sí" para true y "No" para false', () => {

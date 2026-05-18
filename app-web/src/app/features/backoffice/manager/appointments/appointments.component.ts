@@ -7,6 +7,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TextareaModule } from 'primeng/textarea';
 import { DrawerModule } from 'primeng/drawer';
+import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -44,6 +45,7 @@ interface DateGroup {
     TextareaModule,
     DrawerModule,
     TooltipModule,
+    DialogModule,
     ManagerAppointmentCreateDialogComponent,
     ImageUploadComponent
   ],
@@ -107,6 +109,20 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
   selectedPaymentReceipt = signal<File | null>(null);
   paymentReceiptError = signal<string | null>(null);
   uploadingPaymentReceipt = signal(false);
+
+  // Image viewer state
+  selectedImageUrl = signal<string | null>(null);
+  showImageDialog = signal(false);
+
+  openImageViewer(url: string): void {
+    this.selectedImageUrl.set(url);
+    this.showImageDialog.set(true);
+  }
+
+  closeImageViewer(): void {
+    this.showImageDialog.set(false);
+    this.selectedImageUrl.set(null);
+  }
 
   paymentMethodOptions = [
     { label: 'Efectivo', value: 'cash' as PaymentMethod },
