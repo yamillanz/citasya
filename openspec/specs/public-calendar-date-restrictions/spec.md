@@ -1,7 +1,7 @@
 # public-calendar-date-restrictions Specification
 
 ## Purpose
-TBD - created by archiving change block-past-dates-public-calendar. Update Purpose after archive.
+Prevent users from selecting past dates in the public employee booking calendar to avoid booking appointments on unavailable dates and improve the user experience.
 ## Requirements
 ### Requirement: Past dates shall be blocked in public booking calendar
 

@@ -1,7 +1,7 @@
 # booking-phone-validation Specification
 
 ## Purpose
-TBD - created by archiving change require-phone-booking-form. Update Purpose after archive.
+Ensure the client phone field is mandatory in the public booking contact form to prevent database constraint violations and provide clear user feedback on validation errors.
 ## Requirements
 ### Requirement: Phone field shall be mandatory in public booking contact form
 
