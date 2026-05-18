@@ -22,6 +22,7 @@ export interface WeeklyDetailRow {
   commission: number;
   is_paid: boolean;
   payment_date?: string;
+  payment_receipt_url?: string;
 }
 
 export interface DateRange {

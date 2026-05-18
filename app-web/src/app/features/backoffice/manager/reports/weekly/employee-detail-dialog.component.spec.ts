@@ -1,5 +1,6 @@
 import { signal, computed } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { EmployeeDetailDialogComponent } from './employee-detail-dialog.component';
 import { WeeklyReportService } from '../../../../../core/services/weekly-report.service';
 import { CsvExportService } from '../../../../../shared/services/csv-export.service';
@@ -18,7 +19,8 @@ describe('EmployeeDetailDialogComponent', () => {
       status: 'completed',
       commission: 75,
       is_paid: true,
-      payment_date: '2026-04-13T15:00:00Z'
+      payment_date: '2026-04-13T15:00:00Z',
+      payment_receipt_url: 'https://example.com/receipts/payment-apt1.jpg'
     },
     {
       appointment_date: '2026-04-14',
@@ -54,7 +56,8 @@ describe('EmployeeDetailDialogComponent', () => {
       amount_in_bs: 120,
       status: 'no_show',
       commission: 36,
-      is_paid: false
+      is_paid: false,
+      payment_receipt_url: 'https://example.com/receipts/payment-apt4.jpg'
     }
   ];
 
@@ -152,9 +155,12 @@ describe('EmployeeDetailDialogComponent', () => {
         exportCsv: jest.fn()
       } as any;
 
+      document.body.querySelectorAll('.p-dialog').forEach(el => el.remove());
+
       await TestBed.configureTestingModule({
         imports: [EmployeeDetailDialogComponent],
         providers: [
+          provideNoopAnimations(),
           { provide: WeeklyReportService, useValue: weeklyReportServiceMock },
           { provide: CsvExportService, useValue: csvExportServiceMock }
         ]
@@ -189,7 +195,7 @@ describe('EmployeeDetailDialogComponent', () => {
 
       expect(csvExportServiceMock.exportCsv).toHaveBeenCalledWith(
         expect.stringContaining('detalle-ana-garc'),
-        expect.arrayContaining(['Fecha', 'Hora', 'Cliente', 'Servicios', 'Monto', 'Monto Bs.', 'Comisión', 'Estado', 'Pagado', 'Fecha pago']),
+        expect.arrayContaining(['Fecha', 'Hora', 'Cliente', 'Servicios', 'Monto', 'Monto Bs.', 'Comisión', 'Estado', 'Pagado', 'Fecha pago', 'Comprobante']),
         expect.any(Array)
       );
     });
@@ -233,7 +239,7 @@ describe('EmployeeDetailDialogComponent', () => {
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it('CSV debe incluir columnas Pagado y Fecha pago', () => {
+    it('CSV debe incluir columnas Pagado, Fecha pago y Comprobante', () => {
       component.detailData.set(mockDetailData);
       component.exportDetailCsv();
 
@@ -242,8 +248,41 @@ describe('EmployeeDetailDialogComponent', () => {
       const rows = csvCall[2];
       expect(headers).toContain('Pagado');
       expect(headers).toContain('Fecha pago');
+      expect(headers).toContain('Comprobante');
       expect(rows[0]).toContain('Sí');
       expect(rows[1]).toContain('No');
+      expect(rows[0]).toContain('https://example.com/receipts/payment-apt1.jpg');
+      expect(rows[1]).toContain('—');
+    });
+
+    it('debe mostrar enlace de comprobante cuando payment_receipt_url existe', () => {
+      component.loading.set(false);
+      component.detailData.set(mockDetailData);
+      fixture.detectChanges();
+
+      const receiptLinks = document.querySelectorAll('a.receipt-link');
+      expect(receiptLinks.length).toBe(2);
+      expect(receiptLinks[0].querySelector('.pi-image')).toBeTruthy();
+    });
+
+    it('debe mostrar "—" cuando payment_receipt_url no existe', () => {
+      component.loading.set(false);
+      const dataWithoutReceipt = mockDetailData.filter(r => !r.payment_receipt_url);
+      component.detailData.set(dataWithoutReceipt);
+      fixture.detectChanges();
+
+      expect(document.querySelector('a.receipt-link')).toBeFalsy();
+    });
+
+    it('getPaidLabel debe retornar "Sí" para true y "No" para false', () => {
+      expect(component.getPaidLabel(true)).toBe('Sí');
+      expect(component.getPaidLabel(false)).toBe('No');
+    });
+
+    it('formatPaymentDate debe formatear fecha ISO', () => {
+      const result = component.formatPaymentDate('2026-04-13T15:00:00Z');
+      expect(result).toContain('2026');
+      expect(result.length).toBeGreaterThan(0);
     });
   });
 });

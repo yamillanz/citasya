@@ -3,7 +3,7 @@ import { StorageService } from './storage.service';
 
 let mockFromFn: jest.Mock;
 let mockUploadFn: jest.Mock;
-let mockGetPublicUrlFn: jest.Mock;
+let mockCreateSignedUrlFn: jest.Mock;
 let mockRemoveFn: jest.Mock;
 
 jest.mock('../supabase', () => ({
@@ -26,14 +26,15 @@ describe('StorageService', () => {
   beforeEach(() => {
     mockFromFn = jest.fn();
     mockUploadFn = jest.fn().mockResolvedValue({ error: null });
-    mockGetPublicUrlFn = jest.fn().mockReturnValue({
-      data: { publicUrl: 'https://example.com/storage/receipts/receipt.png' }
+    mockCreateSignedUrlFn = jest.fn().mockResolvedValue({
+      data: { signedUrl: 'https://example.com/storage/receipts/receipt.png?token=abc123' },
+      error: null
     });
     mockRemoveFn = jest.fn().mockResolvedValue({ error: null });
 
     mockFromFn.mockImplementation((bucket: string) => ({
       upload: mockUploadFn,
-      getPublicUrl: mockGetPublicUrlFn,
+      createSignedUrl: mockCreateSignedUrlFn,
       remove: mockRemoveFn
     }));
 
@@ -47,7 +48,7 @@ describe('StorageService', () => {
   afterEach(() => { jest.clearAllMocks(); });
 
   describe('uploadReceipt', () => {
-    it('debe subir una imagen PNG y retornar la URL pública', async () => {
+    it('debe subir una imagen PNG y retornar la URL firmada', async () => {
       const url = await service.uploadReceipt(mockFile, 'company-1', 'apt-1', 'completion');
 
       expect(mockFromFn).toHaveBeenCalledWith('receipts');
@@ -56,7 +57,11 @@ describe('StorageService', () => {
         mockFile,
         { upsert: true }
       );
-      expect(url).toBe('https://example.com/storage/receipts/receipt.png');
+      expect(mockCreateSignedUrlFn).toHaveBeenCalledWith(
+        'company-1/apt-1_completion.png',
+        3600
+      );
+      expect(url).toBe('https://example.com/storage/receipts/receipt.png?token=abc123');
     });
 
     it('debe subir una imagen JPG con la extensión correcta', async () => {
@@ -114,6 +119,17 @@ describe('StorageService', () => {
         service.uploadReceipt(mockFile, 'company-1', 'apt-1', 'completion')
       ).rejects.toThrow('Error al subir el comprobante. Intente de nuevo.');
     });
+
+    it('debe lanzar error si la generación de URL firmada falla', async () => {
+      mockCreateSignedUrlFn.mockResolvedValueOnce({
+        data: null,
+        error: new Error('Signed URL error')
+      });
+
+      await expect(
+        service.uploadReceipt(mockFile, 'company-1', 'apt-1', 'completion')
+      ).rejects.toThrow('Error al generar la URL del comprobante.');
+    });
   });
 
   describe('deleteReceipt', () => {
@@ -136,20 +152,22 @@ describe('StorageService', () => {
   });
 
   describe('getReceiptUrl', () => {
-    it('debe construir la URL pública para un comprobante de completion', () => {
-      const url = service.getReceiptUrl('company-1', 'apt-1', 'completion');
+    it('debe retornar la URL firmada para un comprobante de completion', async () => {
+      const url = await service.getReceiptUrl('company-1', 'apt-1', 'completion');
 
-      expect(mockGetPublicUrlFn).toHaveBeenCalledWith(
-        'company-1/apt-1_completion.jpg'
+      expect(mockCreateSignedUrlFn).toHaveBeenCalledWith(
+        'company-1/apt-1_completion.jpg',
+        3600
       );
-      expect(url).toBe('https://example.com/storage/receipts/receipt.png');
+      expect(url).toBe('https://example.com/storage/receipts/receipt.png?token=abc123');
     });
 
-    it('debe construir la URL pública para un comprobante de payment', () => {
-      const url = service.getReceiptUrl('company-1', 'apt-2', 'payment');
+    it('debe retornar la URL firmada para un comprobante de payment', async () => {
+      const url = await service.getReceiptUrl('company-1', 'apt-2', 'payment');
 
-      expect(mockGetPublicUrlFn).toHaveBeenCalledWith(
-        'company-1/apt-2_payment.jpg'
+      expect(mockCreateSignedUrlFn).toHaveBeenCalledWith(
+        'company-1/apt-2_payment.jpg',
+        3600
       );
     });
   });
