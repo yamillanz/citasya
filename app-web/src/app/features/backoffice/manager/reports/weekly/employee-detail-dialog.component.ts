@@ -86,7 +86,7 @@ export class EmployeeDetailDialogComponent implements OnChanges {
 
     this.exporting.set(true);
 
-    const headers = ['Fecha', 'Hora', 'Cliente', 'Servicios', 'Monto', 'Monto Bs.', 'Comisión', 'Estado', 'Pagado', 'Fecha pago'];
+    const headers = ['Fecha', 'Hora', 'Cliente', 'Servicios', 'Monto', 'Monto Bs.', 'Comisión', 'Estado', 'Pagado', 'Fecha pago', 'Comprobante'];
     const rows = data.map(row => [
       row.appointment_date,
       row.appointment_time,
@@ -97,7 +97,8 @@ export class EmployeeDetailDialogComponent implements OnChanges {
       `$${row.commission.toFixed(2)}`,
       getStatusLabel(row.status),
       this.getPaidLabel(row.is_paid),
-      row.payment_date ? this.formatPaymentDate(row.payment_date) : '—'
+      row.payment_date ? this.formatPaymentDate(row.payment_date) : '—',
+      row.payment_receipt_url || '—'
     ]);
 
     const filename = `detalle-${this.employeeName.replace(/\s+/g, '-').toLowerCase()}-${formatDate(this.startDate)}-a-${formatDate(this.endDate)}.csv`;

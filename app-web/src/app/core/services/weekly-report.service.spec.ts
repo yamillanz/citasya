@@ -200,6 +200,9 @@ describe('WeeklyReportService', () => {
         appointment_time: '10:00',
         status: 'completed',
         amount_collected: 150,
+        is_paid: true,
+        payment_date: '2026-04-15T10:00:00Z',
+        payment_receipt_url: 'https://example.com/receipts/payment-apt1.jpg',
         services: [{ service: { id: 's1', name: 'Corte', price: 100, commission_percentage: 50, duration_minutes: 30, company_id: 'company-1', is_active: true, created_at: '2026-01-01' } }]
       },
       {
@@ -211,6 +214,9 @@ describe('WeeklyReportService', () => {
         appointment_time: '11:00',
         status: 'cancelled',
         amount_collected: 0,
+        is_paid: false,
+        payment_date: null,
+        payment_receipt_url: null,
         services: [{ service: { id: 's2', name: 'Peinado', price: 80, commission_percentage: 40, duration_minutes: 45, company_id: 'company-1', is_active: true, created_at: '2026-01-01' } }]
       }
     ];
@@ -257,5 +263,26 @@ describe('WeeklyReportService', () => {
       // apt-2: cancelled, amount=0, commission = 0
       expect(result[1].commission).toBe(0);
     });
+
+    it('debe mapear is_paid y payment_date desde los datos crudos', async () => {
+      const chain = createChain({ data: mockDetailRows, error: null });
+      mockFromFn.mockReturnValue(chain);
+
+      const result = await service.getEmployeeDetail('company-1', 'emp-1', new Date(2026, 3, 13), new Date(2026, 3, 19));
+
+      expect(result[0].is_paid).toBe(true);
+      expect(result[0].payment_date).toBe('2026-04-15T10:00:00Z');
+      expect(result[1].is_paid).toBe(false);
+      expect(result[1].payment_date).toBeUndefined();
+    });
+
+    it('debe mapear payment_receipt_url desde los datos crudos', async () => {
+      const chain = createChain({ data: mockDetailRows, error: null });
+      mockFromFn.mockReturnValue(chain);
+
+      const result = await service.getEmployeeDetail('company-1', 'emp-1', new Date(2026, 3, 13), new Date(2026, 3, 19));
+
+      expect(result[0].payment_receipt_url).toBe('https://example.com/receipts/payment-apt1.jpg');
+      expect(result[1].payment_receipt_url).toBeUndefined();
+    });
   });
-});

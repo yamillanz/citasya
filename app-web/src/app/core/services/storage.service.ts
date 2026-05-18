@@ -27,12 +27,14 @@ export class StorageService {
 
     if (error) throw new Error('Error al subir el comprobante. Intente de nuevo.');
 
-    const { data } = this.supabase
+    const { data, error: signedError } = await this.supabase
       .storage
       .from('receipts')
-      .getPublicUrl(path);
+      .createSignedUrl(path, 3600);
 
-    return data.publicUrl;
+    if (signedError) throw new Error('Error al generar la URL del comprobante.');
+
+    return data.signedUrl;
   }
 
   async deleteReceipt(path: string): Promise<void> {
@@ -44,14 +46,15 @@ export class StorageService {
     if (error) throw error;
   }
 
-  getReceiptUrl(companyId: string, appointmentId: string, type: 'completion' | 'payment'): string {
+  async getReceiptUrl(companyId: string, appointmentId: string, type: 'completion' | 'payment'): Promise<string> {
     const ext = 'jpg';
     const path = `${companyId}/${appointmentId}_${type}.${ext}`;
-    const { data } = this.supabase
+    const { data, error } = await this.supabase
       .storage
       .from('receipts')
-      .getPublicUrl(path);
-    return data.publicUrl;
+      .createSignedUrl(path, 3600);
+    if (error) throw error;
+    return data.signedUrl;
   }
 
   private validateFile(file: File): void {
