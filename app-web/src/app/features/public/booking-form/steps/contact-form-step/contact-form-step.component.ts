@@ -24,17 +24,13 @@ export class ContactFormStepComponent {
 
   isSubmitting = false;
 
-  hasContactError = computed(() => {
-    const form = this.bookingForm();
-    return !!(
-      form.errors?.['noContact'] &&
-      form.get('client_phone')?.touched &&
-      form.get('client_email')?.touched
-    );
-  });
-
   hasInvalidPhoneError = computed(() => {
-    return !!this.bookingForm().errors?.['invalidPhone'];
+    const control = this.bookingForm().get('client_phone');
+    if (!control?.touched) return false;
+    const value = control.value;
+    if (!value) return false;
+    const cleanPhone = value.replace(/\D/g, '');
+    return cleanPhone.length < 10;
   });
 
   getError(field: string): string {
@@ -59,10 +55,6 @@ export class ContactFormStepComponent {
     Object.values(this.bookingForm().controls).forEach((control) => {
       control.markAsTouched();
     });
-
-    if (this.bookingForm().errors?.['noContact']) {
-      return;
-    }
 
     if (this.bookingForm().invalid) {
       return;

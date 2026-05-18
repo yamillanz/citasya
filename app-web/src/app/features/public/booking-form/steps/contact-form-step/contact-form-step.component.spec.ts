@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ContactFormStepComponent } from './contact-form-step.component';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { atLeastOneContactValidator } from '../../booking-form.component';
 
 describe('ContactFormStepComponent', () => {
   let component: ContactFormStepComponent;
@@ -22,11 +21,10 @@ describe('ContactFormStepComponent', () => {
     fixture.componentRef.setInput('bookingForm', fb.group(
       {
         client_name: ['', [Validators.required, Validators.minLength(2)]],
-        client_phone: [''],
+        client_phone: ['', [Validators.required]],
         client_email: [''],
         notes: [''],
       },
-      { validators: atLeastOneContactValidator() },
     ));
     fixture.componentRef.setInput('submitError', '');
     fixture.componentRef.setInput('loading', false);
@@ -60,38 +58,34 @@ describe('ContactFormStepComponent', () => {
     });
   });
 
-  describe('hasContactError', () => {
-    it('debe ser true cuando no hay teléfono ni email y ambos están tocados', () => {
-      component.bookingForm().patchValue({ client_name: 'Juan', client_phone: '', client_email: '' });
+  describe('getError', () => {
+    it('debe retornar mensaje de requerido para teléfono cuando está vacío y touched', () => {
       component.bookingForm().get('client_phone')?.markAsTouched();
-      component.bookingForm().get('client_email')?.markAsTouched();
-      component.bookingForm().updateValueAndValidity();
       fixture.detectChanges();
 
-      expect(component.hasContactError()).toBe(true);
+      expect(component.getError('client_phone')).toBe('Este campo es requerido');
     });
 
-    it('debe ser false cuando hay email', () => {
-      component.bookingForm().patchValue({ client_name: 'Juan', client_email: 'test@test.com' });
-      component.bookingForm().updateValueAndValidity();
+    it('debe retornar string vacío cuando teléfono es válido', () => {
+      component.bookingForm().patchValue({ client_name: 'Juan', client_phone: '555123456789' });
       fixture.detectChanges();
 
-      expect(component.hasContactError()).toBe(false);
+      expect(component.getError('client_phone')).toBe('');
     });
   });
 
   describe('hasInvalidPhoneError', () => {
-    it('debe ser true cuando el teléfono tiene menos de 10 dígitos', () => {
+    it('debe ser true cuando el teléfono tiene menos de 10 dígitos y está tocado', () => {
       component.bookingForm().patchValue({ client_name: 'Juan', client_phone: '04143333' });
-      component.bookingForm().updateValueAndValidity();
+      component.bookingForm().get('client_phone')?.markAsTouched();
       fixture.detectChanges();
 
       expect(component.hasInvalidPhoneError()).toBe(true);
     });
 
-    it('debe ser false cuando el teléfono es válido', () => {
+    it('debe ser false cuando el teléfono es válido y está tocado', () => {
       component.bookingForm().patchValue({ client_name: 'Juan', client_phone: '555123456789' });
-      component.bookingForm().updateValueAndValidity();
+      component.bookingForm().get('client_phone')?.markAsTouched();
       fixture.detectChanges();
 
       expect(component.hasInvalidPhoneError()).toBe(false);
@@ -108,7 +102,7 @@ describe('ContactFormStepComponent', () => {
       expect(submitSpy).not.toHaveBeenCalled();
     });
 
-    it('no debe emitir submit si hay error de contacto', () => {
+    it('no debe emitir submit si hay error de teléfono requerido', () => {
       const submitSpy = jest.fn();
       component.submit.subscribe(submitSpy);
 
@@ -132,7 +126,7 @@ describe('ContactFormStepComponent', () => {
       expect(submitSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('debe emitir submit con solo email (sin teléfono)', () => {
+    it('no debe emitir submit con solo email sin teléfono', () => {
       const submitSpy = jest.fn();
       component.submit.subscribe(submitSpy);
 
@@ -143,7 +137,7 @@ describe('ContactFormStepComponent', () => {
 
       component.onSubmit();
 
-      expect(submitSpy).toHaveBeenCalledTimes(1);
+      expect(submitSpy).not.toHaveBeenCalled();
     });
 
     it('no debe emitir submit si loading es true', () => {

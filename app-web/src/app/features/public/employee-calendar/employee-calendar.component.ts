@@ -87,6 +87,9 @@ export class EmployeeCalendarComponent implements OnInit {
       today: 'Hoy',
       month: 'Mes',
       week: 'Semana'
+    },
+    validRange: {
+      start: new Date().toISOString().split('T')[0]
     }
   };
 

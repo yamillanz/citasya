@@ -188,8 +188,7 @@ describe('BookingFormComponent', () => {
       expect(component.submitError()).toBe('Error del servidor');
     });
 
-    it('debe permitir envío solo con email sin teléfono', async () => {
-      appointmentServiceMock.create.mockResolvedValue({});
+    it('no debe permitir envío sin teléfono', async () => {
       await component.ngOnInit();
       component.bookingForm.patchValue({
         client_name: 'María',
@@ -199,14 +198,7 @@ describe('BookingFormComponent', () => {
 
       await component.onSubmit();
 
-      expect(appointmentServiceMock.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          client_name: 'María',
-          client_phone: undefined,
-          client_email: 'maria@test.com'
-        })
-      );
-      expect(component.success()).toBe(true);
+      expect(appointmentServiceMock.create).not.toHaveBeenCalled();
     });
 
     it('debe enviar notificación de email después de crear cita', async () => {
@@ -227,23 +219,9 @@ describe('BookingFormComponent', () => {
       expect(component.bookingForm.get('client_name')?.hasError('required')).toBe(true);
     });
 
-    it('debe validar teléfono con mínimo 10 dígitos', () => {
-      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '04143333' });
-      component.bookingForm.updateValueAndValidity();
-      expect(component.bookingForm.errors?.['invalidPhone']).toBe(true);
-    });
-
-    it('debe validar contacto mínimo (teléfono o email)', () => {
-      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '', client_email: '' });
-      component.bookingForm.updateValueAndValidity();
-      expect(component.bookingForm.errors?.['noContact']).toBe(true);
-    });
-
-    it('debe permitir reserva solo con email (sin teléfono)', () => {
-      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '', client_email: 'juan@test.com' });
-      component.bookingForm.updateValueAndValidity();
-      expect(component.bookingForm.errors?.['noContact']).toBeUndefined();
-      expect(component.bookingForm.errors?.['invalidPhone']).toBeUndefined();
+    it('debe validar que teléfono es requerido', () => {
+      component.bookingForm.patchValue({ client_name: 'Juan', client_phone: '' });
+      expect(component.bookingForm.get('client_phone')?.hasError('required')).toBe(true);
     });
   });
 
