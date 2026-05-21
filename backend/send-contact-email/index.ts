@@ -3,6 +3,115 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutos
 const RATE_LIMIT_MAX = 3;
 
+function buildContactEmailHtml(name: string, email: string, phone: string | undefined, message: string): string {
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuevo mensaje de contacto</title>
+</head>
+<body style="margin:0;padding:0;background-color:#FAF8F5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#FAF8F5;">
+  <tr>
+    <td align="center" style="padding:24px 12px;">
+      <table role="presentation" width="100%" max-width="520" cellspacing="0" cellpadding="0" border="0" style="max-width:520px;width:100%;background-color:#FFFFFF;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;">
+        <tr>
+          <td style="background-color:#9DC183;padding:24px 28px;text-align:center;">
+            <div style="color:#FFFFFF;font-size:22px;font-weight:700;letter-spacing:0.5px;">Nuevo mensaje de contacto</div>
+            <div style="color:rgba(255,255,255,0.9);font-size:13px;margin-top:4px;">HolaCitas</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:20px;">
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #F0F0F0;">
+                  <span style="color:#5D6D7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Nombre</span>
+                  <div style="color:#2C3E50;font-size:15px;font-weight:600;margin-top:2px;">${name}</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #F0F0F0;">
+                  <span style="color:#5D6D7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Email</span>
+                  <div style="color:#2C3E50;font-size:15px;font-weight:600;margin-top:2px;">${email}</div>
+                </td>
+              </tr>
+              ${phone ? `
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #F0F0F0;">
+                  <span style="color:#5D6D7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Teléfono</span>
+                  <div style="color:#2C3E50;font-size:15px;font-weight:600;margin-top:2px;">${phone}</div>
+                </td>
+              </tr>
+              ` : ''}
+            </table>
+            <div style="margin-bottom:20px;">
+              <div style="color:#5D6D7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:8px;">Mensaje</div>
+              <div style="background-color:#FAF8F5;border-radius:8px;padding:16px;color:#2C3E50;font-size:14px;line-height:1.6;white-space:pre-wrap;">${message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 28px;background-color:#FAF8F5;text-align:center;border-top:1px solid #eee;">
+            <div style="color:#5D6D7E;font-size:12px;line-height:1.5;">
+              <strong style="color:#2C3E50;">HolaCitas</strong><br>
+              Gestión de citas simplificada
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`;
+}
+
+function buildConfirmationEmailHtml(name: string): string {
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hemos recibido tu mensaje</title>
+</head>
+<body style="margin:0;padding:0;background-color:#FAF8F5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#FAF8F5;">
+  <tr>
+    <td align="center" style="padding:24px 12px;">
+      <table role="presentation" width="100%" max-width="520" cellspacing="0" cellpadding="0" border="0" style="max-width:520px;width:100%;background-color:#FFFFFF;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;">
+        <tr>
+          <td style="background-color:#9DC183;padding:24px 28px;text-align:center;">
+            <div style="color:#FFFFFF;font-size:22px;font-weight:700;letter-spacing:0.5px;">¡Gracias por contactarnos!</div>
+            <div style="color:rgba(255,255,255,0.9);font-size:13px;margin-top:4px;">HolaCitas</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px;">
+            <div style="font-size:15px;color:#2C3E50;line-height:1.6;margin-bottom:16px;">Hola <strong>${name}</strong>,</div>
+            <div style="font-size:15px;color:#2C3E50;line-height:1.6;margin-bottom:16px;">Hemos recibido tu mensaje. Te responderemos lo antes posible.</div>
+            <div style="background-color:#FAF8F5;border-radius:8px;padding:16px;color:#2C3E50;font-size:14px;line-height:1.6;">
+              Gracias por contactar a <strong>HolaCitas</strong>.
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 28px;background-color:#FAF8F5;text-align:center;border-top:1px solid #eee;">
+            <div style="color:#5D6D7E;font-size:12px;line-height:1.5;">
+              <strong style="color:#2C3E50;">HolaCitas</strong><br>
+              Gestión de citas simplificada
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`;
+}
+
 Deno.serve(async (req: Request) => {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -89,6 +198,7 @@ Deno.serve(async (req: Request) => {
 
     // Email al negocio
     try {
+      const html = buildContactEmailHtml(name, email, phone, message);
       const res1 = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -100,6 +210,7 @@ Deno.serve(async (req: Request) => {
           to: [contactEmail],
           subject: `Nuevo mensaje de contacto: ${name}`,
           text: emailBody,
+          html,
         }),
       });
 
@@ -115,13 +226,15 @@ Deno.serve(async (req: Request) => {
 
     // Email de confirmación al usuario
     try {
-      const confirmBody = [
+      const confirmText = [
         `Hola ${name},`,
         ``,
         `Hemos recibido tu mensaje. Te responderemos lo antes posible.`,
         ``,
-        `Gracias por contactar a CitasYa.`,
+        `Gracias por contactar a HolaCitas.`,
       ].join('\n');
+
+      const html = buildConfirmationEmailHtml(name);
 
       const res2 = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -132,8 +245,9 @@ Deno.serve(async (req: Request) => {
         body: JSON.stringify({
           from: senderEmail,
           to: [email],
-          subject: 'Hemos recibido tu mensaje — CitasYa',
-          text: confirmBody,
+          subject: 'Hemos recibido tu mensaje — HolaCitas',
+          text: confirmText,
+          html,
         }),
       });
 

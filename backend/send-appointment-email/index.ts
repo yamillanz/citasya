@@ -23,6 +23,12 @@ const STATUS_LABELS: Record<EventType, string> = {
   'no_show': 'NO ASISTIÓ',
 };
 
+const STATUS_COLORS: Record<EventType, string> = {
+  created: '#9DC183',
+  cancelled: '#E74C3C',
+  'no_show': '#F39C12',
+};
+
 function buildSubject(eventType: EventType, clientName: string): string {
   return `${STATUS_LABELS[eventType]}: ${clientName}`;
 }
@@ -32,32 +38,32 @@ function formatDate(dateStr: string): string {
   return `${d}/${m}/${y}`;
 }
 
-function buildEmailBody(eventType: EventType, data: AppointmentData): string {
+function buildEmailText(eventType: EventType, data: AppointmentData): string {
   const servicesText = data.services.map(s => `- ${s.name} (${s.duration_minutes} min${s.price ? `, $${s.price}` : ''})`).join('\n');
   const totalDuration = data.services.reduce((sum, s) => sum + s.duration_minutes, 0);
 
   const lines: string[] = [];
 
   if (eventType === 'created') {
-    lines.push(`Tu cita ha sido **confirmada** en ${data.company.name}.`);
+    lines.push(`Tu cita ha sido confirmada en ${data.company.name}.`);
   } else if (eventType === 'cancelled') {
-    lines.push(`Tu cita ha sido **cancelada** en ${data.company.name}.`);
+    lines.push(`Tu cita ha sido cancelada en ${data.company.name}.`);
   } else {
-    lines.push(`El cliente **no asistió** a la cita en ${data.company.name}.`);
+    lines.push(`El cliente no asistió a la cita en ${data.company.name}.`);
   }
 
   lines.push('');
-  lines.push(`**Cliente:** ${data.client_name}`);
-  lines.push(`**Empleado:** ${data.employee.full_name}`);
-  lines.push(`**Fecha:** ${formatDate(data.appointment_date)}`);
-  lines.push(`**Hora:** ${data.appointment_time} (${totalDuration} min)`);
+  lines.push(`Cliente: ${data.client_name}`);
+  lines.push(`Empleado: ${data.employee.full_name}`);
+  lines.push(`Fecha: ${formatDate(data.appointment_date)}`);
+  lines.push(`Hora: ${data.appointment_time} (${totalDuration} min)`);
   lines.push('');
-  lines.push('**Servicios:**');
+  lines.push('Servicios:');
   lines.push(servicesText);
 
   if (data.company.address || data.company.phone) {
     lines.push('');
-    lines.push('**Negocio:**');
+    lines.push('Negocio:');
     if (data.company.address) lines.push(`Dirección: ${data.company.address}`);
     if (data.company.phone) lines.push(`Teléfono: ${data.company.phone}`);
   }
@@ -65,34 +71,153 @@ function buildEmailBody(eventType: EventType, data: AppointmentData): string {
   return lines.join('\n');
 }
 
-function buildClientEmail(eventType: EventType, data: AppointmentData, appUrl: string): { subject: string; text: string } {
-  let text = buildEmailBody(eventType, data);
+function buildEmailHtml(eventType: EventType, data: AppointmentData): string {
+  const servicesHtml = data.services.map(s => {
+    const priceText = s.price ? `, $${s.price}` : '';
+    return `<tr><td style="padding:6px 0;border-bottom:1px solid #eee;">• ${s.name}</td><td style="padding:6px 0;border-bottom:1px solid #eee;text-align:right;color:#5D6D7E;font-size:13px;">${s.duration_minutes} min${priceText}</td></tr>`;
+  }).join('');
+  const totalDuration = data.services.reduce((sum, s) => sum + s.duration_minutes, 0);
 
-  if (eventType === 'created' && data.cancellation_token) {
-    text += `\n\n---\n¿Necesitas cancelar? Haz clic aquí:\n${appUrl}/cancelar/${data.cancellation_token}`;
+  const color = STATUS_COLORS[eventType];
+  const statusText = STATUS_LABELS[eventType];
+
+  let headline = '';
+  if (eventType === 'created') {
+    headline = `Tu cita ha sido <strong>confirmada</strong> en <strong>${data.company.name}</strong>`;
+  } else if (eventType === 'cancelled') {
+    headline = `Tu cita ha sido <strong>cancelada</strong> en <strong>${data.company.name}</strong>`;
+  } else {
+    headline = `El cliente <strong>no asistió</strong> a la cita en <strong>${data.company.name}</strong>`;
   }
 
-  return { subject: buildSubject(eventType, data.client_name), text };
+  const companyInfo = [];
+  if (data.company.address) companyInfo.push(`<div style="margin-top:4px;">📍 ${data.company.address}</div>`);
+  if (data.company.phone) companyInfo.push(`<div style="margin-top:4px;">📞 ${data.company.phone}</div>`);
+
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${statusText}: ${data.client_name}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#FAF8F5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#FAF8F5;">
+  <tr>
+    <td align="center" style="padding:24px 12px;">
+      <table role="presentation" width="100%" max-width="520" cellspacing="0" cellpadding="0" border="0" style="max-width:520px;width:100%;background-color:#FFFFFF;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;">
+        <!-- Header -->
+        <tr>
+          <td style="background-color:${color};padding:24px 28px;text-align:center;">
+            <div style="color:#FFFFFF;font-size:22px;font-weight:700;letter-spacing:0.5px;">${statusText}</div>
+            <div style="color:rgba(255,255,255,0.9);font-size:13px;margin-top:4px;">${data.company.name}</div>
+          </td>
+        </tr>
+        
+        <!-- Body -->
+        <tr>
+          <td style="padding:28px;">
+            <div style="font-size:15px;color:#2C3E50;line-height:1.6;margin-bottom:24px;">${headline}</div>
+            
+            <!-- Details -->
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:20px;">
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #F0F0F0;">
+                  <span style="color:#5D6D7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Cliente</span>
+                  <div style="color:#2C3E50;font-size:15px;font-weight:600;margin-top:2px;">${data.client_name}</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #F0F0F0;">
+                  <span style="color:#5D6D7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Empleado</span>
+                  <div style="color:#2C3E50;font-size:15px;font-weight:600;margin-top:2px;">${data.employee.full_name}</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #F0F0F0;">
+                  <span style="color:#5D6D7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Fecha</span>
+                  <div style="color:#2C3E50;font-size:15px;font-weight:600;margin-top:2px;">${formatDate(data.appointment_date)}</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #F0F0F0;">
+                  <span style="color:#5D6D7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Hora</span>
+                  <div style="color:#2C3E50;font-size:15px;font-weight:600;margin-top:2px;">${data.appointment_time} <span style="color:#5D6D7E;font-weight:400;">(${totalDuration} min)</span></div>
+                </td>
+              </tr>
+            </table>
+            
+            <!-- Services -->
+            <div style="margin-bottom:20px;">
+              <div style="color:#5D6D7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:8px;">Servicios</div>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                ${servicesHtml}
+              </table>
+            </div>
+            
+            <!-- Company info -->
+            ${companyInfo.length > 0 ? `
+            <div style="background-color:#FAF8F5;border-radius:8px;padding:16px;margin-top:16px;">
+              <div style="color:#5D6D7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:8px;">Negocio</div>
+              <div style="color:#2C3E50;font-size:14px;line-height:1.5;">
+                ${companyInfo.join('')}
+              </div>
+            </div>
+            ` : ''}
+          </td>
+        </tr>
+        
+        <!-- Footer -->
+        <tr>
+          <td style="padding:20px 28px;background-color:#FAF8F5;text-align:center;border-top:1px solid #eee;">
+            <div style="color:#5D6D7E;font-size:12px;line-height:1.5;">
+              <strong style="color:#2C3E50;">HolaCitas</strong><br>
+              Gestión de citas simplificada
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`;
 }
 
-function buildEmployeeEmail(eventType: EventType, data: AppointmentData): { subject: string; text: string } {
+function buildClientEmail(eventType: EventType, data: AppointmentData, appUrl: string): { subject: string; text: string; html: string } {
+  const text = buildEmailText(eventType, data);
+  let fullText = text;
+  const html = buildEmailHtml(eventType, data);
+
+  if (eventType === 'created' && data.cancellation_token) {
+    fullText += `\n\n---\n¿Necesitas cancelar? Haz clic aquí:\n${appUrl}/cancelar/${data.cancellation_token}`;
+  }
+
+  return { subject: buildSubject(eventType, data.client_name), text: fullText, html };
+}
+
+function buildEmployeeEmail(eventType: EventType, data: AppointmentData): { subject: string; text: string; html: string } {
   const prefix = eventType === 'created'
     ? 'Nueva cita agendada'
     : eventType === 'cancelled'
     ? 'Cita cancelada'
     : 'Cliente no asistió';
 
-  let text = `**${prefix}**\n\n${buildEmailBody(eventType, data)}`;
-  return { subject: buildSubject(eventType, data.client_name), text };
+  const text = `${prefix}\n\n${buildEmailText(eventType, data)}`;
+  const html = buildEmailHtml(eventType, data);
+
+  return { subject: buildSubject(eventType, data.client_name), text, html };
 }
 
-function buildManagerEmail(eventType: EventType, data: AppointmentData): { subject: string; text: string } {
+function buildManagerEmail(eventType: EventType, data: AppointmentData): { subject: string; text: string; html: string } {
   const prefix = eventType === 'created'
     ? 'Nueva cita agendada'
     : 'Cita cancelada';
 
-  let text = `**${prefix}** para ${data.employee.full_name}\n\n${buildEmailBody(eventType, data)}`;
-  return { subject: buildSubject(eventType, data.client_name), text };
+  const text = `${prefix} para ${data.employee.full_name}\n\n${buildEmailText(eventType, data)}`;
+  const html = buildEmailHtml(eventType, data);
+
+  return { subject: buildSubject(eventType, data.client_name), text, html };
 }
 
 async function sendEmail(
@@ -101,6 +226,7 @@ async function sendEmail(
   to: string,
   subject: string,
   text: string,
+  html: string,
 ): Promise<{ ok: boolean; id?: string; error?: string }> {
   try {
     const res = await fetch('https://api.resend.com/emails', {
@@ -109,7 +235,7 @@ async function sendEmail(
         'Authorization': `Bearer ${resendKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ from: senderEmail, to: [to], subject, text }),
+      body: JSON.stringify({ from: senderEmail, to: [to], subject, text, html }),
     });
 
     const data = await res.json();
@@ -226,14 +352,14 @@ Deno.serve(async (req: Request) => {
     // Email al cliente
     if (evt !== 'no_show' && appointmentData.client_email) {
       const clientEmail = buildClientEmail(evt, appointmentData, appUrl);
-      const r = await sendEmail(resendKey, senderEmail, appointmentData.client_email, clientEmail.subject, clientEmail.text);
+      const r = await sendEmail(resendKey, senderEmail, appointmentData.client_email, clientEmail.subject, clientEmail.text, clientEmail.html);
       responses.push({ to: appointmentData.client_email, role: 'client', ...r });
     }
 
     // Email al empleado
     if (appointmentData.employee.email) {
       const empEmail = buildEmployeeEmail(evt, appointmentData);
-      const r = await sendEmail(resendKey, senderEmail, appointmentData.employee.email, empEmail.subject, empEmail.text);
+      const r = await sendEmail(resendKey, senderEmail, appointmentData.employee.email, empEmail.subject, empEmail.text, empEmail.html);
       responses.push({ to: appointmentData.employee.email, role: 'employee', ...r });
     }
 
@@ -242,7 +368,7 @@ Deno.serve(async (req: Request) => {
       for (const m of managers) {
         if (m.email) {
           const mgrEmail = buildManagerEmail(evt, appointmentData);
-          const r = await sendEmail(resendKey, senderEmail, m.email, mgrEmail.subject, mgrEmail.text);
+          const r = await sendEmail(resendKey, senderEmail, m.email, mgrEmail.subject, mgrEmail.text, mgrEmail.html);
           responses.push({ to: m.email, role: 'manager', ...r });
         }
       }
