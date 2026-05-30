@@ -870,25 +870,29 @@ describe('CentralManagementComponent - Behavior Driven Tests', () => {
     });
   });
 
-  describe('when superadmin edits a company row', () => {
+  describe('when superadmin edits a company via dialog', () => {
     beforeEach(async () => {
       await component.ngOnInit();
       fixture.detectChanges();
       await fixture.whenStable();
     });
 
-    it('should store a clone when row editing starts', () => {
+    it('should open edit dialog with company data pre-loaded', () => {
       const company = mockCompanies[0];
-      component.onCompanyRowEditInit(company);
+      component.openEditCompanyDialog(company);
 
-      expect(component.editingCompanyId()).toBe('comp-1');
-      expect(component.clonedCompanies()['comp-1']).toBeDefined();
-      expect(component.clonedCompanies()['comp-1'].name).toBe('Empresa Alpha');
+      expect(component.companyDialogVisible()).toBe(true);
+      expect(component.editingCompany()).toEqual(company);
+      expect(component.companyFormData().name).toBe('Empresa Alpha');
+      expect(component.companyFormData().slug).toBe('empresa-alpha');
+      expect(component.companyFormData().plan_id).toBe('plan-1');
     });
 
-    it('should call companyService.update when saving row edit', async () => {
-      const company = { ...mockCompanies[0], name: 'Empresa Alpha Modified' };
-      await component.onCompanyRowEditSave(company);
+    it('should call companyService.update when saving company edit', async () => {
+      component.openEditCompanyDialog(mockCompanies[0]);
+      component.companyFormData.update(d => ({ ...d, name: 'Empresa Alpha Modified' }));
+
+      await component.saveCompany();
 
       expect(companyServiceMock.update).toHaveBeenCalledWith('comp-1',
         expect.objectContaining({ name: 'Empresa Alpha Modified' })
@@ -897,47 +901,33 @@ describe('CentralManagementComponent - Behavior Driven Tests', () => {
 
     it('should show success message after saving company edit', async () => {
       const addSpy = jest.spyOn(messageService, 'add');
-      const company = { ...mockCompanies[0], name: 'Modified' };
-      await component.onCompanyRowEditSave(company);
+      component.openEditCompanyDialog(mockCompanies[0]);
+
+      await component.saveCompany();
 
       expect(addSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ severity: 'success', detail: 'Empresa actualizada' })
+        expect.objectContaining({ severity: 'success', detail: 'Empresa actualizada correctamente' })
       );
     });
 
-    it('should restore original data when save fails', async () => {
+    it('should show error message when company update fails', async () => {
       const addSpy = jest.spyOn(messageService, 'add');
       companyServiceMock.update = jest.fn().mockRejectedValue(new Error('Update failed'));
-      const company = { ...mockCompanies[0] };
-      component.onCompanyRowEditInit(company);
+      component.openEditCompanyDialog(mockCompanies[0]);
 
-      company.name = 'Modified Name';
-      await component.onCompanyRowEditSave(company);
+      await component.saveCompany();
 
       expect(addSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ severity: 'error', detail: 'No se pudo actualizar la empresa' })
+        expect.objectContaining({ severity: 'error', detail: 'No se pudo guardar la empresa' })
       );
     });
 
-    it('should clear editing state after save completes', async () => {
-      const company = { ...mockCompanies[0] };
-      component.onCompanyRowEditInit(company);
+    it('should close dialog after successful company update', async () => {
+      component.openEditCompanyDialog(mockCompanies[0]);
 
-      await component.onCompanyRowEditSave(company);
+      await component.saveCompany();
 
-      expect(component.editingCompanyId()).toBeNull();
-      expect(component.clonedCompanies()['comp-1']).toBeUndefined();
-    });
-
-    it('should restore original data when row edit is cancelled', () => {
-      const company = { ...mockCompanies[0] };
-      component.onCompanyRowEditInit(company);
-
-      company.name = 'Wrong Name';
-      component.onCompanyRowEditCancel(company, 0);
-
-      expect(component.editingCompanyId()).toBeNull();
-      expect(company.name).toBe('Empresa Alpha');
+      expect(component.companyDialogVisible()).toBe(false);
     });
   });
 
