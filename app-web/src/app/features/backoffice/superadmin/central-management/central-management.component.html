@@ -301,7 +301,7 @@
       <label for="company-plan">Plan</label>
       <p-select id="company-plan" [options]="planOptions()" [(ngModel)]="companyFormData().plan_id"
         optionLabel="label" optionValue="value" placeholder="Sin plan"
-        [showClear]="true" [style]="{ width: '100%' }" />
+        [showClear]="true" [appendTo]="'body'" [style]="{ width: '100%' }" />
     </div>
   </div>
   <ng-template pTemplate="footer">
