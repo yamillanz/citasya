@@ -237,8 +237,39 @@
     color: var(--color-text-secondary);
   }
 
-  input, :host ::ng-deep .p-select {
+  input {
     width: 100%;
+  }
+}
+
+.role-select-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+}
+
+.role-option {
+  padding: var(--space-sm) var(--space-md);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+  text-align: center;
+
+  &:hover {
+    border-color: var(--color-sage);
+    color: var(--color-sage);
+    background: var(--color-sage-pale);
+  }
+
+  &.selected {
+    border-color: var(--color-sage);
+    background: var(--color-sage);
+    color: white;
   }
 }
 

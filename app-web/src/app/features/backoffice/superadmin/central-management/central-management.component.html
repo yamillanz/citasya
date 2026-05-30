@@ -332,14 +332,22 @@
       <input pInputText id="user-phone" [(ngModel)]="userFormData().phone" placeholder="+57 300 123 4567" />
     </div>
     <div class="form-field">
-      <label for="user-role">Rol *</label>
-      <p-select id="user-role" [options]="roleOptions" [(ngModel)]="userFormData().role"
-        optionLabel="label" optionValue="value" placeholder="Seleccionar rol" [style]="{ width: '100%' }" />
+      <label>Rol *</label>
+      <div class="role-select-group">
+        @for (role of roleOptions; track role.value) {
+          <button type="button" class="role-option"
+            [class.selected]="userFormData().role === role.value"
+            (click)="selectRole(role.value)">
+            {{ role.label }}
+          </button>
+        }
+      </div>
     </div>
     @if (userFormData().role === 'manager') {
       <div class="form-field form-field-checkbox">
         <p-checkbox [(ngModel)]="userFormData().can_be_employee" [binary]="true"
-          inputId="canBeEmployee" label="Puede actuar como empleado" />
+          inputId="canBeEmployee" />
+        <label for="canBeEmployee">Puede actuar como empleado</label>
       </div>
     }
   </div>

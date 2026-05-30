@@ -524,4 +524,8 @@ export class CentralManagementComponent implements OnInit {
     const map: Record<UserRole, 'success' | 'info' | 'contrast' | 'secondary'> = { superadmin: 'contrast', manager: 'info', employee: 'success' };
     return map[role] || 'secondary';
   }
+
+  selectRole(roleValue: string) {
+    this.userFormData.update(u => ({ ...u, role: roleValue as UserRole }));
+  }
 }
