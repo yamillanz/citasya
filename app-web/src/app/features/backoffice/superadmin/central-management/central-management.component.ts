@@ -63,8 +63,6 @@ export class CentralManagementComponent implements OnInit {
   statusFilter = signal<'all' | 'active' | 'inactive'>('all');
   planFilter = signal<string | null>(null);
   selectedCompanies = signal<CompanyWithPlan[]>([]);
-  editingCompanyId = signal<string | null>(null);
-  clonedCompanies = signal<{ [s: string]: CompanyWithPlan }>({});
 
   // === USERS STATE ===
   users = signal<UserWithCompany[]>([]);
@@ -159,46 +157,16 @@ export class CentralManagementComponent implements OnInit {
     }
   }
 
-  onCompanyRowEditInit(company: CompanyWithPlan) {
-    this.clonedCompanies.update(clone => ({ ...clone, [company.id]: { ...company } }));
-    this.editingCompanyId.set(company.id);
-  }
-
-  async onCompanyRowEditSave(company: CompanyWithPlan) {
-    try {
-      await this.companyService.update(company.id, {
-        name: company.name,
-        slug: company.slug,
-        address: company.address,
-        phone: company.phone,
-        plan_id: company.plan_id
-      });
-      this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Empresa actualizada' });
-    } catch (error) {
-      const clone = this.clonedCompanies()[company.id];
-      if (clone) {
-        Object.assign(company, clone);
-      }
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar la empresa' });
-    } finally {
-      this.clonedCompanies.update(clone => {
-        const { [company.id]: _, ...rest } = clone;
-        return rest;
-      });
-      this.editingCompanyId.set(null);
-    }
-  }
-
-  onCompanyRowEditCancel(company: CompanyWithPlan, index: number) {
-    const clone = this.clonedCompanies()[company.id];
-    if (clone) {
-      Object.assign(company, clone);
-    }
-    this.clonedCompanies.update(clone => {
-      const { [company.id]: _, ...rest } = clone;
-      return rest;
+  openEditCompanyDialog(company: CompanyWithPlan) {
+    this.editingCompany.set(company);
+    this.companyFormData.set({
+      name: company.name,
+      slug: company.slug,
+      address: company.address || '',
+      phone: company.phone || '',
+      plan_id: company.plan_id
     });
-    this.editingCompanyId.set(null);
+    this.companyDialogVisible.set(true);
   }
 
   selectCompany(company: CompanyWithPlan) {
