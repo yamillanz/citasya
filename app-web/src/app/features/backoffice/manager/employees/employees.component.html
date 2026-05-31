@@ -171,14 +171,13 @@
               {{ employee.is_active ? 'Activo' : 'Inactivo' }}
             </span>
             <div class="not-available-toggle">
-              <label class="toggle-label">
-                <p-toggleSwitch 
-                  [ngModel]="employee.not_available"
-                  (ngModelChange)="toggleEmployeeNotAvailable(employee)"
-                  [ngModelOptions]="{standalone: true}">
-                </p-toggleSwitch>
-                <span>No disponible para citas</span>
-              </label>
+              <p-toggleSwitch 
+                [ngModel]="employee.not_available"
+                (ngModelChange)="toggleEmployeeNotAvailable(employee)"
+                [ngModelOptions]="{standalone: true}"
+                styleClass="not-available-switch">
+              </p-toggleSwitch>
+              <span class="toggle-text">NO disponible</span>
             </div>
           </div>
         </div>

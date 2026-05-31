@@ -370,8 +370,23 @@
 
 .employee-footer {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
   margin-top: var(--space-md);
+  gap: var(--space-sm);
+}
+
+.not-available-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.toggle-text {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
 }
 
 .status-badge {
@@ -436,6 +451,29 @@
     
     &:hover {
       background: var(--color-sage-pale) !important;
+    }
+  }
+
+  .not-available-switch {
+    .p-toggleswitch {
+      width: 2.25rem !important;
+      height: 1.25rem !important;
+    }
+
+    .p-toggleswitch-slider {
+      border-radius: 9999px !important;
+    }
+
+    .p-toggleswitch-handle {
+      width: 1rem !important;
+      height: 1rem !important;
+      margin-top: -0.5rem !important;
+      margin-left: -0.5rem !important;
+    }
+
+    &.p-toggleswitch-checked .p-toggleswitch-handle {
+      margin-left: -0.5rem !important;
+      transform: translateX(1rem) !important;
     }
   }
 }
