@@ -370,8 +370,24 @@
 
 .employee-footer {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
   margin-top: var(--space-md);
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.not-available-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.toggle-text {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
 }
 
 .status-badge {

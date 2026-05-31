@@ -71,7 +71,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const body = await req.json()
-    const { email, password, full_name, role, phone, company_id, can_be_employee } = body
+    const { email, password, full_name, role, phone, company_id, can_be_employee, not_available } = body
 
     if (!email || !password || !full_name || !role) {
       return new Response(JSON.stringify({ error: 'Campos requeridos faltantes: email, password, full_name, role' }), {
@@ -119,6 +119,7 @@ Deno.serve(async (req: Request) => {
         role,
         company_id: company_id || null,
         can_be_employee: can_be_employee ?? false,
+        not_available: not_available ?? false,
         is_active: true,
       })
       .select()

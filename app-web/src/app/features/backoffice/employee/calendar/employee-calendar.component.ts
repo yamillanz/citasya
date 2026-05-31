@@ -60,6 +60,8 @@ export class EmployeeCalendarComponent implements OnInit {
     return `Nueva Cita — ${day} ${month}`;
   });
 
+  isNotAvailable = computed(() => this.user()?.not_available ?? false);
+
   async ngOnInit() {
     const user = await this.authService.getCurrentUser();
     if (user) {

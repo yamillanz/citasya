@@ -73,7 +73,8 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
 
     userServiceMock = {
       getByCompany: jest.fn().mockResolvedValue(mockEmployees),
-      update: jest.fn().mockResolvedValue({ ...mockEmployees[0], is_active: false })
+      update: jest.fn().mockResolvedValue({ ...mockEmployees[0], is_active: false }),
+      toggleNotAvailable: jest.fn().mockResolvedValue({ ...mockEmployees[0], not_available: true })
     } as any;
 
     const companyServiceMock = {
@@ -233,6 +234,51 @@ describe('EmployeesComponent - Behavior Driven Tests', () => {
 
       expect(userServiceMock.update).toHaveBeenCalled();
       expect(employee.is_active).toBe(initialState);
+    });
+  });
+
+  describe('when manager toggles employee not_available', () => {
+    beforeEach(async () => {
+      await component.ngOnInit();
+      fixture.detectChanges();
+      await fixture.whenStable();
+    });
+
+    it('should call userService.toggleNotAvailable to mark employee as not available', async () => {
+      const employee = component.employees()[0];
+      employee.not_available = false;
+
+      await component.toggleEmployeeNotAvailable(employee);
+
+      expect(userServiceMock.toggleNotAvailable).toHaveBeenCalledWith(
+        employee.id,
+        true
+      );
+    });
+
+    it('should call userService.toggleNotAvailable to mark employee as available', async () => {
+      const employee = component.employees()[0];
+      employee.not_available = true;
+      userServiceMock.toggleNotAvailable = jest.fn().mockResolvedValue({ ...employee, not_available: false });
+
+      await component.toggleEmployeeNotAvailable(employee);
+
+      expect(userServiceMock.toggleNotAvailable).toHaveBeenCalledWith(
+        employee.id,
+        false
+      );
+    });
+
+    it('should keep not_available state unchanged when toggle fails', async () => {
+      userServiceMock.toggleNotAvailable = jest.fn().mockRejectedValue(new Error('Update failed'));
+
+      const employee = component.employees()[0];
+      const initialState = employee.not_available;
+      
+      await component.toggleEmployeeNotAvailable(employee);
+
+      expect(userServiceMock.toggleNotAvailable).toHaveBeenCalled();
+      expect(employee.not_available).toBe(initialState);
     });
   });
 

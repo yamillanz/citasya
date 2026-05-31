@@ -10,6 +10,7 @@ export interface User {
   company_id?: string;
   can_be_employee: boolean;
   is_active: boolean;
+  not_available?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -21,5 +22,6 @@ export interface CreateUserDto {
   role: UserRole;
   company_id?: string;
   can_be_employee?: boolean;
+  not_available?: boolean;
   password?: string;
 }

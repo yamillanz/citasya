@@ -24,7 +24,8 @@ describe('CompanyListComponent', () => {
 
   const mockEmployees = [
     { id: 'emp-1', full_name: 'Juan Pérez', photo_url: null },
-    { id: 'emp-2', full_name: 'María López', photo_url: null }
+    { id: 'emp-2', full_name: 'María López', photo_url: null },
+    { id: 'emp-3', full_name: 'Carlos Ruiz', photo_url: null, not_available: true }
   ];
 
   const mockServicesMap = {
@@ -110,6 +111,13 @@ describe('CompanyListComponent', () => {
       expect(component.employees()[0].full_name).toBe('Juan Pérez');
     });
 
+    it('debe excluir empleados con not_available del listado público', () => {
+      const employeeNames = component.employees().map(e => e.full_name);
+      expect(employeeNames).toContain('Juan Pérez');
+      expect(employeeNames).toContain('María López');
+      expect(employeeNames).not.toContain('Carlos Ruiz');
+    });
+
     it('debe finalizar carga después de obtener datos', () => {
       expect(component.loading()).toBe(false);
     });
@@ -133,7 +141,7 @@ describe('CompanyListComponent', () => {
       expect(component.company()).toBeNull();
     });
 
-    it('debe cargar servicios para los empleados via batch fetch', () => {
+    it('debe cargar servicios para los empleados disponibles via batch fetch', () => {
       expect(serviceServiceMock.getServicesForEmployees).toHaveBeenCalledWith(['emp-1', 'emp-2']);
     });
 

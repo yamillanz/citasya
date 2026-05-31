@@ -116,6 +116,21 @@
             </div>
           </div>
           
+          <!-- Not Available Checkbox -->
+          <div class="form-field full-width">
+            <label class="checkbox-label">
+              <p-checkbox 
+                [binary]="true"
+                formControlName="not_available"
+                inputId="not_available">
+              </p-checkbox>
+              <span>Marcar como no disponible para citas</span>
+            </label>
+            <small class="field-hint">
+              El empleado no aparecerá en el listado público de reservas
+            </small>
+          </div>
+          
           <!-- Form Actions -->
           <div class="form-actions">
             <p-button 

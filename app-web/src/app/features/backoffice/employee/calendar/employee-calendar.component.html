@@ -30,9 +30,10 @@
         label="Tu link"
         icon="pi pi-copy"
         [loading]="copying()"
+        [disabled]="isNotAvailable()"
         (onClick)="copyBookingLink()"
         styleClass="booking-link-btn"
-        pTooltip="Copiar enlace de reserva"
+        [pTooltip]="isNotAvailable() ? 'No disponible para reservas' : 'Copiar enlace de reserva'"
         tooltipPosition="left">
       </p-button>
     </div>

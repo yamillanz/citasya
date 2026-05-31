@@ -1,0 +1,2 @@
+ALTER TABLE profiles 
+ADD COLUMN IF NOT EXISTS not_available BOOLEAN DEFAULT false;

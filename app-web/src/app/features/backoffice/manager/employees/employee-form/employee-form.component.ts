@@ -51,7 +51,8 @@ export class EmployeeFormComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     full_name: ['', [Validators.required, Validators.minLength(2)]],
     phone: [''],
-    photo_url: ['']
+    photo_url: [''],
+    not_available: [false]
   });
 
   async ngOnInit() {
@@ -93,7 +94,8 @@ export class EmployeeFormComponent implements OnInit {
           email: employee.email,
           full_name: employee.full_name,
           phone: employee.phone || '',
-          photo_url: employee.photo_url || ''
+          photo_url: employee.photo_url || '',
+          not_available: employee.not_available ?? false
         });
         this.editingRole.set(employee.role);
         const assignedServices = await this.serviceService.getByEmployee(this.employeeId());
@@ -145,7 +147,8 @@ export class EmployeeFormComponent implements OnInit {
         email: formValue.email!,
         full_name: formValue.full_name!,
         phone: formValue.phone || null,
-        photo_url: formValue.photo_url || null
+        photo_url: formValue.photo_url || null,
+        not_available: formValue.not_available ?? false
       };
 
       if (this.isEdit()) {
