@@ -444,6 +444,8 @@ a {
 .p-toggleswitch-handle {
   width: 0.875rem !important;
   height: 0.875rem !important;
+  top: 50% !important;
+  margin-top: -0.4375rem !important; /* center vertically */
   left: 0.125rem !important;
 }
 
