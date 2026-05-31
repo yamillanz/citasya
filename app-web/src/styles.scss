@@ -439,6 +439,19 @@ a {
 }
 
 /* ================================
+   PrimeNG ToggleSwitch Fixes
+   ================================ */
+.p-toggleswitch-handle {
+  width: 0.875rem !important;
+  height: 0.875rem !important;
+  left: 0.125rem !important;
+}
+
+.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle {
+  left: calc(100% - 0.875rem - 0.125rem) !important;
+}
+
+/* ================================
    Manager Create Appointment Dialog
    ================================ */
 .manager-create-appointment-dialog {
