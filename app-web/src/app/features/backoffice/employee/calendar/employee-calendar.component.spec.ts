@@ -22,6 +22,7 @@ describe('EmployeeCalendarComponent', () => {
     role: 'employee' as const,
     company_id: 'company-1',
     is_active: true,
+    not_available: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   };
@@ -245,6 +246,24 @@ describe('EmployeeCalendarComponent', () => {
       await component.copyBookingLink();
 
       expect(component.copying()).toBe(false);
+    });
+
+  });
+
+  describe('isNotAvailable', () => {
+    it('debe retornar false cuando el usuario está disponible', () => {
+      component.user.set(mockUser);
+      expect(component.isNotAvailable()).toBe(false);
+    });
+
+    it('debe retornar true cuando el usuario está marcado como no disponible', () => {
+      component.user.set({ ...mockUser, not_available: true });
+      expect(component.isNotAvailable()).toBe(true);
+    });
+
+    it('debe retornar false cuando no hay usuario', () => {
+      component.user.set(null);
+      expect(component.isNotAvailable()).toBe(false);
     });
   });
 

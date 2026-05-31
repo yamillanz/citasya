@@ -54,8 +54,9 @@ export class CompanyListComponent implements OnInit {
 
       this.company.set(company);
       const employees = await this.userService.getEmployeesByCompany(company.id);
-      this.employees.set(employees);
-      const employeeIds = employees.map(e => e.id);
+      const filteredEmployees = employees.filter(e => !e.not_available);
+      this.employees.set(filteredEmployees);
+      const employeeIds = filteredEmployees.map(e => e.id);
       const servicesMap = await this.serviceService.getServicesForEmployees(employeeIds);
       this.servicesByEmployee.set(servicesMap);
     } catch (err) {

@@ -50,6 +50,12 @@
           (click)="statusFilter.set('inactive')">
           Inactivos ({{ inactiveCount() }})
         </button>
+        <button 
+          class="filter-chip"
+          [class.active]="statusFilter() === 'not_available'"
+          (click)="statusFilter.set('not_available')">
+          No disponibles ({{ notAvailableCount() }})
+        </button>
       </div>
     </div>
   }
@@ -122,6 +128,9 @@
                   Empleado
                 }
               </span>
+              @if (employee.not_available) {
+                <p-tag severity="danger" value="No disponible" styleClass="mt-1"></p-tag>
+              }
             </div>
             
             <div class="card-actions">
@@ -161,6 +170,16 @@
             <span class="status-badge" [class.active]="employee.is_active">
               {{ employee.is_active ? 'Activo' : 'Inactivo' }}
             </span>
+            <div class="not-available-toggle">
+              <label class="toggle-label">
+                <p-toggleSwitch 
+                  [ngModel]="employee.not_available"
+                  (ngModelChange)="toggleEmployeeNotAvailable(employee)"
+                  [ngModelOptions]="{standalone: true}">
+                </p-toggleSwitch>
+                <span>No disponible para citas</span>
+              </label>
+            </div>
           </div>
         </div>
       }

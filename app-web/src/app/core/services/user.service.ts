@@ -138,4 +138,16 @@ export class UserService {
     if (error) throw error;
     return data;
   }
+
+  async toggleNotAvailable(id: string, value: boolean): Promise<User> {
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .update({ not_available: value, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
 }

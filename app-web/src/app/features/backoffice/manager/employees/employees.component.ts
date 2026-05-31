@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CompanyService } from '../../../../core/services/company.service';
@@ -22,7 +23,8 @@ import { User } from '../../../../core/models/user.model';
     ButtonModule,
     AvatarModule,
     TagModule,
-    TooltipModule
+    TooltipModule,
+    ToggleSwitchModule
   ],
   templateUrl: './employees.component.html',
   styleUrl: './employees.component.scss'
@@ -38,10 +40,11 @@ export class EmployeesComponent implements OnInit {
   companyId = signal<string | null>(null);
   companyName = signal('');
   searchQuery = signal('');
-  statusFilter = signal<'all' | 'active' | 'inactive'>('all');
+  statusFilter = signal<'all' | 'active' | 'inactive' | 'not_available'>('all');
 
   activeCount = computed(() => this.employees().filter(e => e.is_active).length);
   inactiveCount = computed(() => this.employees().filter(e => !e.is_active).length);
+  notAvailableCount = computed(() => this.employees().filter(e => e.not_available).length);
 
   filteredEmployees = computed(() => {
     let result = this.employees();
@@ -59,6 +62,8 @@ export class EmployeesComponent implements OnInit {
       result = result.filter(e => e.is_active);
     } else if (status === 'inactive') {
       result = result.filter(e => !e.is_active);
+    } else if (status === 'not_available') {
+      result = result.filter(e => e.not_available);
     }
     
     return result;
@@ -117,6 +122,26 @@ export class EmployeesComponent implements OnInit {
         severity: 'error',
         summary: 'Error',
         detail: 'No se pudo actualizar el estado del empleado'
+      });
+    }
+  }
+
+  async toggleEmployeeNotAvailable(employee: User) {
+    try {
+      const newValue = !employee.not_available;
+      await this.userService.toggleNotAvailable(employee.id, newValue);
+      employee.not_available = newValue;
+      this.employees.set([...this.employees()]);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: `Empleado marcado como ${newValue ? 'no disponible' : 'disponible'} para citas`
+      });
+    } catch (error: any) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo actualizar la disponibilidad del empleado'
       });
     }
   }
