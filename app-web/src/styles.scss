@@ -439,6 +439,27 @@ a {
 }
 
 /* ================================
+   PrimeNG ToggleSwitch Overrides
+   ================================ */
+.p-toggleswitch {
+  overflow: visible !important;
+}
+
+.p-toggleswitch-slider {
+  border-radius: 9999px !important;
+}
+
+.p-toggleswitch-handle {
+  margin-left: -0.35rem !important;
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle {
+  transform: translateX(0.7rem) !important;
+}
+
+/* ================================
    Manager Create Appointment Dialog
    ================================ */
 .manager-create-appointment-dialog {
