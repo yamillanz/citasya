@@ -12,8 +12,9 @@ import { User } from '../../core/models/user.model';
 
 interface MenuItem {
   label: string;
-  icon: string;
-  routerLink: string;
+  icon?: string;
+  routerLink?: string;
+  separator?: boolean;
 }
 
 @Component({
@@ -57,10 +58,14 @@ export class BackofficeComponent implements OnInit {
     { label: 'Mi Historial', icon: 'pi pi-clock', routerLink: '/bo/mi-historial' }
   ];
 
-  menuItems = computed(() => {
+  menuItems = computed<MenuItem[]>(() => {
     const user = this.user();
     if (user?.can_be_employee) {
-      return [...this.baseMenuItems, ...this.employeeMenuItems];
+      return [
+        ...this.baseMenuItems,
+        { label: 'Empleado', separator: true },
+        ...this.employeeMenuItems
+      ];
     }
     return this.baseMenuItems;
   });
