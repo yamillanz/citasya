@@ -18,14 +18,20 @@
     </div>
 
     <nav class="sidebar-nav">
-      @for (item of menuItems(); track item.routerLink) {
-        <a 
-          [routerLink]="item.routerLink" 
-          routerLinkActive="active"
-          class="nav-item">
-          <i [class]="item.icon"></i>
-          <span>{{ item.label }}</span>
-        </a>
+      @for (item of menuItems(); track $index) {
+        @if (item.separator) {
+          <div class="nav-separator">
+            <span>{{ item.label }}</span>
+          </div>
+        } @else {
+          <a 
+            [routerLink]="item.routerLink" 
+            routerLinkActive="active"
+            class="nav-item">
+            <i [class]="item.icon"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        }
       }
     </nav>
 
@@ -95,15 +101,21 @@
         </div>
         
         <nav class="mobile-sidebar-nav">
-          @for (item of menuItems(); track item.routerLink) {
-            <a 
-              [routerLink]="item.routerLink" 
-              routerLinkActive="active"
-              class="mobile-nav-item"
-              (click)="sidebarVisible.set(false)">
-              <i [class]="item.icon"></i>
-              <span>{{ item.label }}</span>
-            </a>
+          @for (item of menuItems(); track $index) {
+            @if (item.separator) {
+              <div class="mobile-nav-separator">
+                <span>{{ item.label }}</span>
+              </div>
+            } @else {
+              <a 
+                [routerLink]="item.routerLink" 
+                routerLinkActive="active"
+                class="mobile-nav-item"
+                (click)="sidebarVisible.set(false)">
+                <i [class]="item.icon"></i>
+                <span>{{ item.label }}</span>
+              </a>
+            }
           }
         </nav>
         
