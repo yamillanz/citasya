@@ -20,7 +20,7 @@
         </p-button>
         <p-button
           icon="pi pi-refresh"
-          [loading]="loading()"
+          [loading]="appointmentsResource.isLoading()"
           (onClick)="refreshData()"
           styleClass="refresh-btn"
           [outlined]="true"
@@ -33,7 +33,7 @@
   </header>
 
   <!-- Filters Bar — always rendered, never destroyed by loading state -->
-  <div class="filters-bar" [class.loading]="loading()">
+  <div class="filters-bar" [class.loading]="showLoading()">
     <div class="filters-row">
       <div class="search-box">
         <i class="pi pi-search"></i>
@@ -100,10 +100,22 @@
     </div>
   </div>
 
-  @if (loading()) {
+  @if (showLoading()) {
     <div class="loading-state">
       <div class="loading-spinner"></div>
       <p>Cargando citas...</p>
+    </div>
+  } @else if (appointmentsResource.error()) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-circle"></i>
+      <p>No se pudieron cargar las citas</p>
+      <p-button
+        label="Reintentar"
+        icon="pi pi-refresh"
+        severity="secondary"
+        (onClick)="appointmentsResource.reload()"
+        styleClass="btn-secondary">
+      </p-button>
     </div>
   } @else {
     <!-- Stats Summary -->
@@ -522,7 +534,7 @@
 <app-manager-appointment-create-dialog
   [visible]="showCreateDialog()"
   [companyId]="companyId() ?? ''"
-  [employees]="employees()"
+  [employees]="employeesResource.value() ?? []"
   (onClose)="showCreateDialog.set(false)"
   (onCreated)="handleAppointmentCreated()"
 >

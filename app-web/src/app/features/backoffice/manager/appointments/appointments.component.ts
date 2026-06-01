@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, signal, computed, effect, ChangeDetectionStrategy, NgZone, viewChild, ElementRef } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed, effect, resource, ChangeDetectionStrategy, NgZone, viewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -65,8 +65,6 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
   private zone = inject(NgZone);
 
   accumulatedAppointments = signal<Appointment[]>([]);
-  employees = signal<User[]>([]);
-  loading = signal(true);
   companyId = signal<string | null>(null);
   companyName = signal('');
 
@@ -81,12 +79,13 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
   filterDate = signal<Date | null>(null);
   filterStatus = signal<string>('');
   searchQuery = signal<string>('');
+  debouncedSearchQuery = signal<string>('');
+  private filterGeneration = signal(0);
   viewMode = signal<'list' | 'calendar'>('list');
 
   sentinelEl = viewChild<ElementRef<HTMLDivElement>>('sentinel');
   private observer?: IntersectionObserver;
   private searchTimeout?: ReturnType<typeof setTimeout>;
-  private filterTimeout?: ReturnType<typeof setTimeout>;
 
   // Drawer state
   showStatusDialog = signal(false);
@@ -139,9 +138,19 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
     { label: 'No asistió', value: 'no_show' }
   ];
 
+  employeesResource = resource({
+    params: () => this.companyId(),
+    loader: ({ params }) => {
+      if (!params) return Promise.resolve([]);
+      return this.userService.getByCompany(params).then(users =>
+        users.filter(u => u.role === 'employee' || (u.role === 'manager' && u.can_be_employee))
+      );
+    },
+  });
+
   employeeOptions = computed<FilterOption[]>(() => [
     { label: 'Todos los empleados', value: '' },
-    ...this.employees().map(emp => ({
+    ...(this.employeesResource.value() || []).map(emp => ({
       label: emp.full_name,
       value: emp.id
     }))
@@ -151,7 +160,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
     this.zone.runOutsideAngular(() => {
       this.observer = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && this.hasMore() && !this.loadingMore() && !this.loading()) {
+          if (entries[0].isIntersecting && this.hasMore() && !this.loadingMore() && !this.appointmentsResource.isLoading()) {
             this.zone.run(() => this.loadMore());
           }
         },
@@ -164,6 +173,18 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
       if (el && this.observer) {
         this.observer.disconnect();
         this.observer.observe(el.nativeElement);
+      }
+    });
+
+    effect(() => {
+      const result = this.appointmentsResource.value();
+      if (result) {
+        this.accumulatedAppointments.set(result.data);
+        this.totalCount.set(result.totalCount);
+        this.hasMore.set(result.hasMore);
+        this.currentPage.set(0);
+        this.loadingMore.set(false);
+        this.filterGeneration.update(v => v + 1);
       }
     });
   }
@@ -182,6 +203,34 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
 
   filteredAppointments = computed(() => {
     return this.accumulatedAppointments();
+  });
+
+  filterParams = computed(() => {
+    const cid = this.companyId();
+    if (!cid) return undefined;
+    return {
+      companyId: cid,
+      status: (this.filterStatus() || undefined) as AppointmentStatus | undefined,
+      employeeId: this.filterEmployee() || undefined,
+      date: this.formatFilterDate(this.filterDate()),
+      search: this.debouncedSearchQuery().trim() || undefined,
+    };
+  });
+
+  showLoading = computed(() =>
+    !this.companyId() || this.appointmentsResource.isLoading()
+  );
+
+  appointmentsResource = resource({
+    params: () => this.filterParams(),
+    loader: ({ params }) => {
+      if (!params) throw new Error('No params');
+      return this.appointmentService.getByCompanyPaginated({
+        ...params,
+        page: 0,
+        pageSize: this.pageSize(),
+      });
+    },
   });
 
   groupedAppointments = computed(() => {
@@ -206,6 +255,11 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
     }));
   });
 
+  private formatFilterDate(date: Date | null): string | undefined {
+    if (!date) return undefined;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
   async ngOnInit() {
     const user = await this.authService.getCurrentUser();
     if (user?.company_id) {
@@ -214,80 +268,28 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
       if (company) {
         this.companyName.set(company.name);
       }
-      await this.loadInitialData();
-    }
-    this.loading.set(false);
-  }
-
-  async loadInitialData() {
-    if (!this.companyId()) return;
-
-    this.loading.set(true);
-    try {
-      const employees = await this.userService.getByCompany(this.companyId()!);
-      this.employees.set(employees.filter(e => e.role === 'employee' || (e.role === 'manager' && e.can_be_employee)));
-    } catch {
-      // Employees are non-critical; filters won't populate but appointments still load
-    }
-
-    await this.resetAndLoad();
-  }
-
-  async resetAndLoad() {
-    if (!this.companyId()) return;
-
-    this.currentPage.set(0);
-    this.accumulatedAppointments.set([]);
-    this.hasMore.set(true);
-    this.loading.set(true);
-    try {
-      const filterDateStr = this.filterDate()
-        ? `${this.filterDate()!.getFullYear()}-${String(this.filterDate()!.getMonth() + 1).padStart(2, '0')}-${String(this.filterDate()!.getDate()).padStart(2, '0')}`
-        : undefined;
-
-      const result = await this.appointmentService.getByCompanyPaginated({
-        companyId: this.companyId()!,
-        page: 0,
-        pageSize: this.pageSize(),
-        status: (this.filterStatus() || undefined) as AppointmentStatus | undefined,
-        employeeId: this.filterEmployee() || undefined,
-        date: filterDateStr,
-        search: this.searchQuery().trim() || undefined,
-      });
-
-      this.accumulatedAppointments.set(result.data);
-      this.totalCount.set(result.totalCount);
-      this.hasMore.set(result.hasMore);
-    } catch (error: any) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se pudieron cargar los datos'
-      });
-    } finally {
-      this.loading.set(false);
+      // Resources (appointmentsResource, employeesResource) auto-load when companyId is set
     }
   }
+
 
   async loadMore() {
-    if (!this.hasMore() || this.loadingMore() || this.loading() || !this.companyId()) return;
+    if (!this.hasMore() || this.loadingMore() || this.appointmentsResource.isLoading() || !this.companyId()) return;
 
     const nextPage = this.currentPage() + 1;
+    const gen = this.filterGeneration();
     this.loadingMore.set(true);
     try {
-      const filterDateStr = this.filterDate()
-        ? `${this.filterDate()!.getFullYear()}-${String(this.filterDate()!.getMonth() + 1).padStart(2, '0')}-${String(this.filterDate()!.getDate()).padStart(2, '0')}`
-        : undefined;
+      const params = this.filterParams();
+      if (!params) return;
 
       const result = await this.appointmentService.getByCompanyPaginated({
-        companyId: this.companyId()!,
+        ...params,
         page: nextPage,
         pageSize: this.pageSize(),
-        status: (this.filterStatus() || undefined) as AppointmentStatus | undefined,
-        employeeId: this.filterEmployee() || undefined,
-        date: filterDateStr,
-        search: this.searchQuery().trim() || undefined,
       });
+
+      if (gen !== this.filterGeneration()) return;
 
       this.accumulatedAppointments.update(current => [...current, ...result.data]);
       this.totalCount.set(result.totalCount);
@@ -304,17 +306,16 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
     }
   }
 
-  async refreshData() {
-    await this.resetAndLoad();
+  refreshData() {
+    this.appointmentsResource.reload();
   }
-
   openCreateDialog() {
     this.showCreateDialog.set(true);
   }
 
-  async handleAppointmentCreated() {
+  handleAppointmentCreated() {
     this.showCreateDialog.set(false);
-    await this.resetAndLoad();
+    this.appointmentsResource.reload();
   }
 
   onSearch(event: Event) {
@@ -323,45 +324,37 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
 
     if (this.searchTimeout) clearTimeout(this.searchTimeout);
     this.searchTimeout = setTimeout(() => {
-      this.resetAndLoad();
+      this.debouncedSearchQuery.set(input.value);
     }, 300);
   }
 
   onDateSelect(date: Date) {
     this.filterDate.set(date);
-    this.debouncedFilterChange();
+    // resource auto-reloads via filterParams
   }
 
   onDateClear() {
     this.filterDate.set(null);
-    this.debouncedFilterChange();
+    // resource auto-reloads via filterParams
   }
 
   onEmployeeChange(event: any) {
     this.filterEmployee.set(event.value ?? '');
-    this.debouncedFilterChange();
+    // resource auto-reloads via filterParams
   }
 
   onStatusChange(event: any) {
     this.filterStatus.set(event.value ?? '');
-    this.debouncedFilterChange();
+    // resource auto-reloads via filterParams
   }
-
-  debouncedFilterChange() {
-    if (this.filterTimeout) clearTimeout(this.filterTimeout);
-    this.filterTimeout = setTimeout(() => {
-      this.resetAndLoad();
-    }, 300);
-  }
-
   clearFilters() {
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
     this.filterEmployee.set('');
     this.filterDate.set(null);
     this.filterStatus.set('');
     this.searchQuery.set('');
-    if (this.searchTimeout) clearTimeout(this.searchTimeout);
-    if (this.filterTimeout) clearTimeout(this.filterTimeout);
-    this.resetAndLoad();
+    this.debouncedSearchQuery.set('');
+    // Resources auto-reload via filterParams when search/employee/date/status change
   }
 
   openStatusDialog(appointment: Appointment, status: AppointmentStatus) {
@@ -634,7 +627,6 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.searchTimeout) clearTimeout(this.searchTimeout);
-    if (this.filterTimeout) clearTimeout(this.filterTimeout);
     this.observer?.disconnect();
   }
 
