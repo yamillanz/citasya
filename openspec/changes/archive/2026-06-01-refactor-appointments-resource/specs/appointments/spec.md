@@ -1,80 +1,4 @@
-# appointments Specification
-
-## Purpose
-TBD - created by archiving change add-appointments-lazy-loading. Update Purpose after archive.
-## Requirements
-### Requirement: Server-Side Paginated Fetch
-
-The `AppointmentService` SHALL provide a `getByCompanyPaginated()` method that retrieves appointments in paginated batches with optional server-side filters.
-
-**Parameters:**
-- `companyId` (required): UUID of the company
-- `page` (required): Zero-based page index
-- `pageSize` (required): Number of items per page
-- `status` (optional): Filter by appointment status (`pending`, `completed`, `cancelled`, `no_show`, or `all`)
-- `employeeId` (optional): Filter by employee UUID
-- `date` (optional): Filter by appointment date (YYYY-MM-DD)
-- `search` (optional): Case-insensitive partial match on `client_name`
-
-**Returns:**
-- `data`: Array of `Appointment` objects for the requested page
-- `totalCount`: Total number of records matching the filters
-- `hasMore`: Boolean indicating if more pages exist beyond the current one
-
-#### Scenario: First page of 25 appointments
-
-- **GIVEN** a company has 25 appointments
-- **WHEN** `getByCompanyPaginated({ companyId, page: 0, pageSize: 10 })` is called
-- **THEN** it returns 10 appointments, `totalCount: 25`, `hasMore: true`
-
-#### Scenario: Last incomplete page
-
-- **GIVEN** a company has 25 appointments
-- **WHEN** `getByCompanyPaginated({ companyId, page: 2, pageSize: 10 })` is called
-- **THEN** it returns 5 appointments, `totalCount: 25`, `hasMore: false`
-
-#### Scenario: Status filter
-
-- **GIVEN** a company has appointments with mixed statuses
-- **WHEN** `getByCompanyPaginated({ companyId, page: 0, pageSize: 10, status: 'pending' })` is called
-- **THEN** it returns only pending appointments, with `totalCount` reflecting only matching records
-
-#### Scenario: Search filter
-
-- **GIVEN** a company has appointments, and a search query "Juan" is provided
-- **WHEN** `getByCompanyPaginated({ companyId, page: 0, pageSize: 10, search: 'Juan' })` is called
-- **THEN** it returns only appointments where `client_name` contains "Juan" (case-insensitive)
-
-#### Scenario: Query failure
-
-- **GIVEN** the Supabase query fails
-- **WHEN** `getByCompanyPaginated()` is called
-- **THEN** it throws the error to be handled by the caller
-
-### Requirement: Lazy Loading on List View
-
-The appointments list view SHALL load appointments incrementally in batches of 10 as the user scrolls down, triggered by an Intersection Observer on a sentinel element.
-
-#### Scenario: Initial load of first batch
-
-- **GIVEN** a company has 35 appointments
-- **WHEN** the appointments list page loads
-- **THEN** only the first 10 appointments are rendered
-- **AND** a sentinel element is present at the bottom of the list
-
-#### Scenario: Scroll triggers next batch
-
-- **GIVEN** the first 10 appointments are displayed and `hasMore` is true
-- **WHEN** the user scrolls down and the sentinel element becomes visible
-- **THEN** the next 10 appointments are fetched and appended to the list
-- **AND** `totalCount` remains 35
-
-#### Scenario: All items loaded
-
-- **GIVEN** all 35 appointments have been loaded (`hasMore` is false)
-- **WHEN** the user scrolls to the bottom
-- **THEN** the sentinel element is not rendered
-- **AND** an end-of-list message "No hay más citas" is displayed
+## MODIFIED Requirements
 
 ### Requirement: Loading States
 
@@ -180,44 +104,6 @@ Concurrent or rapid scroll events SHALL NOT trigger duplicate fetches. Filter ch
 - **WHEN** the sentinel fires
 - **THEN** `loadMore()` is not called (guarded by `appointmentsResource.isLoading()` check)
 
-### Requirement: Calendar View Compatibility
-
-The calendar view tab SHALL continue to function using the same accumulated data source, displaying whatever appointments have been loaded so far.
-
-#### Scenario: Calendar shows loaded data
-
-- **GIVEN** 10 appointments have been loaded in list view
-- **WHEN** the user switches to the calendar view tab
-- **THEN** those 10 appointments are displayed grouped by date
-
-#### Scenario: Calendar reflects new loads
-
-- **GIVEN** the user loads 10 more appointments in list view (20 total)
-- **WHEN** the user switches to calendar view
-- **THEN** all 20 appointments are displayed grouped by date
-
-### Requirement: Filters bar persists during loading
-The filters bar (search input, date picker, employee select, status select, view toggle) SHALL remain rendered in the DOM at all times, regardless of the `loading` signal state. Only the data content area (stats, appointment cards/list, calendar view, empty state) SHALL be replaced by a loading spinner when `loading()` is true.
-
-#### Scenario: User selects status filter
-- **GIVEN** the appointments page is loaded with data
-- **WHEN** the user selects "Pendiente" from the status dropdown
-- **THEN** `resetAndLoad()` is triggered and `loading` becomes true
-- **AND** the filters bar remains visible in the DOM (not destroyed)
-- **AND** the data area shows a loading spinner
-- **WHEN** the API response arrives and `loading` becomes false
-- **THEN** the data area shows the filtered results
-- **AND** the status dropdown still shows "Pendiente" selected
-
-#### Scenario: Initial page load
-- **GIVEN** the user navigates to `/bo/appointments`
-- **WHEN** the page starts loading
-- **THEN** the header and filters bar are visible immediately
-- **AND** a loading spinner appears in the data content area
-- **WHEN** data finishes loading
-- **THEN** the data content area shows the appointments list
-- **AND** the filters bar was never destroyed or recreated
-
 ### Requirement: Filter changes are debounced
 
 The search input SHALL have a debounce of 300ms before triggering a refetch. Other filter signals (employee, date, status) SHALL trigger refetches immediately via the `resource()` reactivity, without a manual debounce.
@@ -236,12 +122,12 @@ The search input SHALL have a debounce of 300ms before triggering a refetch. Oth
 - **THEN** the most recent filter values are applied
 - **AND** `resource()` internally aborts the in-flight request from the first filter change
 
-### Requirement: Loading spinner placement in appointments list
-The loading spinner SHALL replace only the data content area (stats + cards/list/calendar + empty state), not the filters bar. During loading, the filters bar SHALL be visible but dimmed (opacity 0.6, pointer-events none) to indicate data is refreshing.
+## REMOVED Requirements
 
-#### Scenario: Filters bar shows loading state
-- **GIVEN** data is being fetched (`loading` is true)
-- **WHEN** the user views the filters bar
-- **THEN** the filters bar is visible but dimmed (opacity 0.6, pointer-events none)
-- **AND** the data content area shows a loading spinner with "Cargando citas..." text
+### Requirement: Date picker uses signal-based event binding
+**Reason**: This requirement describes implementation details (specific PrimeNG event handler pattern) rather than user-visible behavior. The behavior is preserved in the new reactive `resource()`-based implementation.
+**Migration**: Not applicable. The `p-datepicker` continues to use `[ngModel]` (one-way) with `(onSelect)` and `(onClear)` event handlers and `[ngModelOptions]="{standalone: true}"`. The filter changes now trigger refetch declaratively through `filterParams` instead of calling `resetAndLoad()`.
 
+### Requirement: Dropdown filters use one-way binding with onChange
+**Reason**: This requirement describes implementation details (specific PrimeNG event handler pattern) rather than user-visible behavior. The behavior is preserved in the new reactive `resource()`-based implementation.
+**Migration**: Not applicable. The `p-select` components continue to use `[ngModel]` (one-way) with `(onChange)` event handlers. The filter changes now trigger refetch declaratively through `filterParams`.

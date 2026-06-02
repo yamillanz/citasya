@@ -27,17 +27,21 @@ describe('AppointmentsComponent (Manager)', () => {
 
   const createMock = () => {
     const accumulatedAppointments = signal<Appointment[]>([]);
-    const employees = signal<User[]>([]);
-    const loading = signal(true);
+    const employeesResourceValue = signal<User[]>([]);
     const filterEmployee = signal('');
     const filterStatus = signal('');
     const filterDate = signal<Date | null>(null);
     const searchQuery = signal('');
+    const debouncedSearchQuery = signal('');
+    const filterGeneration = signal(0);
     const pageSize = signal(10);
     const currentPage = signal(0);
     const hasMore = signal(true);
     const loadingMore = signal(false);
     const totalCount = signal(0);
+    const companyId = signal<string | null>('company-1');
+    const resourceIsLoading = signal(false);
+    const resourceError = signal<unknown>(undefined);
     const selectedAppointment = signal<Appointment | null>(null);
     const showStatusDialog = signal(false);
     const statusAction = signal<StatusAction>(null);
@@ -75,16 +79,36 @@ describe('AppointmentsComponent (Manager)', () => {
       accumulatedAppointments()
     );
 
+    const formatFilterDate = (date: Date | null): string | undefined => {
+      if (!date) return undefined;
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    };
+
+    const filterParams = computed(() => {
+      const cid = companyId();
+      if (!cid) return undefined;
+      return {
+        companyId: cid,
+        status: (filterStatus() || undefined) as AppointmentStatus | undefined,
+        employeeId: filterEmployee() || undefined,
+        date: formatFilterDate(filterDate()),
+        search: debouncedSearchQuery().trim() || undefined,
+      };
+    });
+
+    const showLoading = computed(() =>
+      !companyId() || resourceIsLoading()
+    );
+
     const employeeOptions = computed(() => [
       { label: 'Todos los empleados', value: '' },
-      ...employees().map(e => ({ label: e.full_name, value: e.id }))
+      ...employeesResourceValue().map(e => ({ label: e.full_name, value: e.id }))
     ]);
 
     const getStatusSeverity = (s: AppointmentStatus) => ({ completed: 'success', pending: 'warn', cancelled: 'danger', no_show: 'secondary' }[s] || 'info') as any;
     const getStatusLabel = (s: AppointmentStatus) => ({ completed: 'Completada', pending: 'Pendiente', cancelled: 'Cancelada', no_show: 'No asistió' }[s] || s);
     const getServicesNames = (apt: Appointment | null) => !apt?.services?.length ? 'N/A' : apt.services.map(s => s.name).join(', ');
     const getTotalPrice = (apt: Appointment | null) => apt?.services?.reduce((s, svc) => s + svc.price, 0) || 0;
-
     const openStatusDialog = (appointment: Appointment, status: AppointmentStatus) => {
       selectedAppointment.set(appointment);
       statusAction.set(status as any);
@@ -187,29 +211,10 @@ describe('AppointmentsComponent (Manager)', () => {
       closeDrawer();
     };
 
-    const resetAndLoadCalls: any[] = [];
-    const loadMoreCalls: any[] = [];
-
-    const resetAndLoad = () => {
-      resetAndLoadCalls.push({
-        filterEmployee: filterEmployee(),
-        filterDate: filterDate(),
-        filterStatus: filterStatus(),
-        searchQuery: searchQuery(),
-      });
-      currentPage.set(0);
-      loading.set(true);
-    };
-
     const loadMore = () => {
-      if (!hasMore() || loadingMore() || loading()) return;
-      loadMoreCalls.push({ currentPage: currentPage() });
+      if (!hasMore() || loadingMore() || resourceIsLoading() || !companyId()) return;
       loadingMore.set(true);
       currentPage.update(p => p + 1);
-    };
-
-    const onFilterChange = () => {
-      resetAndLoad();
     };
 
     const clearFilters = () => {
@@ -217,65 +222,106 @@ describe('AppointmentsComponent (Manager)', () => {
       filterDate.set(null);
       filterStatus.set('');
       searchQuery.set('');
-      resetAndLoad();
+      debouncedSearchQuery.set('');
+      // Resources auto-reload via filterParams
     };
 
-    return { accumulatedAppointments, employees, loading, filterEmployee, filterDate, filterStatus, searchQuery, pageSize, currentPage, hasMore, loadingMore, totalCount, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, employeeOptions, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls, selectedCompletionReceipt, completionReceiptError, uploadingCompletionReceipt, selectedPaymentReceipt, paymentReceiptError, uploadingPaymentReceipt, resetAndLoad, loadMore, onFilterChange, clearFilters, resetAndLoadCalls, loadMoreCalls, selectedImageUrl, showImageDialog, openImageViewer, closeImageViewer };
+    return { accumulatedAppointments, employeesResourceValue, debouncedSearchQuery, filterGeneration, companyId, resourceIsLoading, resourceError, filterEmployee, filterDate, filterStatus, searchQuery, pageSize, currentPage, hasMore, loadingMore, totalCount, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, employeeOptions, filterParams, showLoading, formatFilterDate, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls, selectedCompletionReceipt, completionReceiptError, uploadingCompletionReceipt, selectedPaymentReceipt, paymentReceiptError, uploadingPaymentReceipt, selectedImageUrl, showImageDialog, openImageViewer, closeImageViewer, loadMore, clearFilters };
   };
 
-  describe('lazy loading — resetAndLoad', () => {
-    it('debe resetear currentPage a 0 y activar loading', () => {
+  describe('filterParams — mapeo de filtros a API params', () => {
+    it('debe retornar undefined cuando companyId es null', () => {
       const comp = createMock();
-      comp.currentPage.set(3);
-      comp.loading.set(false);
-      comp.resetAndLoad();
-      expect(comp.currentPage()).toBe(0);
-      expect(comp.loading()).toBe(true);
+      comp.companyId.set(null);
+      expect(comp.filterParams()).toBeUndefined();
     });
 
-    it('debe registrar los filtros activos al resetear', () => {
+    it('debe incluir companyId en los params', () => {
+      const comp = createMock();
+      const params = comp.filterParams();
+      expect(params?.companyId).toBe('company-1');
+    });
+
+    it('debe incluir status cuando filterStatus tiene valor', () => {
+      const comp = createMock();
+      comp.filterStatus.set('pending');
+      const params = comp.filterParams();
+      expect(params?.status).toBe('pending');
+    });
+
+    it('debe omitir status cuando filterStatus está vacío', () => {
+      const comp = createMock();
+      const params = comp.filterParams();
+      expect(params?.status).toBeUndefined();
+    });
+
+    it('debe incluir employeeId cuando filterEmployee tiene valor', () => {
       const comp = createMock();
       comp.filterEmployee.set('emp-1');
-      comp.filterStatus.set('pending');
-      comp.resetAndLoad();
-      expect(comp.resetAndLoadCalls).toHaveLength(1);
-      expect(comp.resetAndLoadCalls[0].filterEmployee).toBe('emp-1');
-      expect(comp.resetAndLoadCalls[0].filterStatus).toBe('pending');
+      const params = comp.filterParams();
+      expect(params?.employeeId).toBe('emp-1');
+    });
+
+    it('debe incluir search desde debouncedSearchQuery', () => {
+      const comp = createMock();
+      comp.debouncedSearchQuery.set('juan');
+      const params = comp.filterParams();
+      expect(params?.search).toBe('juan');
+    });
+
+    it('debe incluir date formateada cuando filterDate tiene valor', () => {
+      const comp = createMock();
+      comp.filterDate.set(new Date(2026, 2, 20));
+      const params = comp.filterParams();
+      expect(params?.date).toBe('2026-03-20');
+    });
+
+    it('debe omitir date cuando filterDate es null', () => {
+      const comp = createMock();
+      const params = comp.filterParams();
+      expect(params?.date).toBeUndefined();
     });
   });
 
   describe('lazy loading — loadMore', () => {
     it('debe incrementar currentPage y activar loadingMore', () => {
       const comp = createMock();
-      comp.loading.set(false);
+      comp.resourceIsLoading.set(false);
       comp.currentPage.set(0);
       comp.loadMore();
-      expect(comp.loadMoreCalls).toHaveLength(1);
       expect(comp.loadingMore()).toBe(true);
       expect(comp.currentPage()).toBe(1);
     });
 
     it('NO debe ejecutar loadMore si loadingMore ya está activo', () => {
       const comp = createMock();
-      comp.loading.set(false);
+      comp.resourceIsLoading.set(false);
       comp.loadingMore.set(true);
       comp.loadMore();
-      expect(comp.loadMoreCalls).toHaveLength(0);
+      expect(comp.loadingMore()).toBe(true);
+      expect(comp.currentPage()).toBe(0);
     });
 
-    it('NO debe ejecutar loadMore si loading está activo', () => {
+    it('NO debe ejecutar loadMore si resource está cargando', () => {
       const comp = createMock();
-      comp.loading.set(true);
+      comp.resourceIsLoading.set(true);
       comp.loadMore();
-      expect(comp.loadMoreCalls).toHaveLength(0);
+      expect(comp.currentPage()).toBe(0);
     });
 
     it('NO debe ejecutar loadMore si hasMore es false', () => {
       const comp = createMock();
-      comp.loading.set(false);
+      comp.resourceIsLoading.set(false);
       comp.hasMore.set(false);
       comp.loadMore();
-      expect(comp.loadMoreCalls).toHaveLength(0);
+      expect(comp.currentPage()).toBe(0);
+    });
+
+    it('NO debe ejecutar loadMore si companyId es null', () => {
+      const comp = createMock();
+      comp.companyId.set(null);
+      comp.loadMore();
+      expect(comp.currentPage()).toBe(0);
     });
   });
 
@@ -292,33 +338,18 @@ describe('AppointmentsComponent (Manager)', () => {
     });
   });
 
-  describe('lazy loading — onFilterChange', () => {
-    it('debe llamar a resetAndLoad cuando un filtro cambia', () => {
-      const comp = createMock();
-      comp.onFilterChange();
-      expect(comp.resetAndLoadCalls).toHaveLength(1);
-      expect(comp.currentPage()).toBe(0);
-    });
-
-    it('debe resetear currentPage al cambiar filtro', () => {
-      const comp = createMock();
-      comp.currentPage.set(2);
-      comp.onFilterChange();
-      expect(comp.currentPage()).toBe(0);
-    });
-  });
-
-  describe('lazy loading — clearFilters', () => {
-    it('debe limpiar todos los filtros y llamar resetAndLoad', () => {
+  describe('clearFilters', () => {
+    it('debe limpiar todos los filtros incluyendo debouncedSearchQuery', () => {
       const comp = createMock();
       comp.filterEmployee.set('emp-1');
       comp.filterStatus.set('completed');
       comp.searchQuery.set('Juan');
+      comp.debouncedSearchQuery.set('Juan');
       comp.clearFilters();
       expect(comp.filterEmployee()).toBe('');
       expect(comp.filterStatus()).toBe('');
       expect(comp.searchQuery()).toBe('');
-      expect(comp.resetAndLoadCalls).toHaveLength(1);
+      expect(comp.debouncedSearchQuery()).toBe('');
     });
   });
 
@@ -339,13 +370,13 @@ describe('AppointmentsComponent (Manager)', () => {
   describe('opciones de empleados', () => {
     it('debe incluir opción "Todos" como primera', () => {
       const comp = createMock();
-      comp.employees.set(mockEmployees);
+      comp.employeesResourceValue.set(mockEmployees);
       expect(comp.employeeOptions()[0].label).toBe('Todos los empleados');
     });
 
     it('debe incluir todos los empleados', () => {
       const comp = createMock();
-      comp.employees.set(mockEmployees);
+      comp.employeesResourceValue.set(mockEmployees);
       expect(comp.employeeOptions()).toHaveLength(3);
     });
   });

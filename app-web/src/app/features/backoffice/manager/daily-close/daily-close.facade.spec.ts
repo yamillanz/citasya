@@ -428,7 +428,10 @@ describe('DailyCloseFacade', () => {
       facade.navigateToPreviousDay();
 
       const newDate = facade.selectedDate();
-      expect(newDate.getDate()).toBe(initialDate.getDate() - 1);
+      // Verify the new date is exactly 1 day before the initial date (24h diff)
+      // This avoids month-boundary issues (e.g., going from June 1 to May 31)
+      const diffMs = initialDate.getTime() - newDate.getTime();
+      expect(diffMs).toBe(24 * 60 * 60 * 1000);
     });
 
     it('should navigate to next day when allowed', async () => {
@@ -439,7 +442,7 @@ describe('DailyCloseFacade', () => {
       // Reload with yesterday's date
       mockAppointmentService.getByDate.mockClear();
       mockAppointmentService.getByDate.mockResolvedValue(mockAppointments);
-      
+
       facade.onDateChange(yesterday);
       await facade.loadAppointments();
 
@@ -448,7 +451,10 @@ describe('DailyCloseFacade', () => {
       facade.navigateToNextDay();
 
       const newDate = facade.selectedDate();
-      expect(newDate.getDate()).toBe(initialDate.getDate() + 1);
+      // Verify the new date is exactly 1 day after the initial date (24h diff)
+      // This avoids month-boundary issues (e.g., going from May 31 to June 1)
+      const diffMs = newDate.getTime() - initialDate.getTime();
+      expect(diffMs).toBe(24 * 60 * 60 * 1000);
     });
 
     it('should not navigate to future dates', () => {
