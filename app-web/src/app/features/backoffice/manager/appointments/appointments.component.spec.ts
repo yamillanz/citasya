@@ -1,6 +1,18 @@
 import { signal, computed } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { MessageService } from 'primeng/api';
 import { Appointment, AppointmentStatus, PaymentMethod } from '../../../../core/models/appointment.model';
 import { User } from '../../../../core/models/user.model';
+import { AppointmentsComponent } from './appointments.component';
+import { AuthService } from '../../../../core/services/auth.service';
+import { AppointmentService } from '../../../../core/services/appointment.service';
+import { CompanyService } from '../../../../core/services/company.service';
+import { UserService } from '../../../../core/services/user.service';
+import { EmailNotificationService } from '../../../../core/services/email-notification.service';
+import { ExchangeRateStorageService } from '../../../../core/services/exchange-rate-storage.service';
+import { StorageService } from '../../../../core/services/storage.service';
+import { ServiceService } from '../../../../core/services/service.service';
 
 describe('AppointmentsComponent (Manager)', () => {
   const mockEmployees: User[] = [
@@ -78,6 +90,21 @@ describe('AppointmentsComponent (Manager)', () => {
     const filteredAppointments = computed(() =>
       accumulatedAppointments()
     );
+
+    const groupedAppointments = computed(() => {
+      const grouped: { [key: string]: Appointment[] } = {};
+      [...filteredAppointments()]
+        .sort((a, b) => {
+          const dateCompare = a.appointment_date.localeCompare(b.appointment_date);
+          if (dateCompare !== 0) return dateCompare;
+          return a.appointment_time.localeCompare(b.appointment_time);
+        })
+        .forEach(apt => {
+          if (!grouped[apt.appointment_date]) grouped[apt.appointment_date] = [];
+          grouped[apt.appointment_date].push(apt);
+        });
+      return Object.entries(grouped).map(([date, appointments]) => ({ date, appointments }));
+    });
 
     const formatFilterDate = (date: Date | null): string | undefined => {
       if (!date) return undefined;
@@ -226,7 +253,7 @@ describe('AppointmentsComponent (Manager)', () => {
       // Resources auto-reload via filterParams
     };
 
-    return { accumulatedAppointments, employeesResourceValue, debouncedSearchQuery, filterGeneration, companyId, resourceIsLoading, resourceError, filterEmployee, filterDate, filterStatus, searchQuery, pageSize, currentPage, hasMore, loadingMore, totalCount, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, employeeOptions, filterParams, showLoading, formatFilterDate, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls, selectedCompletionReceipt, completionReceiptError, uploadingCompletionReceipt, selectedPaymentReceipt, paymentReceiptError, uploadingPaymentReceipt, selectedImageUrl, showImageDialog, openImageViewer, closeImageViewer, loadMore, clearFilters };
+    return { accumulatedAppointments, employeesResourceValue, debouncedSearchQuery, filterGeneration, companyId, resourceIsLoading, resourceError, filterEmployee, filterDate, filterStatus, searchQuery, pageSize, currentPage, hasMore, loadingMore, totalCount, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, groupedAppointments, employeeOptions, filterParams, showLoading, formatFilterDate, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls, selectedCompletionReceipt, completionReceiptError, uploadingCompletionReceipt, selectedPaymentReceipt, paymentReceiptError, uploadingPaymentReceipt, selectedImageUrl, showImageDialog, openImageViewer, closeImageViewer, loadMore, clearFilters };
   };
 
   describe('filterParams — mapeo de filtros a API params', () => {
@@ -814,6 +841,85 @@ describe('AppointmentsComponent (Manager)', () => {
       comp.openImageViewer('https://example.com/second.jpg');
       expect(comp.selectedImageUrl()).toBe('https://example.com/second.jpg');
       expect(comp.showImageDialog()).toBe(true);
+    });
+  });
+
+  describe('groupedAppointments — inmutabilidad del estado', () => {
+    it('debe agrupar ordenado sin mutar accumulatedAppointments', () => {
+      const comp = createMock();
+      const unordered: Appointment[] = [
+        { ...mockAppointments[0], id: 'apt-b', appointment_date: '2026-03-22', appointment_time: '09:00' },
+        { ...mockAppointments[1], id: 'apt-a', appointment_date: '2026-03-20', appointment_time: '10:00' }
+      ];
+      comp.accumulatedAppointments.set(unordered);
+      const referenceBefore = comp.accumulatedAppointments();
+      const orderBefore = referenceBefore.map(a => a.id);
+
+      const groups = comp.groupedAppointments();
+
+      expect(groups[0].date).toBe('2026-03-20');
+      expect(comp.accumulatedAppointments()).toBe(referenceBefore);
+      expect(comp.accumulatedAppointments().map(a => a.id)).toEqual(orderBefore);
+    });
+  });
+
+  describe('template — bloques de lazy loading (render)', () => {
+    beforeAll(() => {
+      (globalThis as any).IntersectionObserver = class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      };
+    });
+
+    const setupTestBed = async (hasMore: boolean) => {
+      await TestBed.configureTestingModule({
+        imports: [AppointmentsComponent],
+        providers: [
+          provideNoopAnimations(),
+          { provide: AuthService, useValue: { getCurrentUser: jest.fn().mockResolvedValue({ id: 'u-1', company_id: 'company-1' }) } },
+          { provide: AppointmentService, useValue: { getByCompanyPaginated: jest.fn().mockResolvedValue({ data: mockAppointments, totalCount: 2, hasMore }) } },
+          { provide: CompanyService, useValue: { getById: jest.fn().mockResolvedValue({ id: 'company-1', name: 'Test Co' }) } },
+          { provide: UserService, useValue: { getByCompany: jest.fn().mockResolvedValue(mockEmployees) } },
+          { provide: EmailNotificationService, useValue: { notify: jest.fn() } },
+          { provide: ExchangeRateStorageService, useValue: { getRate: jest.fn().mockReturnValue(1), setRate: jest.fn() } },
+          { provide: StorageService, useValue: { uploadReceipt: jest.fn() } },
+          { provide: ServiceService, useValue: {} },
+          { provide: MessageService, useValue: { add: jest.fn() } }
+        ]
+      }).compileComponents();
+    };
+
+    const stabilize = async (fixture: any) => {
+      // ngOnInit → companyId → resource fetch → sync effect: cada paso necesita un ciclo
+      for (let i = 0; i < 3; i++) {
+        fixture.detectChanges();
+        await fixture.whenStable();
+      }
+      fixture.detectChanges();
+    };
+
+    it('debe renderizar exactamente un sentinel y fuera de las appointment cards', async () => {
+      await setupTestBed(true);
+      const fixture = TestBed.createComponent(AppointmentsComponent);
+      await stabilize(fixture);
+
+      const el: HTMLElement = fixture.nativeElement;
+      const sentinels = el.querySelectorAll('.scroll-sentinel');
+      expect(sentinels).toHaveLength(1);
+      expect(sentinels[0].closest('.appointment-card')).toBeNull();
+    });
+
+    it('debe ocultar el sentinel y mostrar un solo mensaje de fin de lista cuando hasMore es false', async () => {
+      await setupTestBed(false);
+      const fixture = TestBed.createComponent(AppointmentsComponent);
+      await stabilize(fixture);
+
+      const el: HTMLElement = fixture.nativeElement;
+      expect(el.querySelectorAll('.scroll-sentinel')).toHaveLength(0);
+      const endMessages = el.querySelectorAll('.end-of-list');
+      expect(endMessages).toHaveLength(1);
+      expect(endMessages[0].closest('.appointment-card')).toBeNull();
     });
   });
 });

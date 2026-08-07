@@ -236,7 +236,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
   groupedAppointments = computed(() => {
     const grouped: { [key: string]: Appointment[] } = {};
     
-    this.filteredAppointments()
+    [...this.filteredAppointments()]
       .sort((a, b) => {
         const dateCompare = a.appointment_date.localeCompare(b.appointment_date);
         if (dateCompare !== 0) return dateCompare;

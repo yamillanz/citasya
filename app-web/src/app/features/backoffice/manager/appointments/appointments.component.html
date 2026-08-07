@@ -299,23 +299,23 @@
                   </p-button>
                 </div>
               }
+            </div>
+          }
 
-              @if (loadingMore()) {
-                <div class="loading-more">
-                  <div class="loading-spinner"></div>
-                  <span>Cargando más citas...</span>
-                </div>
-              }
+          @if (loadingMore()) {
+            <div class="loading-more">
+              <div class="loading-spinner"></div>
+              <span>Cargando más citas...</span>
+            </div>
+          }
 
-              @if (hasMore()) {
-                <div #sentinel class="scroll-sentinel"></div>
-              }
+          @if (hasMore() && !appointmentsResource.isLoading()) {
+            <div #sentinel class="scroll-sentinel"></div>
+          }
 
-              @if (!hasMore() && accumulatedAppointments().length > 0) {
-                <div class="end-of-list">
-                  <span>No hay más citas</span>
-                </div>
-              }
+          @if (!hasMore() && accumulatedAppointments().length > 0) {
+            <div class="end-of-list">
+              <span>No hay más citas</span>
             </div>
           }
         </div>
