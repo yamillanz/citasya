@@ -1,0 +1,4 @@
+schema: spec-driven
+name: add-google-oauth-login
+description: Add Google OAuth login button to allow users sign in with their Gmail account while maintaining admin control over who can access the system
+created: 2026-06-11
