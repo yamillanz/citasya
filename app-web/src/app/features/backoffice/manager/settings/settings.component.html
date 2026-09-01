@@ -107,25 +107,43 @@
                 </label>
               </div>
 
-              <div class="col-time">
-                <input
-                  pInputText
-                  type="time"
-                  [value]="day.start_time"
-                  [disabled]="!day.is_active"
-                  (input)="onStartTimeChange(day.day_of_week, $event)"
-                  class="time-input"
-                />
-              </div>
-              <div class="col-time">
-                <input
-                  pInputText
-                  type="time"
-                  [value]="day.end_time"
-                  [disabled]="!day.is_active"
-                  (input)="onEndTimeChange(day.day_of_week, $event)"
-                  class="time-input"
-                />
+              <div class="time-pair">
+                <div class="col-time">
+                  <label
+                    class="time-caption"
+                    [attr.for]="'start-' + day.day_of_week"
+                  >
+                    Apertura
+                  </label>
+                  <input
+                    [id]="'start-' + day.day_of_week"
+                    pInputText
+                    type="time"
+                    [value]="day.start_time"
+                    [attr.aria-label]="dayNames[day.day_of_week] + ', hora de apertura'"
+                    [disabled]="!day.is_active"
+                    (input)="onStartTimeChange(day.day_of_week, $event)"
+                    class="time-input"
+                  />
+                </div>
+                <div class="col-time">
+                  <label
+                    class="time-caption"
+                    [attr.for]="'end-' + day.day_of_week"
+                  >
+                    Cierre
+                  </label>
+                  <input
+                    [id]="'end-' + day.day_of_week"
+                    pInputText
+                    type="time"
+                    [value]="day.end_time"
+                    [attr.aria-label]="dayNames[day.day_of_week] + ', hora de cierre'"
+                    [disabled]="!day.is_active"
+                    (input)="onEndTimeChange(day.day_of_week, $event)"
+                    class="time-input"
+                  />
+                </div>
               </div>
 
               @if (hasTimeError(day.day_of_week)) {
