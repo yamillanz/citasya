@@ -420,6 +420,8 @@ export class AppointmentService {
       .rpc('get_appointment_by_token', { p_token: token });
 
     if (error) throw error;
+    // La función es RETURNS TABLE (setof): PostgREST devuelve un array de filas
+    if (Array.isArray(data)) return data[0] ?? null;
     return data || null;
   }
 

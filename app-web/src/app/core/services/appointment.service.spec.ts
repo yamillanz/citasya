@@ -390,28 +390,43 @@ describe('AppointmentService', () => {
   });
 
   describe('getByToken', () => {
+    const tokenRow = {
+      id: 'apt-1',
+      company_id: 'company-1',
+      employee_id: 'employee-1',
+      client_name: 'Juan Pérez',
+      appointment_date: '2026-03-20',
+      appointment_time: '10:00:00',
+      status: 'pending',
+      company_name: 'Peluquería Juan',
+      employee_name: 'Juan Empleado',
+      services: [{ name: 'Corte', duration_minutes: 30, price: 25 }],
+      total_duration: 30
+    };
+
     it('debe llamar al RPC get_appointment_by_token con el token', async () => {
-      const tokenRow = {
-        id: 'apt-1',
-        company_id: 'company-1',
-        employee_id: 'employee-1',
-        client_name: 'Juan Pérez',
-        appointment_date: '2026-03-20',
-        appointment_time: '10:00:00',
-        status: 'pending',
-        company_name: 'Peluquería Juan',
-        company_address: 'Calle 1',
-        company_phone: '555',
-        employee_name: 'Juan Empleado',
-        services: [{ name: 'Corte', duration_minutes: 30, price: 25 }],
-        total_duration: 30
-      };
       mockRpcFn.mockResolvedValueOnce({ data: tokenRow, error: null });
 
       const result = await service.getByToken('token-123');
 
       expect(mockRpcFn).toHaveBeenCalledWith('get_appointment_by_token', { p_token: 'token-123' });
       expect(result).toEqual(tokenRow);
+    });
+
+    it('debe desenvolver la primera fila cuando el RPC devuelve un array (RETURNS TABLE)', async () => {
+      mockRpcFn.mockResolvedValueOnce({ data: [tokenRow], error: null });
+
+      const result = await service.getByToken('token-123');
+
+      expect(result).toEqual(tokenRow);
+    });
+
+    it('debe retornar null cuando el RPC devuelve un array vacío', async () => {
+      mockRpcFn.mockResolvedValueOnce({ data: [], error: null });
+
+      const result = await service.getByToken('token-inexistente');
+
+      expect(result).toBeNull();
     });
 
     it('debe retornar null cuando el token no existe', async () => {
