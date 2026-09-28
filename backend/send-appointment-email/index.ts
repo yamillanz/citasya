@@ -75,7 +75,7 @@ function buildEmailText(eventType: EventType, data: AppointmentData): string {
   return lines.join('\n');
 }
 
-function buildEmailHtml(eventType: EventType, data: AppointmentData): string {
+function buildEmailHtml(eventType: EventType, data: AppointmentData, ctaHref?: string): string {
   const servicesHtml = data.services.map(s => {
     const priceText = s.price ? `, $${s.price}` : '';
     return `<tr><td style="padding:6px 0;border-bottom:1px solid #eee;">• ${s.name}</td><td style="padding:6px 0;border-bottom:1px solid #eee;text-align:right;color:#5D6D7E;font-size:13px;">${s.duration_minutes} min${priceText}</td></tr>`;
@@ -170,6 +170,14 @@ function buildEmailHtml(eventType: EventType, data: AppointmentData): string {
               </div>
             </div>
             ` : ''}
+
+            <!-- Reschedule CTA -->
+            ${ctaHref ? `
+            <div style="text-align:center;margin-top:24px;">
+              <a href="${ctaHref}" style="background-color:#9DC183;background-image:linear-gradient(135deg,#9DC183 0%,#7BA366 100%);color:#FFFFFF;display:inline-block;padding:12px 28px;border-radius:12px;text-decoration:none;font-weight:600;font-size:14px;letter-spacing:0.02em;">Reprogramar mi cita</a>
+              <div style="color:#5D6D7E;font-size:12px;margin-top:10px;">¿Cambió tu horario? Muévela cuando quieras, sin llamar</div>
+            </div>
+            ` : ''}
           </td>
         </tr>
         
@@ -191,12 +199,15 @@ function buildEmailHtml(eventType: EventType, data: AppointmentData): string {
 }
 
 function buildClientEmail(eventType: EventType, data: AppointmentData, appUrl: string): { subject: string; text: string; html: string } {
+  const withManageLink = (eventType === 'created' || eventType === 'rescheduled') && !!data.cancellation_token;
+  const ctaHref = withManageLink ? `${appUrl}/reprogramar/${data.cancellation_token}` : undefined;
+
   const text = buildEmailText(eventType, data);
   let fullText = text;
-  const html = buildEmailHtml(eventType, data);
+  const html = buildEmailHtml(eventType, data, ctaHref);
 
-  if ((eventType === 'created' || eventType === 'rescheduled') && data.cancellation_token) {
-    fullText += `\n\n---\n¿Necesitas reprogramar tu cita? Haz clic aquí:\n${appUrl}/reprogramar/${data.cancellation_token}`;
+  if (withManageLink) {
+    fullText += `\n\n---\n¿Necesitas reprogramar tu cita? Haz clic aquí:\n${ctaHref}`;
   }
 
   return { subject: buildSubject(eventType, data.client_name), text: fullText, html };
