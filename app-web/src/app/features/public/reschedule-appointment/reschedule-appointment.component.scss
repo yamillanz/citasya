@@ -330,6 +330,36 @@
   font-weight: 500;
 }
 
+/* CTA principal — patrón btn-primary de STYLES.MD */
+:host ::ng-deep .btn-reschedule {
+  background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
+  border: none !important;
+  color: white !important;
+  padding: var(--space-md) var(--space-xl) !important;
+  font-weight: 600 !important;
+  font-size: 0.9375rem !important;
+  border-radius: var(--radius-lg) !important;
+  width: 100%;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(157, 193, 131, 0.4) !important;
+  transition: all var(--duration-fast) ease !important;
+  margin-top: var(--space-sm);
+
+  .p-button-icon {
+    font-size: 1rem;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(157, 193, 131, 0.45) !important;
+  }
+
+  &:disabled {
+    opacity: 0.55 !important;
+    box-shadow: none !important;
+  }
+}
+
 /* ================================
    Loading state
    ================================ */
