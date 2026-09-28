@@ -278,6 +278,16 @@
                   >
                   </p-button>
                   <p-button
+                    label="Reprogramar"
+                    icon="pi pi-calendar-arrow-right"
+                    severity="info"
+                    size="small"
+                    [outlined]="true"
+                    (onClick)="openRescheduleDialog(apt)"
+                    styleClass="btn-info-outline"
+                  >
+                  </p-button>
+                  <p-button
                     label="Cancelar"
                     icon="pi pi-times"
                     severity="danger"
@@ -539,6 +549,14 @@
   (onCreated)="handleAppointmentCreated()"
 >
 </app-manager-appointment-create-dialog>
+
+<app-manager-appointment-reschedule-dialog
+  [visible]="showRescheduleDialog()"
+  [appointment]="rescheduleAppointment()"
+  (onClose)="handleRescheduleClosed()"
+  (onRescheduled)="handleAppointmentRescheduled()"
+>
+</app-manager-appointment-reschedule-dialog>
 
 <!-- Image Viewer Dialog -->
 <p-dialog

@@ -1,0 +1,96 @@
+<p-dialog
+  [modal]="true"
+  [visible]="visible()"
+  [draggable]="false"
+  [closable]="false"
+  styleClass="manager-reschedule-appointment-dialog"
+  (onHide)="close()">
+  <ng-template pTemplate="header">
+    <div class="dialog-header-with-close">
+      <span class="dialog-title-text">Reprogramar Cita</span>
+      <button class="dialog-close-btn" (click)="close()" type="button" aria-label="Cerrar dialog">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="content">
+    <div class="reschedule-form">
+      <div class="appointment-summary">
+        <div class="summary-client">
+          <div class="client-avatar">
+            {{ appointment()?.client_name?.charAt(0) }}
+          </div>
+          <div class="client-details">
+            <span class="client-name">{{ appointment()?.client_name }}</span>
+            <span class="appointment-meta">
+              @for (service of appointment()?.services || []; track service.id) {
+                {{ service.name }}@if (!$last) {<span>, </span>}
+              }
+              <span class="separator">•</span>
+              {{ totalDuration() }} min
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label class="field-label">Nueva fecha</label>
+        <p-datepicker
+          [ngModel]="selectedDate()"
+          (onSelect)="onDateSelect($event)"
+          [ngModelOptions]="{standalone: true}"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          placeholder="Selecciona una fecha"
+          styleClass="w-full"
+          [minDate]="minDate"
+          [appendTo]="'body'"
+          [baseZIndex]="10000">
+        </p-datepicker>
+      </div>
+
+      <div class="form-field">
+        <label class="field-label">Nueva hora</label>
+        @if (loadingSlots()) {
+          <div class="loading-slots">
+            <i class="pi pi-spin pi-spinner"></i>
+            <span>Buscando horarios...</span>
+          </div>
+        } @else if (availableSlots().length === 0) {
+          <p class="slots-placeholder no-slots">No hay horarios disponibles para ese día</p>
+        } @else {
+          <div class="time-slots-grid">
+            @for (slot of availableSlots(); track slot) {
+              <button
+                type="button"
+                class="time-slot-btn"
+                [class.selected]="selectedTime() === slot"
+                (click)="selectTimeSlot(slot)">
+                {{ slot }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="close()">
+      </p-button>
+      <p-button
+        label="Reprogramar"
+        icon="pi pi-calendar-arrow-right"
+        [loading]="submitting()"
+        [disabled]="!canConfirm()"
+        (onClick)="submit()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>

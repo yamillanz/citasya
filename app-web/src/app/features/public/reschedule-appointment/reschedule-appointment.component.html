@@ -1,0 +1,142 @@
+<div class="reschedule-page">
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando tu cita...</p>
+    </div>
+  } @else if (notFound()) {
+    <div class="state-card error-state-card">
+      <div class="state-icon error">
+        <i class="pi pi-exclamation-circle"></i>
+      </div>
+      <h1>Enlace inválido o cita no encontrada</h1>
+      <p>Verifica el enlace del correo o contacta directamente al negocio.</p>
+    </div>
+  } @else {
+    <div class="reschedule-card">
+      <header class="card-header">
+        <div class="header-badge">Tu cita</div>
+        <h1>{{ appointment()?.company_name }}</h1>
+        @if (appointment()?.company_address) {
+          <p class="company-meta"><i class="pi pi-map-marker"></i> {{ appointment()?.company_address }}</p>
+        }
+        @if (appointment()?.company_phone) {
+          <p class="company-meta"><i class="pi pi-phone"></i> {{ appointment()?.company_phone }}</p>
+        }
+      </header>
+
+      <section class="summary-section">
+        <div class="summary-row">
+          <span class="summary-label">Cliente</span>
+          <span class="summary-value">{{ appointment()?.client_name }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Profesional</span>
+          <span class="summary-value">{{ appointment()?.employee_name || '—' }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Fecha actual</span>
+          <span class="summary-value">{{ formatDate(appointment()?.appointment_date || '') }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Hora actual</span>
+          <span class="summary-value">{{ formatTime(appointment()?.appointment_time || '') }}</span>
+        </div>
+        <div class="summary-row services-row">
+          <span class="summary-label">Servicios</span>
+          <div class="services-list">
+            @for (service of services(); track service.name) {
+              <span class="service-chip">
+                {{ service.name }}
+                <small>{{ service.duration_minutes }} min</small>
+              </span>
+            }
+          </div>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Duración total</span>
+          <span class="summary-value">{{ totalDuration() }} min</span>
+        </div>
+      </section>
+
+      @if (notReschedulable()) {
+        <div class="notice-block">
+          <i class="pi pi-info-circle"></i>
+          <p>Esta cita ya no se puede reprogramar</p>
+        </div>
+      } @else if (success()) {
+        <div class="success-block">
+          <div class="state-icon success">
+            <i class="pi pi-check-circle"></i>
+          </div>
+          <h2>Cita reprogramada</h2>
+          <p>
+            Nueva fecha: <strong>{{ formatDate(rescheduledDate()) }}</strong>
+            <span class="separator">•</span>
+            <strong>{{ rescheduledTime() }}</strong>
+          </p>
+        </div>
+      } @else {
+        <section class="form-section">
+          <h2>Elige una nueva fecha y hora</h2>
+
+          <div class="form-field">
+            <label class="field-label" for="reschedule-date">Nueva fecha</label>
+            <p-datepicker
+              inputId="reschedule-date"
+              [ngModel]="selectedDate()"
+              (onSelect)="onDateSelect($event)"
+              [ngModelOptions]="{standalone: true}"
+              [showIcon]="true"
+              dateFormat="dd/mm/yy"
+              placeholder="Selecciona una fecha"
+              [minDate]="minDate">
+            </p-datepicker>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">Horarios disponibles</label>
+            @if (loadingSlots()) {
+              <div class="loading-slots">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Buscando horarios...</span>
+              </div>
+            } @else if (!selectedDate()) {
+              <p class="slots-placeholder">Selecciona una fecha para ver los horarios</p>
+            } @else if (availableSlots().length === 0) {
+              <p class="slots-placeholder no-slots">No hay horarios disponibles para ese día</p>
+            } @else {
+              <div class="time-slots-grid">
+                @for (slot of availableSlots(); track slot) {
+                  <button
+                    type="button"
+                    class="time-slot-btn"
+                    [class.selected]="selectedTime() === slot"
+                    (click)="selectTime(slot)">
+                    {{ slot }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          @if (error()) {
+            <div class="error-banner">
+              <i class="pi pi-exclamation-triangle"></i>
+              <span>{{ error() }}</span>
+            </div>
+          }
+
+          <p-button
+            label="Reprogramar cita"
+            icon="pi pi-calendar-arrow-right"
+            [loading]="submitting()"
+            [disabled]="!canConfirm()"
+            (onClick)="confirmReschedule()"
+            styleClass="btn-reschedule">
+          </p-button>
+        </section>
+      }
+    </div>
+  }
+</div>

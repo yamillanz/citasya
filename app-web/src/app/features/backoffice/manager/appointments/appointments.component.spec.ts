@@ -85,6 +85,31 @@ describe('AppointmentsComponent (Manager)', () => {
       selectedImageUrl.set(null);
     };
 
+    const rescheduleAppointment = signal<Appointment | null>(null);
+    const showRescheduleDialog = signal(false);
+    const notifyCalls: { appointmentId: string; eventType: string }[] = [];
+    const reloadCount = signal(0);
+
+    const openRescheduleDialog = (appointment: Appointment) => {
+      rescheduleAppointment.set(appointment);
+      showRescheduleDialog.set(true);
+    };
+
+    const handleAppointmentRescheduled = () => {
+      showRescheduleDialog.set(false);
+      const apt = rescheduleAppointment();
+      rescheduleAppointment.set(null);
+      if (apt) {
+        notifyCalls.push({ appointmentId: apt.id, eventType: 'rescheduled' });
+      }
+      reloadCount.update(v => v + 1);
+    };
+
+    const handleRescheduleClosed = () => {
+      showRescheduleDialog.set(false);
+      rescheduleAppointment.set(null);
+    };
+
     const updateStatusCalls: { appointment: Appointment; status: AppointmentStatus }[] = [];
 
     const filteredAppointments = computed(() =>
@@ -253,7 +278,7 @@ describe('AppointmentsComponent (Manager)', () => {
       // Resources auto-reload via filterParams
     };
 
-    return { accumulatedAppointments, employeesResourceValue, debouncedSearchQuery, filterGeneration, companyId, resourceIsLoading, resourceError, filterEmployee, filterDate, filterStatus, searchQuery, pageSize, currentPage, hasMore, loadingMore, totalCount, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, groupedAppointments, employeeOptions, filterParams, showLoading, formatFilterDate, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls, selectedCompletionReceipt, completionReceiptError, uploadingCompletionReceipt, selectedPaymentReceipt, paymentReceiptError, uploadingPaymentReceipt, selectedImageUrl, showImageDialog, openImageViewer, closeImageViewer, loadMore, clearFilters };
+    return { accumulatedAppointments, employeesResourceValue, debouncedSearchQuery, filterGeneration, companyId, resourceIsLoading, resourceError, filterEmployee, filterDate, filterStatus, searchQuery, pageSize, currentPage, hasMore, loadingMore, totalCount, selectedAppointment, showStatusDialog, statusAction, amountCollected, exchangeRate, amountBs, observations, paymentMethod, paymentReference, paymentAmountBs, saving, filteredAppointments, groupedAppointments, employeeOptions, filterParams, showLoading, formatFilterDate, getStatusSeverity, getStatusLabel, getServicesNames, getTotalPrice, openStatusDialog, openPaymentDrawer, closeDrawer, getDrawerTitle, getActionLabel, getActionSeverity, confirmStatusChange, confirmPayment, updateStatusCalls, markAsPaidCalls, selectedCompletionReceipt, completionReceiptError, uploadingCompletionReceipt, selectedPaymentReceipt, paymentReceiptError, uploadingPaymentReceipt, selectedImageUrl, showImageDialog, openImageViewer, closeImageViewer, loadMore, clearFilters, rescheduleAppointment, showRescheduleDialog, notifyCalls, reloadCount, openRescheduleDialog, handleAppointmentRescheduled, handleRescheduleClosed };
   };
 
   describe('filterParams — mapeo de filtros a API params', () => {
@@ -844,6 +869,41 @@ describe('AppointmentsComponent (Manager)', () => {
     });
   });
 
+  describe('reprogramar — wiring del listado', () => {
+    it('debe abrir el diálogo con la cita pendiente seleccionada', () => {
+      const comp = createMock();
+
+      comp.openRescheduleDialog(mockAppointments[0]);
+
+      expect(comp.showRescheduleDialog()).toBe(true);
+      expect(comp.rescheduleAppointment()?.id).toBe('apt-1');
+    });
+
+    it('debe notificar rescheduled y refrescar la lista tras reprogramar', () => {
+      const comp = createMock();
+      comp.openRescheduleDialog(mockAppointments[0]);
+
+      comp.handleAppointmentRescheduled();
+
+      expect(comp.showRescheduleDialog()).toBe(false);
+      expect(comp.rescheduleAppointment()).toBeNull();
+      expect(comp.notifyCalls).toEqual([{ appointmentId: 'apt-1', eventType: 'rescheduled' }]);
+      expect(comp.reloadCount()).toBe(1);
+    });
+
+    it('debe cerrar y limpiar la cita sin notificar al cancelar el diálogo', () => {
+      const comp = createMock();
+      comp.openRescheduleDialog(mockAppointments[0]);
+
+      comp.handleRescheduleClosed();
+
+      expect(comp.showRescheduleDialog()).toBe(false);
+      expect(comp.rescheduleAppointment()).toBeNull();
+      expect(comp.notifyCalls).toEqual([]);
+      expect(comp.reloadCount()).toBe(0);
+    });
+  });
+
   describe('groupedAppointments — inmutabilidad del estado', () => {
     it('debe agrupar ordenado sin mutar accumulatedAppointments', () => {
       const comp = createMock();
@@ -920,6 +980,56 @@ describe('AppointmentsComponent (Manager)', () => {
       const endMessages = el.querySelectorAll('.end-of-list');
       expect(endMessages).toHaveLength(1);
       expect(endMessages[0].closest('.appointment-card')).toBeNull();
+    });
+  });
+
+  describe('reprogramar — acción en tarjetas (render)', () => {
+    beforeAll(() => {
+      (globalThis as any).IntersectionObserver = class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      };
+    });
+
+    const setupTestBed = async () => {
+      await TestBed.configureTestingModule({
+        imports: [AppointmentsComponent],
+        providers: [
+          provideNoopAnimations(),
+          { provide: AuthService, useValue: { getCurrentUser: jest.fn().mockResolvedValue({ id: 'u-1', company_id: 'company-1' }) } },
+          { provide: AppointmentService, useValue: { getByCompanyPaginated: jest.fn().mockResolvedValue({ data: mockAppointments, totalCount: 2, hasMore: false }), reschedule: jest.fn() } },
+          { provide: CompanyService, useValue: { getById: jest.fn().mockResolvedValue({ id: 'company-1', name: 'Test Co' }) } },
+          { provide: UserService, useValue: { getByCompany: jest.fn().mockResolvedValue(mockEmployees) } },
+          { provide: EmailNotificationService, useValue: { notify: jest.fn() } },
+          { provide: ExchangeRateStorageService, useValue: { getRate: jest.fn().mockReturnValue(1), setRate: jest.fn() } },
+          { provide: StorageService, useValue: { uploadReceipt: jest.fn() } },
+          { provide: ServiceService, useValue: {} },
+          { provide: MessageService, useValue: { add: jest.fn() } }
+        ]
+      }).compileComponents();
+    };
+
+    const stabilize = async (fixture: any) => {
+      // ngOnInit → companyId → resource fetch → sync effect: cada paso necesita un ciclo
+      for (let i = 0; i < 3; i++) {
+        fixture.detectChanges();
+        await fixture.whenStable();
+      }
+      fixture.detectChanges();
+    };
+
+    it('debe renderizar "Reprogramar" en tarjetas pending y NO en las demás', async () => {
+      await setupTestBed();
+      const fixture = TestBed.createComponent(AppointmentsComponent);
+      await stabilize(fixture);
+
+      const el: HTMLElement = fixture.nativeElement;
+      const pendingCard = el.querySelector('.appointment-card.status-pending');
+      const completedCard = el.querySelector('.appointment-card.status-completed');
+
+      expect(pendingCard?.textContent).toContain('Reprogramar');
+      expect(completedCard?.textContent).not.toContain('Reprogramar');
     });
   });
 });

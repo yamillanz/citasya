@@ -75,6 +75,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public/booking-form/booking-form.component')
       .then(m => m.BookingFormComponent)
   },
+  {
+    path: 'reprogramar/:token',
+    loadComponent: () => import('./features/public/reschedule-appointment/reschedule-appointment.component')
+      .then(m => m.RescheduleAppointmentComponent)
+  },
   // Back Office Manager routes
   {
     path: 'bo',

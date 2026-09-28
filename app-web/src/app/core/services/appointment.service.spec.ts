@@ -3,6 +3,7 @@ import { AppointmentService } from './appointment.service';
 import { ScheduleService } from './schedule.service';
 
 let mockFromFn: jest.Mock;
+let mockRpcFn: jest.Mock;
 let appointmentsInsertMock: jest.Mock;
 let appointmentServicesInsertMock: jest.Mock;
 let appointmentsUpdateMock: jest.Mock;
@@ -10,7 +11,8 @@ let servicesSelectInMock: jest.Mock;
 
 jest.mock('../supabase', () => ({
   supabase: {
-    from: (...args: any[]) => mockFromFn(...args)
+    from: (...args: any[]) => mockFromFn(...args),
+    rpc: (...args: any[]) => mockRpcFn(...args)
   }
 }));
 
@@ -38,6 +40,7 @@ describe('AppointmentService', () => {
 
   beforeEach(() => {
     mockFromFn = jest.fn();
+    mockRpcFn = jest.fn().mockResolvedValue({ data: null, error: null });
     appointmentsInsertMock = jest.fn().mockReturnValue({
       select: jest.fn().mockReturnValue({
         single: jest.fn().mockResolvedValue({ data: mockAppointment, error: null })
@@ -68,6 +71,7 @@ describe('AppointmentService', () => {
           eq: jest.fn().mockReturnValue({
             eq: jest.fn().mockReturnValue({
               neq: jest.fn().mockReturnValue({
+                neq: jest.fn().mockResolvedValue({ data: [], error: null }),
                 single: jest.fn().mockResolvedValue({ data: mockAppointment, error: null })
               })
             }),
@@ -221,6 +225,35 @@ describe('AppointmentService', () => {
 
       expect(slots).toEqual([]);
     });
+
+    it('debe re-ofrecer los slots de la cita excluida (excludeAppointmentId)', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([
+        { id: 'apt-1', appointment_time: '10:00', appointment_date: '2026-03-20',
+          services: [{ id: 's1', name: 'Corte', duration_minutes: 30, price: 25 }] } as any
+      ]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 5, start_time: '09:00:00', end_time: '12:00:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 30, 'apt-1');
+
+      expect(slots).toContain('10:00');
+      expect(slots).toContain('10:30');
+    });
+
+    it('sin excludeAppointmentId debe seguir bloqueando los slots ocupados', async () => {
+      jest.spyOn(service, 'getByEmployee').mockResolvedValueOnce([
+        { id: 'apt-1', appointment_time: '10:00', appointment_date: '2026-03-20',
+          services: [{ id: 's1', name: 'Corte', duration_minutes: 30, price: 25 }] } as any
+      ]);
+      scheduleServiceMock.getByCompany.mockResolvedValueOnce([
+        { day_of_week: 5, start_time: '09:00:00', end_time: '12:00:00' }
+      ]);
+
+      const slots = await service.getAvailableSlots('company-1', 'employee-1', '2026-03-20', 30);
+
+      expect(slots).not.toContain('10:00');
+    });
   });
 
   describe('getByEmployee', () => {
@@ -231,12 +264,192 @@ describe('AppointmentService', () => {
     });
   });
 
+  describe('secreto del token (cancellation_token)', () => {
+    const getSelectArg = (tableIndex = 0, selectCallIndex = 0): string => {
+      const fromResult = mockFromFn.mock.results[tableIndex]?.value as any;
+      return fromResult?.select?.mock?.calls?.[selectCallIndex]?.[0] ?? '';
+    };
+
+    it('getByEmployee debe solicitar columnas explícitas sin cancellation_token', async () => {
+      await service.getByEmployee('emp-1', '2026-03-20');
+
+      const selectArg = getSelectArg();
+      expect(selectArg.trimStart().startsWith('*')).toBe(false);
+      expect(selectArg).not.toContain('cancellation_token');
+      expect(selectArg).toContain('appointment_date');
+      expect(selectArg).toContain('appointment_services');
+    });
+
+    it('getById debe solicitar columnas explícitas sin cancellation_token', async () => {
+      await service.getById('apt-1');
+
+      const selectArg = getSelectArg();
+      expect(selectArg.trimStart().startsWith('*')).toBe(false);
+      expect(selectArg).not.toContain('cancellation_token');
+    });
+
+    it('el insert con retorno de create debe solicitar columnas explícitas sin cancellation_token', async () => {
+      await service.create({
+        company_id: 'company-1',
+        employee_id: 'employee-1',
+        service_ids: ['service-1'],
+        client_name: 'Juan',
+        client_phone: '12345678',
+        appointment_date: '2026-03-20',
+        appointment_time: '10:00'
+      });
+
+      const insertSelectArg = appointmentsInsertMock.mock.results[0]?.value?.select?.mock?.calls?.[0]?.[0] as string;
+      expect(insertSelectArg.trimStart().startsWith('*')).toBe(false);
+      expect(insertSelectArg).not.toContain('cancellation_token');
+    });
+  });
+
   describe('cancel', () => {
     it('debe llamar a update en la tabla appointments', async () => {
       await service.cancel('apt-1');
 
       expect(mockFromFn).toHaveBeenCalledWith('appointments');
       expect(appointmentsUpdateMock).toHaveBeenCalled();
+    });
+  });
+
+  describe('reschedule', () => {
+    const pendingApt = { ...mockAppointment, status: 'pending' as const };
+
+    beforeEach(() => {
+      jest.spyOn(service, 'getById').mockResolvedValue(pendingApt as any);
+    });
+
+    it('debe escribir solo fecha y hora (sin status ni otros campos)', async () => {
+      await service.reschedule('apt-1', '2026-03-25', '15:00');
+
+      expect(appointmentsUpdateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          appointment_date: '2026-03-25',
+          appointment_time: '15:00'
+        })
+      );
+      const callArgs = appointmentsUpdateMock.mock.calls.at(-1)[0];
+      expect(callArgs.status).toBeUndefined();
+      expect(callArgs.client_name).toBeUndefined();
+      expect(callArgs.updated_at).toBeDefined();
+    });
+
+    it('debe validar disponibilidad excluyendo su propia cita', async () => {
+      // cita original: 2026-03-20 10:00 con servicio de 30 min — moverla al mismo slot no debe fallar
+      await service.reschedule('apt-1', '2026-03-20', '10:00');
+
+      expect(appointmentsUpdateMock).toHaveBeenCalledWith(
+        expect.objectContaining({ appointment_date: '2026-03-20', appointment_time: '10:00' })
+      );
+    });
+
+    it('debe lanzar error y no escribir cuando el horario está ocupado', async () => {
+      // checkAvailability encuentra otra cita de 60 min a las 10:00
+      mockFromFn.mockImplementationOnce(() => ({
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              neq: () => ({
+                neq: () => Promise.resolve({
+                  data: [{ appointment_time: '10:00', services: [{ service: { duration_minutes: 60 } }] }],
+                  error: null
+                }),
+                error: null
+              })
+            })
+          })
+        })
+      }));
+
+      await expect(
+        service.reschedule('apt-1', '2026-03-20', '10:00')
+      ).rejects.toThrow('El horario ya no está disponible');
+
+      expect(appointmentsUpdateMock).not.toHaveBeenCalled();
+    });
+
+    it('debe lanzar error si la cita no está pendiente', async () => {
+      jest.spyOn(service, 'getById').mockResolvedValueOnce({
+        ...mockAppointment,
+        status: 'cancelled'
+      } as any);
+
+      await expect(
+        service.reschedule('apt-1', '2026-03-25', '15:00')
+      ).rejects.toThrow('Esta cita ya no se puede reprogramar');
+
+      expect(appointmentsUpdateMock).not.toHaveBeenCalled();
+    });
+
+    it('debe retornar la cita actualizada tras el cambio', async () => {
+      const updated = await service.reschedule('apt-1', '2026-03-25', '15:00');
+      expect(updated).toEqual(pendingApt);
+    });
+  });
+
+  describe('getByToken', () => {
+    it('debe llamar al RPC get_appointment_by_token con el token', async () => {
+      const tokenRow = {
+        id: 'apt-1',
+        company_id: 'company-1',
+        employee_id: 'employee-1',
+        client_name: 'Juan Pérez',
+        appointment_date: '2026-03-20',
+        appointment_time: '10:00:00',
+        status: 'pending',
+        company_name: 'Peluquería Juan',
+        company_address: 'Calle 1',
+        company_phone: '555',
+        employee_name: 'Juan Empleado',
+        services: [{ name: 'Corte', duration_minutes: 30, price: 25 }],
+        total_duration: 30
+      };
+      mockRpcFn.mockResolvedValueOnce({ data: tokenRow, error: null });
+
+      const result = await service.getByToken('token-123');
+
+      expect(mockRpcFn).toHaveBeenCalledWith('get_appointment_by_token', { p_token: 'token-123' });
+      expect(result).toEqual(tokenRow);
+    });
+
+    it('debe retornar null cuando el token no existe', async () => {
+      mockRpcFn.mockResolvedValueOnce({ data: null, error: null });
+
+      const result = await service.getByToken('token-inexistente');
+
+      expect(result).toBeNull();
+    });
+
+    it('debe propagar el error del RPC', async () => {
+      mockRpcFn.mockResolvedValueOnce({ data: null, error: new Error('DB error') });
+
+      await expect(service.getByToken('token-123')).rejects.toThrow('DB error');
+    });
+  });
+
+  describe('rescheduleByToken', () => {
+    it('debe llamar al RPC reschedule_appointment_by_token con token, fecha y hora', async () => {
+      const updatedRow = { id: 'apt-1', appointment_date: '2026-03-25', appointment_time: '15:00:00' };
+      mockRpcFn.mockResolvedValueOnce({ data: updatedRow, error: null });
+
+      const result = await service.rescheduleByToken('token-123', '2026-03-25', '15:00');
+
+      expect(mockRpcFn).toHaveBeenCalledWith('reschedule_appointment_by_token', {
+        p_token: 'token-123',
+        p_date: '2026-03-25',
+        p_time: '15:00'
+      });
+      expect(result).toEqual(updatedRow);
+    });
+
+    it('debe propagar el error del RPC cuando la validación falla', async () => {
+      mockRpcFn.mockResolvedValueOnce({ data: null, error: new Error('El horario ya no está disponible') });
+
+      await expect(
+        service.rescheduleByToken('token-123', '2026-03-25', '15:00')
+      ).rejects.toThrow('El horario ya no está disponible');
     });
   });
 
