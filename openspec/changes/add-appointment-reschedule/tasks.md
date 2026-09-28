@@ -5,7 +5,7 @@
 - [x] 1.3 Implement `reschedule_appointment_by_token(p_token text, p_date date, p_time time)`: advisory lock on (employee, date), `FOR UPDATE` on the token row, then validate token → status `pending` → future date/time → bookable employee → no overlap with other non-cancelled appointments (duration = sum of `appointment_services`, fallback `service_id`, fallback 30 min); `UPDATE … RETURNING *`
 - [x] 1.4 Use the Spanish messages from the design (`'Enlace inválido o cita no encontrada'`, `'Esta cita ya no se puede reprogramar'`, `'La nueva fecha debe ser futura'`, `'El profesional no está disponible'`, `'El horario ya no está disponible'`)
 - [x] 1.5 Effective grant pattern (a column-only REVOKE is a no-op while `anon` holds table-level SELECT): `REVOKE ALL PRIVILEGES ON appointments FROM anon; GRANT INSERT …; GRANT SELECT (<all columns except cancellation_token>) TO anon`, plus `GRANT EXECUTE ON FUNCTION … TO anon, authenticated` for both functions
-- [x] 1.6 Two-step apply: (a) ejecutar `…_rpcs.sql` (Paso 1/2) en el SQL Editor y smoke-test both functions: valid token, unknown token, non-pending appointment, overlapping slot (el reschedule dentro de `BEGIN…ROLLBACK`); (b) ejecutar `…_grants.sql` (Paso 2/2) solo después del deploy del frontend, verificando que booking/calendario siguen funcionando y que un `select cancellation_token` anónimo es rechazado — *(completado; se corrigió `make_interval(mins => bigint)` con cast `::int` en el overlap check)*
+- [ ] 1.6 Two-step apply: (a) ejecutar `…_rpcs.sql` (Paso 1/2) en el SQL Editor y smoke-test both functions: valid token, unknown token, non-pending appointment, overlapping slot (el reschedule dentro de `BEGIN…ROLLBACK`); (b) ejecutar `…_grants.sql` (Paso 2/2) solo después del deploy del frontend, verificando que booking/calendario siguen funcionando y que un `select cancellation_token` anónimo es rechazado
 
 ## 2. Service and model layer
 
@@ -48,7 +48,7 @@
 ## 6. Verification and rollout
 
 - [x] 6.1 Run the frontend suite (`npm test` in `app-web`) and confirm no regressions in booking, cancellation, service-edit and payment flows *(39 suites / 850 tests OK, tsc limpio)*
-- [x] 6.2 Manual end-to-end (client): book an appointment, open the emailed `/reprogramar/{token}` link, move it, verify the success screen, the new slot blocking the old one, and the email — *(verificado en producción con cita real)*
-- [x] 6.3 Manual end-to-end (manager): reschedule a pending appointment from `/bo/appointments`, verify the toast, the refreshed card, the availability of the freed slot and the email — *(verificado con 2 citas reales)*
-- [x] 6.4 Negative checks: token of a cancelled appointment, unknown token, past date, slot taken by another appointment, and an anonymous `select=cancellation_token` request rejected by the column privilege — *(enlaces inválidos y estado no-pending vistos en real; slot ocupado devuelve 'El horario ya no está disponible' tras el fix; privilegio verificado vía `has_column_privilege`: anon sin SELECT en cancellation_token, tabla-revoke efectivo, INSERT intacto)*
-- [x] 6.5 Confirm the deploy order (frontend explicit column list first, then the migration) and record the rollback steps from the design — *(orden respetado: columnas explícitas → RPCs → grants; rollback documentado en el header de `…_grants.sql` y en design.md)*
+- [ ] 6.2 Manual end-to-end (client): book an appointment, open the emailed `/reprogramar/{token}` link, move it, verify the success screen, the new slot blocking the old one, and the email
+- [ ] 6.3 Manual end-to-end (manager): reschedule a pending appointment from `/bo/appointments`, verify the toast, the refreshed card, the availability of the freed slot and the email
+- [ ] 6.4 Negative checks: token of a cancelled appointment, unknown token, past date, slot taken by another appointment, and an anonymous `select=cancellation_token` request rejected by the column privilege
+- [ ] 6.5 Confirm the deploy order (frontend explicit column list first, then the migration) and record the rollback steps from the design
