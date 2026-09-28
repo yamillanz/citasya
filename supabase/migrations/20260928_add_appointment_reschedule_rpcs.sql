@@ -176,11 +176,13 @@ BEGIN
   );
 
   -- 6. Solapamiento con otras citas no canceladas del mismo empleado
+  -- NOTA: SUM(int) devuelve bigint y make_interval(mins =>) solo acepta integer,
+  -- por eso el cast explícito ::int (sin él: "function make_interval(mins => bigint) does not exist")
   IF EXISTS (
     SELECT 1
     FROM appointments a
     LEFT JOIN LATERAL (
-      SELECT COALESCE(SUM(s.duration_minutes), 0) AS duration
+      SELECT COALESCE(SUM(s.duration_minutes), 0)::int AS duration
       FROM appointment_services aps
       JOIN services s ON s.id = aps.service_id
       WHERE aps.appointment_id = a.id
