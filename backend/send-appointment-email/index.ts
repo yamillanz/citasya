@@ -1,6 +1,6 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
-type EventType = 'created' | 'cancelled' | 'no_show';
+type EventType = 'created' | 'cancelled' | 'no_show' | 'rescheduled';
 
 interface AppointmentData {
   id: string;
@@ -21,12 +21,14 @@ const STATUS_LABELS: Record<EventType, string> = {
   created: 'CONFIRMADA',
   cancelled: 'CANCELADA',
   'no_show': 'NO ASISTIÓ',
+  rescheduled: 'REPROGRAMADA',
 };
 
 const STATUS_COLORS: Record<EventType, string> = {
   created: '#9DC183',
   cancelled: '#E74C3C',
   'no_show': '#F39C12',
+  rescheduled: '#5D9CEC',
 };
 
 function buildSubject(eventType: EventType, clientName: string): string {
@@ -48,6 +50,8 @@ function buildEmailText(eventType: EventType, data: AppointmentData): string {
     lines.push(`Tu cita ha sido confirmada en ${data.company.name}.`);
   } else if (eventType === 'cancelled') {
     lines.push(`Tu cita ha sido cancelada en ${data.company.name}.`);
+  } else if (eventType === 'rescheduled') {
+    lines.push(`Tu cita fue reprogramada en ${data.company.name}. Nueva fecha y hora abajo.`);
   } else {
     lines.push(`El cliente no asistió a la cita en ${data.company.name}.`);
   }
@@ -86,6 +90,8 @@ function buildEmailHtml(eventType: EventType, data: AppointmentData): string {
     headline = `Tu cita ha sido <strong>confirmada</strong> en <strong>${data.company.name}</strong>`;
   } else if (eventType === 'cancelled') {
     headline = `Tu cita ha sido <strong>cancelada</strong> en <strong>${data.company.name}</strong>`;
+  } else if (eventType === 'rescheduled') {
+    headline = `Tu cita fue <strong>reprogramada</strong> en <strong>${data.company.name}</strong>. Nueva fecha: <strong>${formatDate(data.appointment_date)}</strong> a las <strong>${data.appointment_time}</strong>`;
   } else {
     headline = `El cliente <strong>no asistió</strong> a la cita en <strong>${data.company.name}</strong>`;
   }
@@ -189,8 +195,8 @@ function buildClientEmail(eventType: EventType, data: AppointmentData, appUrl: s
   let fullText = text;
   const html = buildEmailHtml(eventType, data);
 
-  if (eventType === 'created' && data.cancellation_token) {
-    fullText += `\n\n---\n¿Necesitas cancelar? Haz clic aquí:\n${appUrl}/cancelar/${data.cancellation_token}`;
+  if ((eventType === 'created' || eventType === 'rescheduled') && data.cancellation_token) {
+    fullText += `\n\n---\n¿Necesitas reprogramar tu cita? Haz clic aquí:\n${appUrl}/reprogramar/${data.cancellation_token}`;
   }
 
   return { subject: buildSubject(eventType, data.client_name), text: fullText, html };
@@ -201,6 +207,8 @@ function buildEmployeeEmail(eventType: EventType, data: AppointmentData): { subj
     ? 'Nueva cita agendada'
     : eventType === 'cancelled'
     ? 'Cita cancelada'
+    : eventType === 'rescheduled'
+    ? 'Cita reprogramada'
     : 'Cliente no asistió';
 
   const text = `${prefix}\n\n${buildEmailText(eventType, data)}`;
@@ -212,7 +220,11 @@ function buildEmployeeEmail(eventType: EventType, data: AppointmentData): { subj
 function buildManagerEmail(eventType: EventType, data: AppointmentData): { subject: string; text: string; html: string } {
   const prefix = eventType === 'created'
     ? 'Nueva cita agendada'
-    : 'Cita cancelada';
+    : eventType === 'rescheduled'
+    ? 'Cita reprogramada'
+    : eventType === 'cancelled'
+    ? 'Cita cancelada'
+    : 'Cliente no asistió';
 
   const text = `${prefix} para ${data.employee.full_name}\n\n${buildEmailText(eventType, data)}`;
   const html = buildEmailHtml(eventType, data);
@@ -266,7 +278,7 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    if (!['created', 'cancelled', 'no_show'].includes(event_type)) {
+    if (!['created', 'cancelled', 'no_show', 'rescheduled'].includes(event_type)) {
       return new Response(JSON.stringify({ error: 'event_type inválido' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

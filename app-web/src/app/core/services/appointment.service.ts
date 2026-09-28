@@ -11,19 +11,31 @@ export class AppointmentService {
   private supabase: SupabaseClient = supabase;
   private scheduleService = inject(ScheduleService);
 
+  // Lista explícita de columnas: NO incluye cancellation_token, que es secreto
+  // (REVOKE SELECT (cancellation_token) ON appointments FROM anon).
+  private static readonly APPOINTMENT_COLUMNS = `
+    id, company_id, employee_id, service_id, client_name, client_phone,
+    client_email, appointment_date, appointment_time, status,
+    amount_collected, notes, is_paid, payment_method, payment_reference,
+    payment_amount_bs, payment_date, receipt_url, payment_receipt_url,
+    exchange_rate, amount_in_bs, observations, created_at, updated_at
+  `;
+
+  private static readonly APPOINTMENT_SELECT = `
+    ${AppointmentService.APPOINTMENT_COLUMNS},
+    services:appointment_services(
+      service:services(*)
+    )
+  `;
+
   async getByEmployee(employeeId: string, date: string): Promise<Appointment[]> {
     const { data, error } = await this.supabase
       .from('appointments')
-      .select(`
-        *,
-        services:appointment_services(
-          service:services(*)
-        )
-      `)
+      .select(AppointmentService.APPOINTMENT_SELECT)
       .eq('employee_id', employeeId)
       .eq('appointment_date', date)
       .neq('status', 'cancelled');
-    
+
     if (error) throw error;
     return data?.map(apt => this.flattenServices(apt)) || [];
   }
@@ -63,16 +75,17 @@ export class AppointmentService {
     return data?.map(apt => this.flattenServices(apt)) || [];
   }
 
-  async getAvailableSlots(companyId: string, employeeId: string, date: string, durationMinutes: number): Promise<string[]> {
+  async getAvailableSlots(companyId: string, employeeId: string, date: string, durationMinutes: number, excludeAppointmentId?: string): Promise<string[]> {
     const [year, month, day] = date.split('-').map(Number);
     const dayOfWeek = new Date(year, month - 1, day).getDay();
-    
+
     const schedules = await this.scheduleService.getByCompany(companyId);
     const daySchedule = schedules.find(s => s.day_of_week === dayOfWeek);
-    
+
     if (!daySchedule) return [];
 
-    const appointments = await this.getByEmployee(employeeId, date);
+    const appointments = (await this.getByEmployee(employeeId, date))
+      .filter(apt => apt.id !== excludeAppointmentId);
     
     const slots: string[] = [];
     const [startHour, startMin] = daySchedule.start_time.split(':').map(Number);
@@ -141,7 +154,7 @@ export class AppointmentService {
         status: 'pending',
         cancellation_token: crypto.randomUUID()
       })
-      .select()
+      .select(AppointmentService.APPOINTMENT_COLUMNS)
       .single();
     
     if (aptError) throw aptError;
@@ -367,15 +380,61 @@ export class AppointmentService {
     return this.getById(appointmentId);
   }
 
+  async reschedule(appointmentId: string, date: string, time: string): Promise<Appointment> {
+    const appointment = await this.getById(appointmentId);
+
+    if (appointment.status !== 'pending') {
+      throw new Error('Esta cita ya no se puede reprogramar');
+    }
+
+    const totalDuration = calculateTotalDuration(appointment.services || []);
+
+    const isAvailable = await this.checkAvailability(
+      appointment.employee_id,
+      date,
+      time,
+      totalDuration,
+      appointmentId
+    );
+
+    if (!isAvailable) {
+      throw new Error('El horario ya no está disponible');
+    }
+
+    const { error } = await this.supabase
+      .from('appointments')
+      .update({
+        appointment_date: date,
+        appointment_time: time,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', appointmentId);
+
+    if (error) throw error;
+
+    return this.getById(appointmentId);
+  }
+
+  async getByToken(token: string): Promise<any> {
+    const { data, error } = await this.supabase
+      .rpc('get_appointment_by_token', { p_token: token });
+
+    if (error) throw error;
+    return data || null;
+  }
+
+  async rescheduleByToken(token: string, date: string, time: string): Promise<any> {
+    const { data, error } = await this.supabase
+      .rpc('reschedule_appointment_by_token', { p_token: token, p_date: date, p_time: time });
+
+    if (error) throw error;
+    return data;
+  }
+
   async getById(id: string): Promise<Appointment> {
     const { data, error } = await this.supabase
       .from('appointments')
-      .select(`
-        *,
-        services:appointment_services(
-          service:services(*)
-        )
-      `)
+      .select(AppointmentService.APPOINTMENT_SELECT)
       .eq('id', id)
       .single();
 

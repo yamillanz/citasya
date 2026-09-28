@@ -71,6 +71,14 @@ export function calculateTotalDuration(services: Service[]): number {
   return services.reduce((sum, service) => sum + service.duration_minutes, 0);
 }
 
+// Parse 'YYYY-MM-DD' como fecha LOCAL.
+// new Date('YYYY-MM-DD') se interpreta como medianoche UTC y, en zonas con
+// offset negativo (ej: Venezuela UTC-4), muestra un día menos.
+export function parseDateOnly(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y || 1970, (m || 1) - 1, d || 1);
+}
+
 export function calculateTotalPrice(services: Service[]): number {
   return services.reduce((sum, service) => sum + (service.price || 0), 0);
 }

@@ -17,9 +17,10 @@ import { EmailNotificationService } from '../../../../core/services/email-notifi
 import { UserService } from '../../../../core/services/user.service';
 import { ExchangeRateStorageService } from '../../../../core/services/exchange-rate-storage.service';
 import { StorageService } from '../../../../core/services/storage.service';
-import { Appointment, AppointmentStatus, PaymentMethod, calculateTotalDuration, calculateTotalPrice, formatServicesList } from '../../../../core/models/appointment.model';
+import { Appointment, AppointmentStatus, PaymentMethod, calculateTotalDuration, calculateTotalPrice, formatServicesList, parseDateOnly } from '../../../../core/models/appointment.model';
 import { User } from '../../../../core/models/user.model';
 import { ManagerAppointmentCreateDialogComponent } from './manager-appointment-create-dialog.component';
+import { ManagerAppointmentRescheduleDialogComponent } from './manager-appointment-reschedule-dialog.component';
 import { ImageUploadComponent } from '../../../../shared/components/image-upload/image-upload.component';
 
 interface FilterOption {
@@ -47,6 +48,7 @@ interface DateGroup {
     TooltipModule,
     DialogModule,
     ManagerAppointmentCreateDialogComponent,
+    ManagerAppointmentRescheduleDialogComponent,
     ImageUploadComponent
   ],
   templateUrl: './appointments.component.html',
@@ -90,6 +92,8 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
   // Drawer state
   showStatusDialog = signal(false);
   showCreateDialog = signal(false);
+  showRescheduleDialog = signal(false);
+  rescheduleAppointment = signal<Appointment | null>(null);
   selectedAppointment = signal<Appointment | null>(null);
   statusAction = signal<'completed' | 'cancelled' | 'no_show' | 'paid' | null>(null);
   amountCollected = signal<number>(0);
@@ -316,6 +320,26 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
   handleAppointmentCreated() {
     this.showCreateDialog.set(false);
     this.appointmentsResource.reload();
+  }
+
+  openRescheduleDialog(appointment: Appointment) {
+    this.rescheduleAppointment.set(appointment);
+    this.showRescheduleDialog.set(true);
+  }
+
+  handleAppointmentRescheduled() {
+    this.showRescheduleDialog.set(false);
+    const apt = this.rescheduleAppointment();
+    this.rescheduleAppointment.set(null);
+    if (apt) {
+      this.emailNotificationService.notify(apt.id, 'rescheduled');
+    }
+    this.appointmentsResource.reload();
+  }
+
+  handleRescheduleClosed() {
+    this.showRescheduleDialog.set(false);
+    this.rescheduleAppointment.set(null);
   }
 
   onSearch(event: Event) {
@@ -631,8 +655,7 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
   }
 
   formatDate(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('es-ES', {
+    return parseDateOnly(dateStr).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: 'short',
       year: 'numeric'
@@ -640,16 +663,14 @@ export class AppointmentsComponent implements OnInit, OnDestroy {
   }
 
   formatDateShort(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('es-ES', {
+    return parseDateOnly(dateStr).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: 'short'
     });
   }
 
   formatDateFull(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('es-ES', {
+    return parseDateOnly(dateStr).toLocaleDateString('es-ES', {
       weekday: 'long',
       day: '2-digit',
       month: 'long',
