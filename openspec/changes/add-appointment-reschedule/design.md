@@ -72,7 +72,7 @@ The RPC takes `pg_advisory_xact_lock(hashtext(employee_id || date))` before vali
 
 ### D7 — Email link: replace the dead cancel link with the working reschedule link
 
-`buildClientEmail` currently appends "¿Necesitas cancelar? … /cancelar/{token}". Since that route does not exist, the change replaces that block with "¿Necesitas reprogramar tu cita? … /reprogramar/{token}". Client cancellation remains out of scope; the proposal's Non-Goals record it.
+`buildClientEmail` currently appends "¿Necesitas cancelar? … /cancelar/{token}". Since that route does not exist, the change replaces that block with "¿Necesitas reprogramar tu cita? … /reprogramar/{token}". The link is included in both parts of the email: the plain-text body and the HTML body, where it renders as a styled CTA button ("Reprogramar mi cita") — modern clients (Gmail) render the HTML part, so a text-only link would be invisible. Client cancellation remains out of scope; the proposal's Non-Goals record it.
 
 ### D8 — Manager UI: new dialog opened from the list card, not the shared detail dialog
 

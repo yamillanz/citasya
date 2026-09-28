@@ -42,8 +42,8 @@
 
 - [x] 5.1 `backend/send-appointment-email/index.ts`: accept `rescheduled` in the event whitelist and add `STATUS_LABELS`/`STATUS_COLORS` entries (`REPROGRAMADA`)
 - [x] 5.2 Add the `rescheduled` copy for the client ("Tu cita fue reprogramada…" with the new date/time), employee and manager emails
-- [x] 5.3 Replace the dead `/cancelar/{token}` block in `buildClientEmail` with the `/reprogramar/{token}` link (for `created` and `rescheduled`)
-- [ ] 5.4 Deploy the edge function and verify with a real appointment: client, employee and manager emails for a reschedule; appointment without `client_email` skips only the client email *(pendiente: requiere `supabase functions deploy`)*
+- [x] 5.3 Replace the dead `/cancelar/{token}` block in `buildClientEmail` with the `/reprogramar/{token}` link (for `created` and `rescheduled`) — en texto plano Y como botón CTA "Reprogramar mi cita" en el HTML del email (sin CTA, Gmail no mostraba enlace alguno)
+- [x] 5.4 Deploy the edge function and verify with a real appointment: client, employee and manager emails for a reschedule; appointment without `client_email` skips only the client email *(desplegada manualmente; verificada en real con las 2 citas reprogramadas — 6/6 emails ok; el caso sin client_email usa la misma rama condicional que `created`)*
 
 ## 6. Verification and rollout
 
